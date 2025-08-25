@@ -2697,7 +2697,7 @@ class ChaosSimulator {
     const grid = Array(14).fill().map(() => Array(78).fill(' '));
     
     // Add title in top-left corner
-    const title = 'Agent Chaos Theater 🎭';
+    const title = 'Agent Chaos Theatre 🎭';
     const version = 'v1.1';
     for (let i = 0; i < title.length && i < 78; i++) {
       grid[0][i + 2] = title[i];
@@ -3044,7 +3044,14 @@ window.sim = sim;
 // Chaos Lab Tour Implementation
 class ChaosLabTour {
   constructor() {
-    this.driver = new Driver({
+    // Check if Driver.js is loaded properly
+    const DriverConstructor = window.driver?.js?.driver || window.Driver;
+    if (!DriverConstructor) {
+      console.error('Driver.js failed to load. Tour functionality unavailable.');
+      this.driver = null; // Set to null instead of returning
+    } else {
+      // Call as function, not with new
+      this.driver = DriverConstructor({
       showProgress: true,
       showButtons: ['next', 'previous', 'close'],
       keyboardControl: true,
@@ -3056,6 +3063,7 @@ class ChaosLabTour {
       prevBtnText: '< BACK',
       steps: this.getTourSteps()
     });
+    }
 
     this.setupEventHandlers();
     this.checkFirstVisit();
@@ -3151,20 +3159,15 @@ class ChaosLabTour {
 
   setupEventHandlers() {
     // Tour button click handler
-    document.getElementById('tourBtn').addEventListener('click', () => {
-      this.startTour();
-    });
+    const tourBtn = document.getElementById('tourBtn');
+    if (tourBtn) {
+      tourBtn.addEventListener('click', () => {
+        this.startTour();
+      });
+    }
 
-    // Driver.js event handlers
-    this.driver.on('completed', () => {
-      localStorage.setItem('chaosLabTourCompleted', 'true');
-      this.showCompletionMessage();
-    });
-
-    this.driver.on('reset', () => {
-      // Clean up any changes made during tour
-      this.restoreOriginalState();
-    });
+    // Driver.js doesn't use .on() for events - removed event handlers
+    // Tour completion is handled in the last step instead
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
@@ -3185,6 +3188,12 @@ class ChaosLabTour {
   }
 
   startTour() {
+    if (!this.driver) {
+      console.warn('Tour not available - Driver.js not loaded');
+      return;
+    }
+    // Use drive() method to start the tour
+    this.driver.drive();
     // Ensure we're on scenarios mode for the tour
     const scenarioMode = document.getElementById('scenarioMode');
     if (scenarioMode && !scenarioMode.classList.contains('active')) {
@@ -3242,18 +3251,38 @@ tourStyles.textContent = `
 `;
 document.head.appendChild(tourStyles);
 
-// Initialize tour when page loads
-document.addEventListener('DOMContentLoaded', () => {
-  window.chaosLabTour = new ChaosLabTour();
-});
-
-// Fallback initialization if DOMContentLoaded already fired
-if (document.readyState === 'loading') {
-  // DOMContentLoaded will fire
-} else {
-  // Document is already loaded
-  window.chaosLabTour = new ChaosLabTour();
+// Initialize tour when page loads with proper Driver.js check
+function initializeTour() {
+  // Wait a bit for Driver.js to fully load from CDN
+  setTimeout(() => {
+    const DriverConstructor = window.driver?.js?.driver || window.Driver;
+    if (DriverConstructor) {
+      window.chaosLabTour = new ChaosLabTour();
+    } else {
+      console.warn('Driver.js not available. Tour functionality disabled.');
+      // Hide tour button if Driver.js fails to load
+      const tourBtn = document.getElementById('tourBtn');
+      if (tourBtn) {
+        tourBtn.style.display = 'none';
+      }
+    }
+  }, 100);
 }
+
+// Try multiple initialization approaches
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeTour);
+} else {
+  // Document already loaded
+  initializeTour();
+}
+
+// Also try on window load as fallback
+window.addEventListener('load', () => {
+  if (!window.chaosLabTour) {
+    initializeTour();
+  }
+});
 </script>
 
 </body>
