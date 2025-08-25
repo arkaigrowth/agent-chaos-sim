@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Chaos Theatre — Playground</title>
+<link rel="stylesheet" href="./theatre.css"/>
+<style> body{background:#0A0E14;color:#E5E7EB;font:14px ui-monospace,monospace; margin:0; padding:16px;} .wrap{max-width:1000px;margin:0 auto;} .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;} .mt8{margin-top:8px;} </style>
+</head>
+<body>
+<div class="wrap card">
+  <h2>Chaos Theatre — Playground</h2>
+  <div class="row mt8">
+    <label>Seed <input id="seed" class="input" value="1337" style="width:100px"/></label>
+    <label>Scenario
+      <select id="scenario" class="select">
+        <option value="fetch">Fetch → Parse → Summarize</option>
+        <option value="rag">RAG Retrieve → Answer</option>
+        <option value="json">JSON parse → Table</option>
+      </select>
+    </label>
+    <button id="start" class="btn">Start</button>
+    <label><input type="checkbox" id="asciiOnly"/> ASCII-only</label>
+    <label><input type="checkbox" id="soundOn"/> Sound ON</label>
+    <label><input type="checkbox" id="mouseSpice"/> Mouse spice</label>
+  </div>
+
+  <pre id="stage" class="ascii" aria-live="polite" aria-label="Chaos visualization"></pre>
+  <div id="timelineRail" class="timeline">Timeline: </div>
+
+  <div class="toolbar">
+    <button class="btn" data-f="latency">🐌 Latency</button>
+    <button class="btn" data-f="500">☁ 500</button>
+    <button class="btn" data-f="429">⛔ 429</button>
+    <button class="btn" data-f="malformed_json">▢ Malformed JSON</button>
+    <button class="btn" data-f="tool_unavailable">⊘ Tool off</button>
+    <button class="btn" data-f="context_truncate">💣 Context</button>
+    <button class="btn" data-f="inject">🪤 Injection</button>
+    <button class="btn" id="retry">🔄 retry()</button>
+    <button class="btn" id="fallback">🪂 fallback</button>
+    <button class="btn" id="loop">⤾ loop arrest</button>
+    <button class="btn" id="ok">✓ recovered</button>
+    <button class="btn" id="score">🏁 finish + score</button>
+    <button class="btn" id="autoplay">▶ autoplay faults</button>
+    <button class="btn" id="stop">■ stop</button>
+  </div>
+
+  <div class="hint">Legend: ● packet · ☁500 · ⛔429 · ⏳ latency · ▢→◇ malformed · ⊘ tool · 💣 ctx · ✓ recovered</div>
+</div>
+
+<script src="./theatre.js"></script>
+<script>
+const theatre = new ChaosTheatre();
+
+document.getElementById('start').onclick = ()=>{
+  theatre.start(document.getElementById('seed').value || "1337", document.getElementById('scenario').value);
+};
+
+document.querySelectorAll('.toolbar .btn[data-f]').forEach(btn=>{
+  btn.onclick = ()=>{
+    const t = btn.dataset.f;
+    if (t==='latency') theatre.event('fault', {type:'latency', delay_ms: 2000});
+    else theatre.event('fault', {type: t});
+  };
+});
+
+let attempts = 0;
+document.getElementById('retry').onclick = ()=> theatre.event('retry',{attempts: ++attempts, backoff_ms: attempts*300});
+document.getElementById('fallback').onclick = ()=> theatre.event('fallback',{});
+document.getElementById('loop').onclick = ()=> theatre.event('loop_arrest',{});
+document.getElementById('ok').onclick = ()=> theatre.event('recovered',{action:`retry(${attempts})`});
+document.getElementById('score').onclick = ()=> theatre.finish(82);
+
+let auto = null;
+document.getElementById('autoplay').onclick = ()=>{
+  if (auto) return;
+  const faults = ['latency','500','429','malformed_json','tool_unavailable','context_truncate','inject'];
+  auto = setInterval(()=>{
+    const pick = faults[Math.floor(Math.random()*faults.length)];
+    if (pick==='latency') theatre.event('fault',{type:'latency', delay_ms: 1200});
+    else theatre.event('fault',{type: pick});
+    if (Math.random()>0.6) theatre.event('retry',{attempts: 1+Math.floor(Math.random()*3)});
+    if (Math.random()>0.8) theatre.event('fallback',{});
+  }, 1500);
+};
+document.getElementById('stop').onclick = ()=>{ if (auto) clearInterval(auto); auto=null; theatre.stop(); };
+</script>
+</body>
+</html>

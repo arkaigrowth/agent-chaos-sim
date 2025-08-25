@@ -1,0 +1,65 @@
+hero:
+  title: "Ship agents that don't flinch"
+  sub: "Production-grade resilience testing. Inject faults systematically. Measure MTTR. Prove reliability before launch."
+story:
+  step1: 
+    title: "Define failure scenarios"
+    sub: "Configure exact fault conditions to test"
+  step2: 
+    title: "Establish baseline"
+    sub: "Document expected behavior under normal conditions"
+  step3: 
+    title: "Execute chaos tests"
+    sub: "Systematic fault injection with full observability"
+  step4: 
+    title: "Analyze recovery"
+    sub: "MTTR metrics, success rates, failure patterns"
+about:
+  title: "Enterprise resilience testing"
+  short:
+    title: "Production-ready testing"
+    body: "Systematic fault injection framework for autonomous agents. Simulate network failures, API errors, and data corruption. Quantify mean time to recovery and validate fallback strategies."
+  when:
+    title: "Critical use cases"
+    items:
+      - "Pre-production validation of mission-critical agents"
+      - "Compliance documentation for reliability standards"
+      - "Root cause analysis of production incidents"
+  score:
+    title: "Reliability metrics"
+    body: "Industry-standard calculations: availability percentage, MTTR, failure containment rate. Scores map directly to SLA targets."
+tooltips:
+  btnBaseline: "Establish control metrics under normal operating conditions"
+  btnChaos: "Execute configured fault injection test suite"
+  btnReplay: "Reproduce exact test conditions with locked seed"
+  btnPermalink: "Generate audit trail link with full configuration"
+  btnDownload: "Export compliance-ready test results as JSON"
+  btnViewConfig: "Inspect current test configuration parameters"
+  btnCopyConfig: "Archive configuration for test reproducibility"
+  scenario_fetch: "Validate external API integration resilience patterns"
+  scenario_rag: "Test retrieval pipeline fault tolerance mechanisms"
+  scenario_json: "Verify data parsing error handling procedures"
+  latencyMs: "Network latency simulation in milliseconds"
+  latencyRate: "Percentage of requests experiencing latency"
+  http500Rate: "Server error injection rate (0-100%)"
+  rate429: "Rate limit simulation frequency (0-100%)"
+  malformedRate: "Data corruption injection rate (0-100%)"
+  toolUnavailableSteps: "Specify components to mark unavailable"
+  injSeed: "Deterministic seed for fault pattern generation"
+  ctxBytes: "Context window limit for truncation testing"
+  tripwireOn: "Activate automatic recovery mechanisms"
+  loopN: "Maximum retry attempts per failure"
+  backoffBase: "Initial retry delay in milliseconds"
+  backoffFactor: "Exponential backoff multiplication factor"
+  jitter: "Retry timing randomization percentage"
+  maxRetries: "Absolute retry limit per operation"
+  fallback: "Degraded operation mode configuration"
+  seed: "Master seed for test reproducibility"
+  surprise: "Enable random fault discovery mode"
+alts:
+  - title: "Reliability testing for AI ops"
+    sub: "Systematic fault injection. Compliance-ready reports. Prove your agents meet SLAs before deployment."
+  - title: "Production resilience validation"
+    sub: "Test recovery from 500s, 429s, timeouts. Document MTTR. Export audit trails. Meet reliability standards."
+  - title: "Enterprise agent hardening"
+    sub: "Controlled chaos testing. Measure availability metrics. Validate failover logic. Ship with confidence."

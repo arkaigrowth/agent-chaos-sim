@@ -1,0 +1,65 @@
+hero:
+  title: "Break your agent before users do"
+  sub: "Inject real faults. Watch recovery. Get resilience scores in 60 seconds—no API keys needed."
+story:
+  step1: 
+    title: "Pick a scenario"
+    sub: "Web scraping, RAG Q&A, or JSON parsing"
+  step2: 
+    title: "Run baseline"
+    sub: "Clean run establishes your control metrics"
+  step3: 
+    title: "Toggle chaos"
+    sub: "500s, 429s, timeouts—deterministic and repeatable"
+  step4: 
+    title: "Compare & remix"
+    sub: "Side-by-side traces, resilience score, one-click fork"
+about:
+  title: "How Chaos Lab works"
+  short:
+    title: "What is this?"
+    body: "A fault injection testbed for agent workflows. Flip switches to simulate API failures, network issues, and malformed responses. See exactly how your agent handles chaos—then fix what breaks."
+  when:
+    title: "When to use Chaos Lab"
+    items:
+      - "Before deploying agents that hit external APIs"
+      - "When debugging mysterious production failures"
+      - "To benchmark retry logic and fallback strategies"
+  score:
+    title: "Resilience Score explained"
+    body: "Combines success-after-fault rate, mean recovery time, and idempotency checks. Higher scores mean your agent keeps working when things break."
+tooltips:
+  btnBaseline: "Run without faults to establish clean baseline metrics"
+  btnChaos: "Run with your configured fault injections active"
+  btnReplay: "Re-run with same seed for deterministic reproduction"
+  btnPermalink: "Get shareable link with current config and seed"
+  btnDownload: "Export full trace as JSON for analysis"
+  btnViewConfig: "Show current chaos configuration in YAML format"
+  btnCopyConfig: "Copy configuration to clipboard for reuse"
+  scenario_fetch: "Web scraping with extraction and summarization pipeline"
+  scenario_rag: "Question-answering over retrieved document chunks"
+  scenario_json: "Parse JSON and transform to structured table"
+  latencyMs: "Add milliseconds of delay to each tool call"
+  latencyRate: "Percentage of requests that get delayed (0-100)"
+  http500Rate: "Percentage of requests returning server errors (0-100)"
+  rate429: "Percentage of requests hitting rate limits (0-100)"
+  malformedRate: "Percentage of responses with corrupted data (0-100)"
+  toolUnavailableSteps: "Which pipeline steps report tool unavailable (comma-separated)"
+  injSeed: "Random seed for deterministic fault injection patterns"
+  ctxBytes: "Maximum context window size to simulate truncation"
+  tripwireOn: "Enable automatic retries and exponential backoff"
+  loopN: "Maximum retry attempts before declaring failure"
+  backoffBase: "Initial wait time in milliseconds between retries"
+  backoffFactor: "Multiplier for each subsequent retry delay"
+  jitter: "Add randomness to retry timing (0-100%)"
+  maxRetries: "Hard limit on total retry attempts"
+  fallback: "Backup strategy when all retries exhausted"
+  seed: "Master seed for entire run reproducibility"
+  surprise: "Inject random unplanned faults for discovery testing"
+alts:
+  - title: "Test what breaks your agent"
+    sub: "Zero-config fault injection. See failures, measure recovery, get resilience scores. Fork and customize."
+  - title: "Chaos engineering for AI agents"
+    sub: "Simulate 500s, 429s, timeouts. Watch your agent adapt—or crash. One-click remix included."
+  - title: "Find agent failure modes fast"
+    sub: "Toggle faults. Compare baseline vs chaos. Download traces. Ship agents that handle real-world mess."

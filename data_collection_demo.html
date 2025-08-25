@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Collection Pipeline Demo - Agent Chaos Monkey</title>
+<style>
+body {
+  background: #0a0a0a;
+  color: #00ff41;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.demo-header {
+  text-align: center;
+  padding: 30px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.demo-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #00ff41;
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+  margin-bottom: 10px;
+}
+
+.demo-subtitle {
+  color: #888;
+  font-size: 16px;
+}
+
+.demo-section {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.demo-section h2 {
+  color: #00ff41;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 8px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.feature-card {
+  background: #0f0f0f;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.feature-card h3 {
+  color: #00ff41;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.feature-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.feature-card li {
+  color: #888;
+  font-size: 13px;
+  margin-bottom: 8px;
+  padding-left: 15px;
+  position: relative;
+}
+
+.feature-card li::before {
+  content: '▸';
+  color: #00ff41;
+  position: absolute;
+  left: 0;
+}
+
+.code-example {
+  background: #050505;
+  border: 1px solid #222;
+  border-radius: 4px;
+  padding: 15px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  overflow-x: auto;
+  margin: 15px 0;
+}
+
+.json-key {
+  color: #00ff41;
+}
+
+.json-string {
+  color: #88ff88;
+}
+
+.json-number {
+  color: #ffaa00;
+}
+
+.json-boolean {
+  color: #ff8888;
+}
+
+.test-buttons {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.test-btn {
+  background: #1a1a1a;
+  border: 1px solid #00ff41;
+  color: #00ff41;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.test-btn:hover {
+  background: #00ff41;
+  color: #000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 255, 65, 0.3);
+}
+
+.output {
+  background: #050505;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 15px;
+  min-height: 200px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  color: #888;
+}
+
+.trace-log {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.trace-entry {
+  padding: 5px 0;
+  border-bottom: 1px solid #222;
+  font-size: 11px;
+}
+
+.trace-timestamp {
+  color: #666;
+}
+
+.trace-action {
+  color: #00ff41;
+  font-weight: bold;
+}
+
+.trace-data {
+  color: #888;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.metric-card {
+  background: #0f0f0f;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 15px;
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #00ff41;
+  margin-bottom: 5px;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="demo-header">
+    <div class="demo-title">🎭 Data Collection Pipeline Demo</div>
+    <div class="demo-subtitle">Production-Ready Data Architecture for Agent Chaos Monkey</div>
+  </div>
+
+  <!-- Core Features -->
+  <div class="demo-section">
+    <h2>🏗️ Core Architecture Features</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>📊 DataCollector Class</h3>
+        <ul>
+          <li>UUID-based session management</li>
+          <li>Seed-based reproducibility</li>
+          <li>High-resolution timestamps</li>
+          <li>Comprehensive interaction logging</li>
+          <li>Performance impact monitoring</li>
+        </ul>
+      </div>
+      
+      <div class="feature-card">
+        <h3>🔄 Trace Data Structure</h3>
+        <ul>
+          <li>Standardized JSON format</li>
+          <li>Step-by-step execution traces</li>
+          <li>Effect injection logging</li>
+          <li>Recovery attempt tracking</li>
+          <li>Evaluation result capture</li>
+        </ul>
+      </div>
+      
+      <div class="feature-card">
+        <h3>📤 Export System</h3>
+        <ul>
+          <li>Raw JSON for developers</li>
+          <li>CSV for spreadsheet analysis</li>
+          <li>Human-readable reports</li>
+          <li>Shareable URLs for collaboration</li>
+          <li>Compressed session encoding</li>
+        </ul>
+      </div>
+      
+      <div class="feature-card">
+        <h3>⚡ Performance Monitoring</h3>
+        <ul>
+          <li>Sub-100ms data collection</li>
+          <li>Real-time trace events</li>
+          <li>Memory-efficient logging</li>
+          <li>Performance warning system</li>
+          <li>Resource usage tracking</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Demo -->
+  <div class="demo-section">
+    <h2>🧪 Live Data Collection Demo</h2>
+    
+    <div class="test-buttons">
+      <button class="test-btn" onclick="startDemoSession()">🎬 Start Session</button>
+      <button class="test-btn" onclick="simulateEffects()">⚡ Simulate Effects</button>
+      <button class="test-btn" onclick="simulateRecovery()">🛡️ Simulate Recovery</button>
+      <button class="test-btn" onclick="runEvaluation()">🔍 Run Evaluation</button>
+      <button class="test-btn" onclick="endSession()">🏁 End Session</button>
+    </div>
+    
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-value" id="traceCount">0</div>
+        <div class="metric-label">Total Traces</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="effectCount">0</div>
+        <div class="metric-label">Effects Injected</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="recoveryCount">0</div>
+        <div class="metric-label">Recovery Attempts</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value" id="sessionDuration">0s</div>
+        <div class="metric-label">Session Duration</div>
+      </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div>
+        <h3 style="color: #00ff41; margin-bottom: 10px;">📋 Live Trace Log</h3>
+        <div class="trace-log output" id="traceLog">
+          <div style="color: #666; text-align: center; padding: 20px;">
+            Start a demo session to see live traces...
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <h3 style="color: #00ff41; margin-bottom: 10px;">📊 Session Data Preview</h3>
+        <div class="output" id="sessionPreview">
+          <div style="color: #666; text-align: center; padding: 20px;">
+            Session data will appear here...
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Demo -->
+  <div class="demo-section">
+    <h2>📤 Export System Demo</h2>
+    
+    <div class="test-buttons">
+      <button class="test-btn" onclick="exportJSON()">📄 Export JSON</button>
+      <button class="test-btn" onclick="exportCSV()">📊 Export CSV</button>
+      <button class="test-btn" onclick="exportReport()">📋 Generate Report</button>
+      <button class="test-btn" onclick="generateShareURL()">🔗 Share URL</button>
+    </div>
+    
+    <div id="exportOutput" class="output" style="margin-top: 15px;">
+      Export results will appear here...
+    </div>
+  </div>
+
+  <!-- Data Structure Examples -->
+  <div class="demo-section">
+    <h2>🗂️ Trace Data Structure Examples</h2>
+    
+    <h3 style="color: #888; margin-bottom: 15px;">Effect Injection Trace:</h3>
+    <div class="code-example">
+{
+  <span class="json-key">"step"</span>: <span class="json-number">3</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-string">"2024-01-01T10:30:01.234Z"</span>,
+  <span class="json-key">"relative_time"</span>: <span class="json-number">1234.5</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"effect_injection"</span>,
+  <span class="json-key">"effect_type"</span>: <span class="json-string">"inject_500_error"</span>,
+  <span class="json-key">"target"</span>: <span class="json-string">"fetch_operation"</span>,
+  <span class="json-key">"parameters"</span>: {
+    <span class="json-key">"rate"</span>: <span class="json-string">"50%"</span>,
+    <span class="json-key">"packet_position"</span>: <span class="json-number">23.45</span>
+  },
+  <span class="json-key">"result"</span>: {
+    <span class="json-key">"score_impact"</span>: <span class="json-number">-15</span>,
+    <span class="json-key">"current_score"</span>: <span class="json-number">75</span>
+  },
+  <span class="json-key">"performance_impact"</span>: <span class="json-number">-15</span>
+}
+    </div>
+    
+    <h3 style="color: #888; margin-bottom: 15px;">Recovery Attempt Trace:</h3>
+    <div class="code-example">
+{
+  <span class="json-key">"step"</span>: <span class="json-number">5</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-string">"2024-01-01T10:30:03.567Z"</span>,
+  <span class="json-key">"relative_time"</span>: <span class="json-number">3567.8</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"recovery_attempt"</span>,
+  <span class="json-key">"strategy"</span>: <span class="json-string">"auto_retry"</span>,
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"duration_ms"</span>: <span class="json-number">2300</span>,
+  <span class="json-key">"resilience_score"</span>: <span class="json-number">88</span>,
+  <span class="json-key">"attempt_number"</span>: <span class="json-number">2</span>,
+  <span class="json-key">"packet_position"</span>: <span class="json-number">35.78</span>
+}
+    </div>
+    
+    <h3 style="color: #888; margin-bottom: 15px;">Session Summary:</h3>
+    <div class="code-example">
+{
+  <span class="json-key">"session_id"</span>: <span class="json-string">"cm-1704110200000-abc123def"</span>,
+  <span class="json-key">"seed"</span>: <span class="json-string">"user-defined-seed"</span>,
+  <span class="json-key">"mode"</span>: <span class="json-string">"scenario"</span>,
+  <span class="json-key">"summary"</span>: {
+    <span class="json-key">"total_effects"</span>: <span class="json-number">12</span>,
+    <span class="json-key">"total_recoveries"</span>: <span class="json-number">8</span>,
+    <span class="json-key">"recovery_rate"</span>: <span class="json-number">0.75</span>,
+    <span class="json-key">"avg_resilience"</span>: <span class="json-number">82</span>,
+    <span class="json-key">"final_score"</span>: <span class="json-number">78</span>
+  }
+}
+    </div>
+  </div>
+</div>
+
+<script>
+// Demo DataCollector instance
+let demoCollector = null;
+let demoSession = null;
+let updateInterval = null;
+
+// Enhanced DataCollector class for demo
+class DemoDataCollector {
+  constructor() {
+    this.sessionId = this.generateSessionId();
+    this.userSeed = null;
+    this.traces = [];
+    this.startTimestamp = null;
+    this.configuration = {};
+    this.mode = 'demo';
+    this.performance = {
+      startTime: 0,
+      interactions: 0,
+      effectsInjected: 0,
+      recoveryAttempts: 0
+    };
+  }
+  
+  generateSessionId() {
+    return 'demo-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  }
+  
+  generateSeed() {
+    return 'demo-seed-' + Date.now();
+  }
+  
+  startSession(configuration, mode = 'demo', userSeed = null) {
+    this.startTimestamp = new Date().toISOString();
+    this.userSeed = userSeed || this.generateSeed();
+    this.configuration = JSON.parse(JSON.stringify(configuration));
+    this.mode = mode;
+    this.traces = [];
+    this.performance.startTime = performance.now();
+    
+    this.logTrace('session_start', {
+      session_id: this.sessionId,
+      user_seed: this.userSeed,
+      mode: this.mode,
+      configuration: this.configuration
+    });
+    
+    return {
+      sessionId: this.sessionId,
+      seed: this.userSeed,
+      timestamp: this.startTimestamp
+    };
+  }
+  
+  logTrace(action, data = {}) {
+    const trace = {
+      step: this.traces.length + 1,
+      timestamp: new Date().toISOString(),
+      relative_time: performance.now() - this.performance.startTime,
+      action: action,
+      ...data
+    };
+    
+    this.traces.push(trace);
+    this.performance.interactions++;
+    
+    // Update demo UI
+    updateTraceLog(trace);
+    updateMetrics();
+    updateSessionPreview();
+    
+    return trace;
+  }
+  
+  logEffectInjection(effectType, target, parameters = {}, result = null) {
+    this.performance.effectsInjected++;
+    return this.logTrace('effect_injection', {
+      effect_type: effectType,
+      target: target,
+      parameters: parameters,
+      result: result,
+      performance_impact: this.calculatePerformanceImpact(result)
+    });
+  }
+  
+  logRecoveryAttempt(strategy, success, duration, metadata = {}) {
+    this.performance.recoveryAttempts++;
+    return this.logTrace('recovery_attempt', {
+      strategy: strategy,
+      success: success,
+      duration_ms: duration,
+      resilience_score: this.calculateResilienceScore(success, duration),
+      ...metadata
+    });
+  }
+  
+  logEvaluationResult(testCase, result, score, assertions = []) {
+    return this.logTrace('evaluation_result', {
+      test_case: testCase,
+      result: result,
+      score: score,
+      assertions: assertions,
+      evaluation_metrics: this.calculateEvaluationMetrics(result, score)
+    });
+  }
+  
+  calculatePerformanceImpact(result) {
+    if (!result || typeof result.score_impact !== 'number') return 0;
+    return result.score_impact;
+  }
+  
+  calculateResilienceScore(success, duration) {
+    if (!success) return 0;
+    const baseScore = 75;
+    const timeBonus = Math.max(0, 25 - (duration / 1000 * 5));
+    return Math.round(Math.min(100, baseScore + timeBonus));
+  }
+  
+  calculateEvaluationMetrics(result, score) {
+    return {
+      passed: result === 'pass',
+      score_normalized: score / 100,
+      confidence: score >= 80 ? 'high' : score >= 60 ? 'medium' : 'low'
+    };
+  }
+  
+  endSession(summary = {}) {
+    const endTimestamp = new Date().toISOString();
+    const sessionDuration = performance.now() - this.performance.startTime;
+    
+    const sessionSummary = {
+      session_id: this.sessionId,
+      seed: this.userSeed,
+      start_timestamp: this.startTimestamp,
+      end_timestamp: endTimestamp,
+      duration_ms: sessionDuration,
+      mode: this.mode,
+      configuration: this.configuration,
+      traces: this.traces,
+      performance: {
+        ...this.performance,
+        total_duration: sessionDuration
+      },
+      summary: {
+        total_effects: this.performance.effectsInjected,
+        total_recoveries: this.performance.recoveryAttempts,
+        recovery_rate: this.performance.recoveryAttempts > 0 ? 
+          this.traces.filter(t => t.action === 'recovery_attempt' && t.success).length / this.performance.recoveryAttempts : 0,
+        avg_resilience: this.calculateAverageResilience(),
+        ...summary
+      }
+    };
+    
+    this.logTrace('session_end', { summary: sessionSummary.summary });
+    
+    return sessionSummary;
+  }
+  
+  calculateAverageResilience() {
+    const resilienceScores = this.traces
+      .filter(t => t.action === 'recovery_attempt' && typeof t.resilience_score === 'number')
+      .map(t => t.resilience_score);
+    
+    if (resilienceScores.length === 0) return 0;
+    return Math.round(resilienceScores.reduce((a, b) => a + b, 0) / resilienceScores.length);
+  }
+  
+  exportAsJSON(pretty = true) {
+    const data = this.getSessionData();
+    return pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data);
+  }
+  
+  exportAsCSV() {
+    const traces = this.traces;
+    if (traces.length === 0) return '';
+    
+    const headers = ['step', 'timestamp', 'relative_time_ms', 'action'];
+    const additionalFields = new Set();
+    
+    traces.forEach(trace => {
+      Object.keys(trace).forEach(key => {
+        if (!headers.includes(key)) {
+          additionalFields.add(key);
+        }
+      });
+    });
+    
+    const allHeaders = [...headers, ...Array.from(additionalFields)];
+    
+    let csv = allHeaders.join(',') + '\\n';
+    
+    traces.forEach(trace => {
+      const row = allHeaders.map(header => {
+        const value = trace[header];
+        if (value === null || value === undefined) return '';
+        if (typeof value === 'object') return JSON.stringify(value).replace(/,/g, ';');
+        return String(value).replace(/,/g, ';');
+      });
+      csv += row.join(',') + '\\n';
+    });
+    
+    return csv;
+  }
+  
+  exportAsReport() {
+    const data = this.getSessionData();
+    const summary = data.summary;
+    
+    let report = `# Agent Chaos Monkey Session Report\\n\\n`;
+    report += `**Session ID:** ${data.session_id}\\n`;
+    report += `**Seed:** ${data.seed}\\n`;
+    report += `**Mode:** ${data.mode}\\n`;
+    report += `**Duration:** ${Math.round(data.duration_ms / 1000)}s\\n\\n`;
+    
+    report += `## Summary\\n\\n`;
+    report += `- **Total Effects:** ${summary.total_effects}\\n`;
+    report += `- **Recovery Attempts:** ${summary.total_recoveries}\\n`;
+    report += `- **Recovery Rate:** ${Math.round(summary.recovery_rate * 100)}%\\n`;
+    report += `- **Average Resilience:** ${summary.avg_resilience}\\n\\n`;
+    
+    report += `## Recent Traces\\n\\n`;
+    this.traces.slice(-5).forEach(trace => {
+      const time = new Date(trace.timestamp).toLocaleTimeString();
+      report += `- **${time}** [${trace.action}] ${this.formatTraceForReport(trace)}\\n`;
+    });
+    
+    return report;
+  }
+  
+  formatTraceForReport(trace) {
+    switch (trace.action) {
+      case 'effect_injection':
+        return `${trace.effect_type} on ${trace.target} (impact: ${trace.performance_impact})`;
+      case 'recovery_attempt':
+        return `${trace.strategy} - ${trace.success ? 'Success' : 'Failed'} (${trace.duration_ms}ms)`;
+      case 'evaluation_result':
+        return `${trace.test_case}: ${trace.result} (score: ${trace.score})`;
+      default:
+        return JSON.stringify(trace).slice(0, 50) + '...';
+    }
+  }
+  
+  exportAsShareableURL() {
+    const sessionData = this.getSessionData();
+    const compressed = JSON.stringify({
+      id: sessionData.session_id,
+      seed: sessionData.seed,
+      mode: sessionData.mode,
+      summary: sessionData.summary
+    });
+    const encoded = btoa(encodeURIComponent(compressed));
+    
+    return window.location.origin + window.location.pathname + '?session=' + encoded;
+  }
+  
+  getSessionData() {
+    return {
+      session_id: this.sessionId,
+      seed: this.userSeed,
+      start_timestamp: this.startTimestamp,
+      end_timestamp: new Date().toISOString(),
+      duration_ms: performance.now() - this.performance.startTime,
+      mode: this.mode,
+      configuration: this.configuration,
+      traces: this.traces,
+      performance: this.performance,
+      summary: {
+        total_effects: this.performance.effectsInjected,
+        total_recoveries: this.performance.recoveryAttempts,
+        recovery_rate: this.performance.recoveryAttempts > 0 ? 
+          this.traces.filter(t => t.action === 'recovery_attempt' && t.success).length / this.performance.recoveryAttempts : 0,
+        avg_resilience: this.calculateAverageResilience()
+      }
+    };
+  }
+}
+
+// Demo Functions
+function startDemoSession() {
+  demoCollector = new DemoDataCollector();
+  demoSession = demoCollector.startSession({
+    demo_mode: true,
+    effects_enabled: true,
+    recovery_strategy: 'auto_retry'
+  }, 'demo');
+  
+  // Start updating session duration
+  updateInterval = setInterval(() => {
+    if (demoSession) {
+      const duration = Math.round((performance.now() - demoCollector.performance.startTime) / 1000);
+      document.getElementById('sessionDuration').textContent = duration + 's';
+    }
+  }, 1000);
+  
+  showMessage('Demo session started!', 'success');
+}
+
+function simulateEffects() {
+  if (!demoCollector) {
+    showMessage('Please start a session first', 'warning');
+    return;
+  }
+  
+  const effects = ['latency_injection', 'http_500_error', 'rate_limit_429', 'malformed_json', 'tool_unavailable'];
+  const targets = ['fetch_operation', 'json_parser', 'api_endpoint', 'data_processor'];
+  
+  const effectType = effects[Math.floor(Math.random() * effects.length)];
+  const target = targets[Math.floor(Math.random() * targets.length)];
+  
+  demoCollector.logEffectInjection(effectType, target, {
+    rate: Math.round(Math.random() * 50) + '%',
+    severity: Math.random() > 0.5 ? 'high' : 'medium'
+  }, {
+    score_impact: -Math.round(Math.random() * 20 + 5),
+    current_score: Math.round(Math.random() * 40 + 60)
+  });
+  
+  showMessage(`Injected ${effectType} effect`, 'info');
+}
+
+function simulateRecovery() {
+  if (!demoCollector) {
+    showMessage('Please start a session first', 'warning');
+    return;
+  }
+  
+  const strategies = ['auto_retry', 'fallback_cache', 'circuit_breaker', 'exponential_backoff'];
+  const strategy = strategies[Math.floor(Math.random() * strategies.length)];
+  const success = Math.random() > 0.3; // 70% success rate
+  const duration = Math.round(Math.random() * 3000 + 500); // 500-3500ms
+  
+  demoCollector.logRecoveryAttempt(strategy, success, duration, {
+    attempt_number: demoCollector.performance.recoveryAttempts + 1,
+    resource_usage: Math.round(Math.random() * 100) + '%'
+  });
+  
+  showMessage(`Recovery attempt: ${strategy} - ${success ? 'Success' : 'Failed'}`, success ? 'success' : 'error');
+}
+
+function runEvaluation() {
+  if (!demoCollector) {
+    showMessage('Please start a session first', 'warning');
+    return;
+  }
+  
+  const testCases = ['reliability_test', 'performance_test', 'security_test', 'recovery_test'];
+  const testCase = testCases[Math.floor(Math.random() * testCases.length)];
+  const score = Math.round(Math.random() * 40 + 60); // 60-100
+  const result = score >= 70 ? 'pass' : 'fail';
+  
+  demoCollector.logEvaluationResult(testCase, result, score, [
+    { type: 'metric_threshold', metric: 'success_rate', passed: result === 'pass' },
+    { type: 'performance_check', metric: 'response_time', passed: score >= 80 }
+  ]);
+  
+  showMessage(`Evaluation: ${testCase} - ${result.toUpperCase()} (${score}%)`, result === 'pass' ? 'success' : 'warning');
+}
+
+function endSession() {
+  if (!demoCollector) {
+    showMessage('No active session to end', 'warning');
+    return;
+  }
+  
+  const summary = demoCollector.endSession({
+    final_score: Math.round(Math.random() * 30 + 70),
+    completion_status: 'demo_complete'
+  });
+  
+  if (updateInterval) {
+    clearInterval(updateInterval);
+    updateInterval = null;
+  }
+  
+  showMessage('Demo session ended successfully!', 'success');
+  console.log('Session Summary:', summary);
+}
+
+// Export functions
+function exportJSON() {
+  if (!demoCollector) {
+    showMessage('No session data to export', 'warning');
+    return;
+  }
+  
+  const jsonData = demoCollector.exportAsJSON();
+  document.getElementById('exportOutput').textContent = 'JSON Export (truncated):\\n\\n' + jsonData.slice(0, 1000) + '...';
+  showMessage('JSON export generated', 'info');
+}
+
+function exportCSV() {
+  if (!demoCollector) {
+    showMessage('No session data to export', 'warning');
+    return;
+  }
+  
+  const csvData = demoCollector.exportAsCSV();
+  document.getElementById('exportOutput').textContent = 'CSV Export (first 500 chars):\\n\\n' + csvData.slice(0, 500) + '...';
+  showMessage('CSV export generated', 'info');
+}
+
+function exportReport() {
+  if (!demoCollector) {
+    showMessage('No session data to export', 'warning');
+    return;
+  }
+  
+  const reportData = demoCollector.exportAsReport();
+  document.getElementById('exportOutput').textContent = reportData;
+  showMessage('Human-readable report generated', 'info');
+}
+
+function generateShareURL() {
+  if (!demoCollector) {
+    showMessage('No session data to share', 'warning');
+    return;
+  }
+  
+  const shareUrl = demoCollector.exportAsShareableURL();
+  document.getElementById('exportOutput').textContent = 'Shareable URL:\\n\\n' + shareUrl + '\\n\\n(This URL would contain compressed session data for replay)';
+  showMessage('Share URL generated', 'info');
+}
+
+// UI Update Functions
+function updateTraceLog(trace) {
+  const traceLog = document.getElementById('traceLog');
+  const entry = document.createElement('div');
+  entry.className = 'trace-entry';
+  
+  const time = new Date(trace.timestamp).toLocaleTimeString();
+  entry.innerHTML = `
+    <span class="trace-timestamp">[${time}]</span>
+    <span class="trace-action">${trace.action}</span>
+    <span class="trace-data">${formatTraceData(trace)}</span>
+  `;
+  
+  traceLog.appendChild(entry);
+  traceLog.scrollTop = traceLog.scrollHeight;
+  
+  // Keep only last 20 entries
+  while (traceLog.children.length > 20) {
+    traceLog.removeChild(traceLog.firstChild);
+  }
+}
+
+function formatTraceData(trace) {
+  switch (trace.action) {
+    case 'effect_injection':
+      return `${trace.effect_type} → ${trace.target}`;
+    case 'recovery_attempt':
+      return `${trace.strategy} (${trace.success ? '✓' : '✗'}) ${trace.duration_ms}ms`;
+    case 'evaluation_result':
+      return `${trace.test_case}: ${trace.result} (${trace.score}%)`;
+    case 'session_start':
+      return `Started with seed: ${trace.user_seed}`;
+    case 'session_end':
+      return `Ended (${trace.summary?.total_effects || 0} effects)`;
+    default:
+      return JSON.stringify(trace).slice(0, 50) + '...';
+  }
+}
+
+function updateMetrics() {
+  if (!demoCollector) return;
+  
+  document.getElementById('traceCount').textContent = demoCollector.traces.length;
+  document.getElementById('effectCount').textContent = demoCollector.performance.effectsInjected;
+  document.getElementById('recoveryCount').textContent = demoCollector.performance.recoveryAttempts;
+}
+
+function updateSessionPreview() {
+  if (!demoCollector) return;
+  
+  const sessionData = demoCollector.getSessionData();
+  const preview = {
+    session_id: sessionData.session_id.substr(-12) + '...',
+    seed: sessionData.seed,
+    mode: sessionData.mode,
+    traces: sessionData.traces.length,
+    performance: {
+      effects: sessionData.performance.effectsInjected,
+      recoveries: sessionData.performance.recoveryAttempts
+    },
+    summary: sessionData.summary
+  };
+  
+  document.getElementById('sessionPreview').textContent = JSON.stringify(preview, null, 2);
+}
+
+function showMessage(message, type = 'info') {
+  // Simple message display
+  const colors = {
+    success: '#00ff41',
+    error: '#ff4444',
+    warning: '#ffaa00',
+    info: '#4488ff'
+  };
+  
+  console.log(`%c${message}`, `color: ${colors[type] || colors.info}`);
+}
+
+// Initialize demo
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('traceLog').innerHTML = `
+    <div style="color: #666; text-align: center; padding: 20px;">
+      Click "Start Session" to begin demo...
+    </div>
+  `;
+});
+</script>
+
+</body>
+</html>

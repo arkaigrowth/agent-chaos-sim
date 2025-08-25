@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debug Console</title>
+</head>
+<body>
+  <h1>Debug Console</h1>
+  <button onclick="testClick()">Test Click Handler</button>
+  <pre id="output"></pre>
+  
+  <script>
+    async function testClick() {
+      const response = await fetch('http://localhost:5173');
+      const html = await response.text();
+      
+      // Create a temporary DOM to test
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Check if applyFaultConfiguration exists
+      const scripts = doc.querySelectorAll('script');
+      let hasFunction = false;
+      scripts.forEach(script => {
+        if (script.textContent.includes('applyFaultConfiguration')) {
+          hasFunction = true;
+        }
+      });
+      
+      document.getElementById('output').textContent = 
+        'Has applyFaultConfiguration: ' + hasFunction;
+    }
+  </script>
+</body>
+</html>

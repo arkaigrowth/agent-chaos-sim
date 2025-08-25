@@ -1,0 +1,65 @@
+{
+  "name": "agent-chaos-monkey",
+  "version": "1.0.0",
+  "description": "Agent resilience testing tool with comprehensive chaos engineering capabilities",
+  "main": "index_new.html",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:mobile": "playwright test --project=\"Mobile Chrome\" --project=\"Mobile Safari\"",
+    "test:ui-validation": "playwright test ui-validation.spec.ts",
+    "test:integration": "playwright test new-integration.spec.ts",
+    "test:api": "playwright test api-enhanced.spec.ts",
+    "test:e2e": "playwright test e2e-complete.spec.ts",
+    "test:performance": "playwright test performance-new.spec.ts",
+    "test:cross-browser": "playwright test cross-browser.spec.ts",
+    "test:report": "playwright show-report",
+    "test:install": "playwright install",
+    "dev": "python -m http.server 8080",
+    "start": "python -m http.server 8080",
+    "lint:tests": "npx eslint tests/**/*.ts",
+    "format:tests": "npx prettier --write tests/**/*.ts"
+  },
+  "keywords": [
+    "chaos-engineering",
+    "agent-testing",
+    "resilience",
+    "fault-injection",
+    "testing",
+    "automation",
+    "playwright"
+  ],
+  "author": "Agent Chaos Monkey Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.50.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/agent-chaos-monkey.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/agent-chaos-monkey/issues"
+  },
+  "homepage": "https://github.com/your-org/agent-chaos-monkey#readme",
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions"
+  ]
+}

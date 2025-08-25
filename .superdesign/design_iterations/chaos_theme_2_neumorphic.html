@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chaos Lab - Neumorphic Theme</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Base chaos/hazard palette with soft modifications */
+      --primary: #fbbf24;
+      --secondary: #fb923c;
+      --danger: #ef4444;
+      --success: #10b981;
+      --background: #2d3748;
+      
+      /* Neumorphic extensions */
+      --surface: #374151;
+      --surface-raised: #4a5568;
+      --surface-pressed: #1a202c;
+      --text: #f7fafc;
+      --text-muted: #a0aec0;
+      --border: transparent;
+      
+      /* Neumorphic shadows */
+      --shadow-raised: 6px 6px 12px #1a202c, -6px -6px 12px #4a5568;
+      --shadow-pressed: inset 4px 4px 8px #1a202c, inset -4px -4px 8px #4a5568;
+      --shadow-soft: 3px 3px 6px #1a202c, -3px -3px 6px #4a5568;
+      
+      /* Typography */
+      --font-heading: 'Poppins', system-ui, sans-serif;
+      --font-body: 'Poppins', system-ui, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      
+      /* Rounded elements */
+      --border-radius: 16px;
+      --border-radius-lg: 24px;
+    }
+
+    /* Animations */
+    .neuro-press { transition: box-shadow 0.2s ease, transform 0.1s ease; }
+    .neuro-press:active { box-shadow: var(--shadow-pressed); transform: scale(0.98); }
+    .soft-bounce { animation: softBounce 0.6s ease-out; }
+    .glow-pulse { animation: glowPulse 3s ease-in-out infinite; }
+
+    @keyframes softBounce { 
+      0%, 20%, 80%, 100% { transform: translateY(0); } 
+      40% { transform: translateY(-10px); } 
+      60% { transform: translateY(-5px); } 
+    }
+    @keyframes glowPulse { 
+      0%, 100% { filter: drop-shadow(0 0 5px var(--primary)); } 
+      50% { filter: drop-shadow(0 0 20px var(--primary)); } 
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: var(--surface);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .logo {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+    }
+
+    .theme-selector {
+      background: var(--surface);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 0.75rem 1.25rem;
+      color: var(--text);
+      font-size: 0.875rem;
+      box-shadow: var(--shadow-soft);
+      font-family: var(--font-body);
+    }
+
+    .hero {
+      padding: 4rem 2rem 2rem;
+      text-align: center;
+      background: var(--background);
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .btn {
+      background: var(--surface);
+      color: var(--primary);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: var(--border-radius-lg);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: var(--shadow-raised);
+      transition: box-shadow 0.2s ease, transform 0.1s ease;
+      font-family: var(--font-body);
+    }
+
+    .btn:hover {
+      box-shadow: 8px 8px 16px #1a202c, -8px -8px 16px #4a5568;
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      box-shadow: var(--shadow-pressed);
+      transform: scale(0.98);
+    }
+
+    .story {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      background: var(--surface);
+      margin: 2rem;
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-raised);
+    }
+
+    .story .step {
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--surface);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .story .step div {
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .story .step span {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2.5rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--border-radius-lg);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-raised);
+      transition: box-shadow 0.3s ease, transform 0.2s ease;
+    }
+
+    .card:hover {
+      box-shadow: 8px 8px 16px #1a202c, -8px -8px 16px #4a5568;
+      transform: translateY(-3px);
+    }
+
+    .card h3 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: var(--border-radius);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 1rem;
+      box-shadow: var(--shadow-pressed);
+      font-family: var(--font-body);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      box-shadow: inset 6px 6px 10px #1a202c, inset -6px -6px 10px #4a5568;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--surface);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* Bottom Sheet Focus */
+    .bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      padding: 2.5rem;
+      box-shadow: 0 -8px 32px rgba(26, 32, 44, 0.5);
+      z-index: 1000;
+      border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+
+    .test-controls {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+      padding: 1.5rem;
+      background: var(--background);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .test-controls input {
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: var(--border-radius);
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow-pressed);
+      font-family: var(--font-body);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-primary {
+      background: var(--surface);
+      color: var(--primary);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-raised);
+      font-family: var(--font-body);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 8px 8px 16px #1a202c, -8px -8px 16px #4a5568;
+    }
+
+    .btn-primary:active {
+      box-shadow: var(--shadow-pressed);
+      transform: scale(0.98);
+    }
+
+    .btn-danger {
+      background: var(--surface);
+      color: var(--danger);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-raised);
+      font-family: var(--font-body);
+    }
+
+    .btn-danger:hover {
+      box-shadow: 8px 8px 16px #1a202c, -8px -8px 16px #4a5568;
+    }
+
+    .btn-danger:active {
+      box-shadow: var(--shadow-pressed);
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-raised);
+      font-family: var(--font-body);
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 8px 8px 16px #1a202c, -8px -8px 16px #4a5568;
+    }
+
+    .btn-secondary:active {
+      box-shadow: var(--shadow-pressed);
+      transform: scale(0.98);
+    }
+
+    .results-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .metric-card {
+      background: var(--background);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .metric-card h4 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .metric-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      text-shadow: 0 0 10px rgba(247, 250, 252, 0.3);
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .trace-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--background);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .trace-table th,
+    .trace-table td {
+      padding: 1rem;
+      text-align: left;
+    }
+
+    .trace-table th {
+      background: var(--surface-raised);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .trace-table tbody tr {
+      border-bottom: 1px solid rgba(74, 85, 104, 0.3);
+    }
+
+    .status-success {
+      color: var(--success);
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+
+    .status-error {
+      color: var(--danger);
+      text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+    }
+
+    .view-toggles {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .view-toggle {
+      background: var(--surface);
+      border: none;
+      color: var(--text);
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      box-shadow: var(--shadow-raised);
+      font-family: var(--font-body);
+      font-weight: 500;
+    }
+
+    .view-toggle.active {
+      color: var(--primary);
+      box-shadow: var(--shadow-pressed);
+    }
+
+    .view-toggle:hover {
+      box-shadow: 6px 6px 12px #1a202c, -6px -6px 12px #4a5568;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .results-panel {
+        grid-template-columns: 1fr;
+      }
+      
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .bottom-sheet {
+        padding: 1.5rem;
+      }
+      
+      .test-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header soft-bounce">
+    <div class="logo glow-pulse">CHAOS LAB</div>
+    <select class="theme-selector neuro-press">
+      <option>Theme ▼</option>
+      <option value="modern">Modern Flat</option>
+      <option value="neumorphic" selected>Neumorphic</option>
+      <option value="geometric">Bold Geometric</option>
+      <option value="glass">Glassmorphism</option>
+      <option value="brutalist">Neo-Brutalist</option>
+    </select>
+  </div>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1 class="glow-pulse">Chaos Lab</h1>
+    <p>Test your AI agent's resilience with soft, immersive testing environment</p>
+    <a href="#" class="btn neuro-press">Get Started →</a>
+  </div>
+
+  <!-- Story Steps -->
+  <div class="story">
+    <div class="step">
+      <div>Pick a scenario</div>
+      <span>Web · Mini-RAG · JSON→Table</span>
+    </div>
+    <div class="step">
+      <div>Run baseline</div>
+      <span>Clean control metrics</span>
+    </div>
+    <div class="step">
+      <div>Toggle chaos</div>
+      <span>500s · 429s · latency · bad JSON</span>
+    </div>
+    <div class="step">
+      <div>Compare & Remix</div>
+      <span>Trace + Score + one-click fork</span>
+    </div>
+  </div>
+
+  <!-- Main Configuration Grid -->
+  <div class="main-grid">
+    <div class="card">
+      <h3>Choose Test Scenario</h3>
+      <div class="form-group">
+        <label>
+          <input type="radio" name="scenario" value="fetch" checked> 
+          🌐 Web Scraping
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="radio" name="scenario" value="rag"> 
+          📚 Document Q&A
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="radio" name="scenario" value="json"> 
+          🔧 API Processing
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Configure Failures</h3>
+      <div class="form-group">
+        <label>Network Latency (ms)</label>
+        <input type="number" value="2000">
+      </div>
+      <div class="form-group">
+        <label>Error Rate (%)</label>
+        <input type="number" value="10">
+      </div>
+      <div class="form-group">
+        <label>Rate Limiting (%)</label>
+        <input type="number" value="10">
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Recovery Settings</h3>
+      <div class="checkbox-group">
+        <input type="checkbox" checked>
+        <label>✓ Smart Recovery</label>
+      </div>
+      <div class="form-group">
+        <label>Max Retries</label>
+        <input type="number" value="3">
+      </div>
+      <div class="form-group">
+        <label>Backoff (ms)</label>
+        <input type="number" value="250">
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet Focus -->
+  <div class="bottom-sheet">
+    <!-- Test Controls -->
+    <div class="test-controls">
+      <label>Seed:</label>
+      <input type="text" value="1337" placeholder="Test seed">
+      <label>
+        <input type="checkbox"> 🎲 Randomize
+      </label>
+      <button class="btn-secondary neuro-press">↻ Replay</button>
+      <button class="btn-secondary neuro-press">🔗 Share</button>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="btn-group">
+      <button class="btn-primary neuro-press">▶️ Run Baseline</button>
+      <button class="btn-danger neuro-press">⚡ Run Chaos</button>
+      <button class="btn-secondary neuro-press">📊 Export Report</button>
+    </div>
+
+    <!-- Live Results -->
+    <div class="results-panel">
+      <div class="metric-card">
+        <h4>Baseline</h4>
+        <div class="metric-value">95</div>
+        <div class="metric-label">Score</div>
+      </div>
+      <div class="metric-card">
+        <h4>Chaos</h4>
+        <div class="metric-value">85</div>
+        <div class="metric-label">Score</div>
+      </div>
+      <div class="metric-card">
+        <h4>Delta</h4>
+        <div class="metric-value">-10</div>
+        <div class="metric-label">Δ Score</div>
+      </div>
+    </div>
+
+    <!-- View Controls -->
+    <div class="view-toggles">
+      <button class="view-toggle active neuro-press">📊 TABLE</button>
+      <button class="view-toggle neuro-press">🔧 JSON</button>
+      <button class="view-toggle neuro-press">📈 GRAPH</button>
+      <button class="btn-secondary neuro-press">💾 Download</button>
+      <button class="btn-secondary neuro-press">📋 Copy</button>
+    </div>
+
+    <!-- Trace Table -->
+    <table class="trace-table">
+      <thead>
+        <tr>
+          <th>Step</th>
+          <th>Tool</th>
+          <th>Fault</th>
+          <th>Action</th>
+          <th>Duration</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>WebFetch</td>
+          <td>None</td>
+          <td>GET /api</td>
+          <td>1.2s</td>
+          <td class="status-success">✅</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>WebFetch</td>
+          <td>500 ERR</td>
+          <td>GET /data</td>
+          <td>3.1s</td>
+          <td class="status-error">❌</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Retry</td>
+          <td>Backoff</td>
+          <td>Retry GET</td>
+          <td>2.8s</td>
+          <td class="status-success">✅</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

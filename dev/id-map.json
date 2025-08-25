@@ -1,0 +1,42 @@
+{
+  "runners": {
+    "type": "split",
+    "unified": null,
+    "split": ["runFetch", "runJSON", "runRAG"]
+  },
+  "selectors": {
+    "seed": "#seed",
+    "surprise": "#surprise",
+    "latency_ms": "#latencyMs",
+    "latency_rate": "#latencyRate",
+    "http_500_rate": "#http500Rate",
+    "rate_429": "#rate429",
+    "malformed_rate": "#malformedRate",
+    "inj_seed": "#injSeed",
+    "ctx_bytes": "#ctxBytes",
+    "ascii_only": "#asciiOnly",
+    "sound_on": "#soundOn",
+    "mouse_spice": "#mouseSpice",
+    "stage": "#stage",
+    "timeline_rail": "#timelineRail"
+  },
+  "assets": {
+    "theatre_js": "/theatre.js",
+    "theatre_css": "/theatre.css"
+  },
+  "theatre": {
+    "has_start": true,
+    "has_finish": true,
+    "has_event": true,
+    "has_getEventLog": true
+  },
+  "scenarios": ["fetch", "json", "rag"],
+  "toggle_defaults": {
+    "latency_ms": 2000,
+    "latency_rate": 0.2,
+    "http_500_rate": 0.1,
+    "rate_429": 0.05,
+    "malformed_rate": 0.15,
+    "ctx_bytes": 512
+  }
+}

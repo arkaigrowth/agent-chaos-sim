@@ -1,0 +1,1212 @@
+/* CHAOS LAB - NEO-BRUTALIST THEME */
+
+/* Raw Industrial Typography */
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black:wght@400&family=Bebas+Neue:wght@400&family=JetBrains+Mono:wght@400;500;600;700;800&family=Oswald:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Neo-Brutalist Color Palette - Raw Industrial Chaos */
+  --bg: #f5f5f5;
+  --bg-secondary: #e8e8e8;
+  --fg: #1a1a1a;
+  --fg-secondary: #2d2d2d;
+  --muted: #666666;
+  --card: #ffffff;
+  --border: #000000;
+  --surface: #f0f0f0;
+  
+  /* Harsh Industrial Colors */
+  --primary: #ff0000;        /* Brutal red */
+  --primary-hover: #cc0000;
+  --primary-light: rgba(255, 0, 0, 0.1);
+  --secondary: #000000;      /* Harsh black */
+  --success: #00ff00;        /* Electric green */
+  --warning: #ffff00;        /* Hazard yellow */
+  --danger: #ff0000;         /* Alert red */
+  --danger-light: rgba(255, 0, 0, 0.1);
+  --accent: #0000ff;         /* Electric blue */
+  
+  /* Brutalist Patterns */
+  --concrete-texture: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  --industrial-stripes: 
+    repeating-linear-gradient(
+      45deg,
+      #ffff00 0px,
+      #ffff00 10px,
+      #000000 10px,
+      #000000 20px
+    );
+  --warning-tape: 
+    repeating-linear-gradient(
+      45deg,
+      #ffff00 0px,
+      #ffff00 25px,
+      #ff0000 25px,
+      #ff0000 50px
+    );
+  
+  /* Harsh Shadows */
+  --shadow-brutal: 8px 8px 0px #000000;
+  --shadow-heavy: 12px 12px 0px #000000;
+  --shadow-massive: 20px 20px 0px #000000;
+  --shadow-inset: inset 4px 4px 0px #000000;
+  --shadow-red: 8px 8px 0px #ff0000;
+  --shadow-yellow: 8px 8px 0px #ffff00;
+  
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  
+  /* Typography */
+  --font-display: 'Bebas Neue', 'Archivo Black', Impact, sans-serif;
+  --font-body: 'Oswald', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  
+  /* No animations - Brutalist is static */
+  --anim-fast: 0s;
+  --anim-normal: 0s;
+  --anim-slow: 0s;
+  
+  /* Chaos Score Colors */
+  --score-critical: #ff0000;
+  --score-poor: #ff6600;
+  --score-fair: #ffff00;
+  --score-good: #00ff00;
+  --score-excellent: #00ff00;
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  background-image: var(--concrete-texture);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-weight: 400;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* No animations - Brutalist philosophy */
+* {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Industrial Grid Overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.3;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+/* Brutalist Hero Section */
+.hero {
+  background: var(--warning);
+  background-image: var(--warning-tape);
+  color: var(--fg);
+  text-align: center;
+  padding: var(--space-2xl) var(--space-lg);
+  position: relative;
+  overflow: hidden;
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 8px solid var(--border);
+  border-radius: 0;
+  box-shadow: var(--shadow-massive);
+  margin: var(--space-lg) 0;
+}
+
+.hero::before {
+  content: 'DANGER - CHAOS TESTING ZONE - AUTHORIZED PERSONNEL ONLY';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--danger);
+  color: var(--card);
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 400;
+  padding: 8px;
+  border-bottom: 4px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: var(--industrial-stripes);
+  border-top: 4px solid var(--border);
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 5rem;
+  font-weight: 400;
+  margin: var(--space-xl) 0 var(--space-md);
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-shadow: 4px 4px 0px var(--card), 8px 8px 0px var(--border);
+  transform: skew(-5deg);
+  line-height: 0.9;
+}
+
+h1::before {
+  content: '⚠ ';
+  color: var(--danger);
+  text-shadow: none;
+  transform: skew(5deg);
+  display: inline-block;
+}
+
+h1::after {
+  content: ' ⚠';
+  color: var(--danger);
+  text-shadow: none;
+  transform: skew(5deg);
+  display: inline-block;
+}
+
+.sub {
+  font-size: 1.1rem;
+  margin: 0 0 var(--space-xl);
+  max-width: 700px;
+  position: relative;
+  z-index: 1;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--fg);
+  background: var(--card);
+  padding: var(--space-lg);
+  border: 6px solid var(--border);
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-body);
+  box-shadow: var(--shadow-brutal);
+}
+
+.hero-actions {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-actions .link {
+  background: var(--danger);
+  color: var(--card);
+  padding: var(--space-lg) var(--space-xl);
+  border: 6px solid var(--border);
+  border-radius: 0;
+  font-weight: 700;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow: var(--shadow-brutal);
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+}
+
+.hero-actions .link:hover {
+  background: var(--border);
+  color: var(--card);
+  text-decoration: none;
+  transform: translate(4px, 4px);
+  box-shadow: 4px 4px 0px var(--danger);
+}
+
+.hero-actions .link:active {
+  transform: translate(8px, 8px);
+  box-shadow: none;
+}
+
+/* Brutalist Cards - Industrial Bottom Sheet Focus */
+.card {
+  background: var(--card);
+  background-image: var(--concrete-texture);
+  border: 6px solid var(--border);
+  border-radius: 0;
+  padding: var(--space-xl);
+  margin: var(--space-lg) 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-brutal);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--industrial-stripes);
+}
+
+.card::after {
+  content: '⚠';
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  font-size: 20px;
+  color: var(--danger);
+  font-family: var(--font-display);
+  background: var(--warning);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--border);
+  box-shadow: var(--shadow-brutal);
+}
+
+/* Enhanced Bottom Sheet Cards */
+main .card {
+  margin: var(--space-xl) 0;
+  border-width: 8px;
+  box-shadow: var(--shadow-heavy);
+}
+
+main .card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: var(--shadow-massive);
+  background: var(--bg-secondary);
+}
+
+main .card:nth-child(odd) {
+  border-color: var(--danger);
+}
+
+main .card:nth-child(odd)::after {
+  background: var(--danger);
+  color: var(--card);
+}
+
+main .card:nth-child(even) {
+  border-color: var(--accent);
+}
+
+main .card:nth-child(even)::after {
+  background: var(--accent);
+  color: var(--card);
+}
+
+/* Brutalist card headers */
+.card h2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  margin: 0 0 var(--space-lg);
+  color: var(--fg);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  padding-right: 60px;
+}
+
+.card h2::before {
+  content: '■';
+  color: var(--danger);
+  font-size: 0.8em;
+  margin-right: var(--space-sm);
+}
+
+.card h2::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 60%;
+  height: 6px;
+  background: var(--border);
+}
+
+/* Layout Helpers */
+.row {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+}
+
+/* Brutalist Buttons */
+.primary {
+  background: var(--danger);
+  color: var(--card);
+  border: 4px solid var(--border);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-brutal);
+  position: relative;
+}
+
+.primary:hover {
+  background: var(--border);
+  transform: translate(-4px, -4px);
+  box-shadow: var(--shadow-heavy);
+}
+
+.primary:active {
+  transform: translate(4px, 4px);
+  box-shadow: 4px 4px 0px var(--border);
+}
+
+.secondary {
+  background: var(--card);
+  color: var(--fg);
+  border: 4px solid var(--border);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-brutal);
+}
+
+.secondary:hover {
+  background: var(--bg-secondary);
+  border-color: var(--accent);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--accent);
+}
+
+.danger {
+  background: var(--warning);
+  color: var(--fg);
+  border: 4px solid var(--border);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-brutal);
+  position: relative;
+}
+
+.danger::before {
+  content: 'CHAOS';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: var(--industrial-stripes);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg);
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0;
+  z-index: -1;
+}
+
+.danger:hover {
+  background: var(--danger);
+  color: var(--card);
+  transform: translate(-4px, -4px);
+  box-shadow: var(--shadow-heavy);
+}
+
+.danger:hover::before {
+  opacity: 1;
+}
+
+.link {
+  background: none;
+  border: 0;
+  color: var(--danger);
+  cursor: pointer;
+  padding: 0;
+  font-weight: 700;
+  text-decoration: underline;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-body);
+}
+
+.link:hover {
+  color: var(--border);
+  text-decoration: none;
+  background: var(--warning);
+  padding: 2px 4px;
+  border: 2px solid var(--border);
+}
+
+/* Brutalist Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: 0;
+  background: var(--danger);
+  color: var(--card);
+  font-weight: 700;
+  font-size: 14px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 4px solid var(--border);
+  box-shadow: var(--shadow-brutal);
+}
+
+.badge::before {
+  content: '⚠';
+  margin-right: 4px;
+  font-size: 16px;
+}
+
+/* Industrial Forms */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+select,
+textarea {
+  background: var(--card);
+  background-image: var(--concrete-texture);
+  border: 4px solid var(--border);
+  border-radius: 0;
+  padding: var(--space-md);
+  font-size: 15px;
+  font-family: var(--font-mono);
+  color: var(--fg);
+  width: 100%;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-inset);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--danger);
+  background: var(--warning);
+  box-shadow: var(--shadow-red);
+  transform: translate(-2px, -2px);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-weight: 700;
+  color: var(--fg);
+  font-size: 14px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  margin-right: var(--space-xs);
+  accent-color: var(--danger);
+  transform: scale(1.5);
+}
+
+/* Industrial Tables */
+.trace {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--space-lg);
+  background: var(--card);
+  background-image: var(--concrete-texture);
+  border: 6px solid var(--border);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-heavy);
+}
+
+.trace th {
+  background: var(--border);
+  color: var(--card);
+  font-weight: 700;
+  font-family: var(--font-display);
+  padding: var(--space-lg);
+  text-align: left;
+  border-bottom: 4px solid var(--danger);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+}
+
+.trace th::before {
+  content: '▲';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--danger);
+}
+
+.trace td {
+  padding: var(--space-lg);
+  border-bottom: 2px solid var(--border);
+  border-right: 2px solid var(--border);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 14px;
+}
+
+.trace tr:last-child td {
+  border-bottom: none;
+}
+
+.trace td:last-child {
+  border-right: none;
+}
+
+.trace tr:hover {
+  background: var(--warning);
+  color: var(--fg);
+}
+
+/* Industrial Code Blocks */
+.code {
+  background: var(--border);
+  color: var(--success);
+  border: 6px solid var(--danger);
+  padding: var(--space-xl);
+  border-radius: 0;
+  white-space: pre-wrap;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.3;
+  overflow-x: auto;
+  position: relative;
+  box-shadow: var(--shadow-heavy);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.code::before {
+  content: '>>> SYSTEM_TERMINAL.LOG <<<';
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  right: var(--space-md);
+  font-size: 12px;
+  color: var(--card);
+  font-family: var(--font-display);
+  font-weight: 700;
+  background: var(--danger);
+  padding: 4px 8px;
+  border: 2px solid var(--card);
+  text-align: center;
+}
+
+/* Process Steps - Industrial Bottom Sheet */
+.story {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-xl);
+  margin: var(--space-2xl) 0;
+  padding: 0 var(--space-lg);
+  position: relative;
+}
+
+.story::before {
+  content: '⚠ INDUSTRIAL CHAOS PROTOCOL SEQUENCE ⚠';
+  position: absolute;
+  top: -60px;
+  left: 0;
+  right: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--card);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: var(--border);
+  padding: var(--space-md);
+  border: 4px solid var(--danger);
+  text-align: center;
+  box-shadow: var(--shadow-brutal);
+}
+
+.story .step {
+  background: var(--card);
+  background-image: var(--concrete-texture);
+  border: 6px solid var(--border);
+  border-radius: 0;
+  padding: var(--space-xl);
+  text-align: center;
+  position: relative;
+  box-shadow: var(--shadow-brutal);
+  overflow: hidden;
+}
+
+.story .step::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: var(--industrial-stripes);
+}
+
+.story .step:nth-child(1) { border-color: var(--danger); }
+.story .step:nth-child(2) { border-color: var(--warning); }
+.story .step:nth-child(3) { border-color: var(--success); }
+.story .step:nth-child(4) { border-color: var(--accent); }
+
+.story .step:hover {
+  transform: translate(-8px, -8px);
+  box-shadow: var(--shadow-massive);
+  background: var(--bg-secondary);
+}
+
+.story .step::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  background: var(--border);
+  border: 6px solid var(--card);
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-brutal);
+  color: var(--card);
+  font-weight: 400;
+  font-size: 24px;
+  font-family: var(--font-display);
+}
+
+.story .step:nth-child(1)::after { 
+  content: '1'; 
+  background: var(--danger);
+}
+.story .step:nth-child(2)::after { 
+  content: '2'; 
+  background: var(--warning);
+  color: var(--fg);
+}
+.story .step:nth-child(3)::after { 
+  content: '3'; 
+  background: var(--success);
+  color: var(--fg);
+}
+.story .step:nth-child(4)::after { 
+  content: '4'; 
+  background: var(--accent);
+}
+
+.story .step div {
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin: var(--space-lg) 0 var(--space-sm);
+  color: var(--fg);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+}
+
+.story .step span {
+  display: block;
+  color: var(--fg-secondary);
+  font-size: 15px;
+  line-height: 1.3;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Industrial Examples Grid */
+.examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-xl);
+}
+
+.examples .ex {
+  background: var(--card);
+  background-image: var(--concrete-texture);
+  border: 6px solid var(--border);
+  border-radius: 0;
+  padding: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-brutal);
+}
+
+.examples .ex::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--industrial-stripes);
+}
+
+.examples .ex::after {
+  content: '◼';
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  font-size: 16px;
+  color: var(--card);
+  background: var(--danger);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--border);
+}
+
+.examples .ex:hover {
+  transform: translate(-6px, -6px);
+  box-shadow: var(--shadow-heavy);
+  background: var(--bg-secondary);
+}
+
+.examples .ex h3 {
+  margin: 0 0 var(--space-md);
+  font-weight: 700;
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-right: 50px;
+}
+
+/* Industrial Toast */
+.toast {
+  position: fixed;
+  right: var(--space-lg);
+  bottom: var(--space-lg);
+  z-index: 100;
+  max-width: 400px;
+}
+
+.toast-inner {
+  background: var(--card);
+  background-image: var(--concrete-texture);
+  border: 6px solid var(--border);
+  border-radius: 0;
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-heavy);
+  position: relative;
+  overflow: hidden;
+}
+
+.toast-inner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--industrial-stripes);
+}
+
+.toast-inner::after {
+  content: '⚠ SYSTEM ALERT ⚠';
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  right: var(--space-sm);
+  background: var(--danger);
+  color: var(--card);
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px;
+  border: 2px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.toast-title {
+  font-weight: 700;
+  margin: var(--space-lg) 0 var(--space-sm);
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bar {
+  position: relative;
+  height: 16px;
+  border-radius: 0;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  border: 3px solid var(--border);
+  margin: var(--space-sm) 0;
+  box-shadow: var(--shadow-inset);
+}
+
+.bar #barFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--danger);
+  border-radius: 0;
+  position: relative;
+}
+
+.bar #barFill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--industrial-stripes);
+  opacity: 0.5;
+}
+
+.bar #barText {
+  position: absolute;
+  right: 0;
+  top: -28px;
+  font-size: 12px;
+  color: var(--fg);
+  font-weight: 700;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--warning);
+  padding: 2px 6px;
+  border: 2px solid var(--border);
+}
+
+.toast-msg {
+  color: var(--fg-secondary);
+  font-size: 14px;
+  font-family: var(--font-mono);
+  margin-top: var(--space-sm);
+  line-height: 1.3;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Utility Classes */
+.hidden { display: none; }
+.hint { 
+  color: var(--muted); 
+  font-size: 14px; 
+  margin-top: var(--space-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-family: var(--font-mono);
+}
+
+.text-success { 
+  color: var(--success) !important; 
+  font-weight: 700; 
+  text-transform: uppercase;
+  background: var(--fg);
+  padding: 2px 4px;
+  border: 2px solid var(--border);
+}
+.text-warning { 
+  color: var(--fg) !important; 
+  font-weight: 700; 
+  text-transform: uppercase;
+  background: var(--warning);
+  padding: 2px 4px;
+  border: 2px solid var(--border);
+}
+.text-danger { 
+  color: var(--card) !important; 
+  font-weight: 700; 
+  text-transform: uppercase;
+  background: var(--danger);
+  padding: 2px 4px;
+  border: 2px solid var(--border);
+}
+
+/* Industrial Preset Buttons */
+.presets {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--bg-secondary);
+  background-image: var(--concrete-texture);
+  border: 6px solid var(--border);
+  border-radius: 0;
+  box-shadow: var(--shadow-brutal);
+  position: relative;
+}
+
+.presets::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--industrial-stripes);
+}
+
+.preset-btn {
+  background: var(--success);
+  color: var(--fg);
+  border: 4px solid var(--border);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-brutal);
+}
+
+.preset-btn:hover {
+  background: var(--accent);
+  color: var(--card);
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow-heavy);
+}
+
+.preset-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0px var(--border);
+}
+
+.preset-btn.active {
+  background: var(--danger);
+  color: var(--card);
+  box-shadow: var(--shadow-red);
+}
+
+/* Modal - Industrial Style */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 90;
+  padding: var(--space-lg);
+  overflow-y: auto;
+}
+
+.modal-inner {
+  background: var(--card);
+  background-image: var(--concrete-texture);
+  border: 8px solid var(--border);
+  padding: var(--space-2xl);
+  border-radius: 0;
+  max-width: 580px;
+  width: 100%;
+  max-height: 90vh;
+  box-shadow: var(--shadow-massive);
+  position: relative;
+  overflow-y: auto;
+  margin: auto;
+}
+
+.modal-inner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: var(--warning-tape);
+}
+
+.modal-close {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 50px;
+  height: 50px;
+  background: var(--danger);
+  border: 4px solid var(--border);
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--card);
+  font-family: var(--font-display);
+  box-shadow: var(--shadow-brutal);
+}
+
+.modal-close:hover {
+  background: var(--border);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-heavy);
+}
+
+.modal-close::before {
+  content: '×';
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container { padding: 0 var(--space-md); }
+  h1 { font-size: 3.5rem; }
+  .story { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: 1fr; }
+  .row { flex-direction: column; align-items: stretch; }
+  .toast { right: var(--space-md); bottom: var(--space-md); left: var(--space-md); max-width: none; }
+  .presets { flex-direction: column; }
+  .hero { margin: var(--space-md) 0; }
+}
+
+/*
+THEME NOTES - Neo-Brutalist:
+
+DESIGN PHILOSOPHY:
+- Raw, unpolished industrial aesthetic
+- High contrast black and white base with warning colors
+- No animations or smooth transitions
+- Harsh shadows and thick borders
+- Function over form with utilitarian design
+
+LAYOUT 2 FOCUS (Bottom Sheet):
+- Heavy borders and industrial warning stripes
+- Alternating border colors for visual hierarchy
+- Concrete texture overlays for raw feel
+- Sharp transform effects on hover
+- Warning tape patterns and alert symbols
+
+INDUSTRIAL ELEMENTS:
+- Concrete texture backgrounds
+- Warning stripe patterns (yellow/black, yellow/red)
+- Heavy drop shadows with no blur
+- Thick borders throughout
+- Industrial warning symbols and typography
+
+TYPOGRAPHY:
+- Bebas Neue for display (industrial/construction feel)
+- Oswald for body text (technical documentation)
+- JetBrains Mono for code (terminal aesthetic)
+- All uppercase transforms for authority
+- High letter spacing for impact
+
+KEY FEATURES:
+- No smooth animations or transitions
+- Harsh click/press interactions
+- Industrial color palette (red, yellow, black)
+- Grid overlay for construction blueprint feel
+- Warning tape and hazard symbols throughout
+
+ACCESSIBILITY CONSIDERATIONS:
+- High contrast ratios for maximum readability
+- Large click targets with clear boundaries
+- No motion for users sensitive to animation
+- Strong visual hierarchy through size and color
+- Clear focus states with industrial styling
+
+PHILOSOPHY:
+- Embraces the "ugly" aesthetic of raw functionality
+- Prioritizes clarity and directness over beauty
+- Reflects the chaos testing context through industrial design
+- No decoration that doesn't serve a functional purpose
+*/

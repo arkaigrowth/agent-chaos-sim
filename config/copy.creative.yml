@@ -1,0 +1,65 @@
+hero:
+  title: "Crash-test your agent"
+  sub: "Throw wrenches at your AI. Watch it dodge, stumble, or faceplant. Score the chaos—then remix everything."
+story:
+  step1: 
+    title: "Choose your victim"
+    sub: "Web bot, chat brain, or data muncher"
+  step2: 
+    title: "Run happy path"
+    sub: "See how it acts when life is perfect"
+  step3: 
+    title: "Unleash the gremlins"
+    sub: "500s! Timeouts! Garbage data! Pure chaos!"
+  step4: 
+    title: "Watch the fireworks"
+    sub: "Red traces, green recoveries, surprise wins"
+about:
+  title: "Welcome to chaos"
+  short:
+    title: "What's this madness?"
+    body: "A playground for breaking AI agents on purpose. Flip chaos switches, watch agents scramble to recover. Some survive, some explode—all teach you something."
+  when:
+    title: "Perfect moments for chaos"
+    items:
+      - "When your agent seems too good to be true"
+      - "Before that big demo (test the worst case)"
+      - "Friday afternoon entertainment with the team"
+  score:
+    title: "Your chaos score"
+    body: "How well your agent dances with disaster. High scores mean it laughs at failure. Low scores mean... well, good thing you tested."
+tooltips:
+  btnBaseline: "Run your agent in its happy place"
+  btnChaos: "Release the chaos gremlins upon your agent"
+  btnReplay: "Watch that beautiful disaster again, exactly"
+  btnPermalink: "Share this glorious mess with others"
+  btnDownload: "Keep the carnage for your records"
+  btnViewConfig: "Peek at the chaos recipe you cooked"
+  btnCopyConfig: "Steal this chaos configuration"
+  scenario_fetch: "Web scraper meets Murphy's Law"
+  scenario_rag: "Q&A bot versus corrupted knowledge"
+  scenario_json: "Data parser fights malformed mutations"
+  latencyMs: "How slow to make things crawl"
+  latencyRate: "How often to hit the brakes"
+  http500Rate: "Frequency of server meltdowns"
+  rate429: "How often to slam the door"
+  malformedRate: "Garbage data injection frequency"
+  toolUnavailableSteps: "Which tools suddenly vanish"
+  injSeed: "Your chaos randomness fingerprint"
+  ctxBytes: "Memory limit torture test"
+  tripwireOn: "Give your agent survival instincts"
+  loopN: "How many times to try again"
+  backoffBase: "Initial pause before retry"
+  backoffFactor: "How much longer each retry waits"
+  jitter: "Add some jazz to retry timing"
+  maxRetries: "When to finally give up"
+  fallback: "Plan B when everything fails"
+  seed: "The chaos DNA sequence"
+  surprise: "Enable mystery chaos mode"
+alts:
+  - title: "Agent fight club"
+    sub: "First rule: break everything. Watch agents battle chaos. Winners get resilience badges. Losers get debugged."
+  - title: "Controlled agent demolition"
+    sub: "Professional chaos. Amateur agents. Spectacular failures. Fork the survivors. Share the disasters."
+  - title: "The agent torture chamber"
+    sub: "Where good agents go bad—on purpose. Inject faults, measure pain tolerance, remix the survivors."

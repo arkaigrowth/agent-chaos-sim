@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaos Lab - Theme Preview</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+        }
+        .theme-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .theme-switcher h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .theme-btn {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: left;
+        }
+        .theme-btn:hover {
+            background: #f0f0f0;
+        }
+        .theme-btn.active {
+            background: #007AFF;
+            color: white;
+            border-color: #007AFF;
+        }
+        .info {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        iframe {
+            width: 100%;
+            height: 80vh;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-switcher">
+        <h3>🎨 Theme Switcher</h3>
+        <button class="theme-btn active" data-theme="styles.css">Original (Matrix/Hazard)</button>
+        <button class="theme-btn" data-theme="theme-1-modern-flat.css">Modern Flat Design</button>
+        <button class="theme-btn" data-theme="theme-2-neumorphic.css">Neumorphic Soft UI</button>
+        <button class="theme-btn" data-theme="theme-3-bold-geometric.css">Bold Geometric</button>
+        <button class="theme-btn" data-theme="theme-4-glassmorphism.css">Glassmorphism</button>
+        <button class="theme-btn" data-theme="theme-5-neo-brutalist.css">Neo-Brutalist</button>
+    </div>
+
+    <div class="info">
+        <h1>🧪 Chaos Lab Theme Gallery</h1>
+        <p>This preview shows the Chaos Lab application with 5 different theme variations, each designed with Layout 2 (Bottom Sheet Focus) in mind. Each theme maintains the chaos/testing context while offering a completely different visual approach:</p>
+        
+        <h3>🎯 Theme Variations:</h3>
+        <ul>
+            <li><strong>Modern Flat Design</strong> - Clean, minimalist with bold orange accents and generous whitespace</li>
+            <li><strong>Neumorphic Soft UI</strong> - Soft, raised elements with subtle shadows and gentle animations</li>
+            <li><strong>Bold Geometric</strong> - Sharp angles, high contrast dark theme with electric neon accents</li>
+            <li><strong>Glassmorphism</strong> - Translucent layers with backdrop blur and floating animations</li>
+            <li><strong>Neo-Brutalist</strong> - Raw, industrial aesthetic with harsh shadows and warning colors</li>
+        </ul>
+
+        <h3>🔧 Layout 2 Focus (Bottom Sheet):</h3>
+        <p>Each theme enhances the main content cards with improved visual hierarchy, enhanced hover states, better spacing, and theme-specific animations or effects.</p>
+
+        <h3>🚀 Usage:</h3>
+        <p>To use any theme, simply replace the link to <code>styles.css</code> in your <code>index.html</code> with the desired theme file:</p>
+        <pre><code>&lt;link rel="stylesheet" href="/theme-1-modern-flat.css" /&gt;</code></pre>
+    </div>
+
+    <iframe id="preview-frame" src="index.html"></iframe>
+
+    <script>
+        const themeBtns = document.querySelectorAll('.theme-btn');
+        const previewFrame = document.getElementById('preview-frame');
+        
+        themeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                themeBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                // Update iframe with theme parameter
+                const theme = btn.dataset.theme;
+                const url = `index.html?theme=${theme}`;
+                previewFrame.src = url;
+            });
+        });
+
+        // If the main app supports theme switching via URL parameter,
+        // you would modify index.html to read the theme parameter:
+        /*
+        const urlParams = new URLSearchParams(window.location.search);
+        const theme = urlParams.get('theme');
+        if (theme) {
+            document.querySelector('link[rel="stylesheet"]').href = theme;
+        }
+        */
+    </script>
+</body>
+</html>

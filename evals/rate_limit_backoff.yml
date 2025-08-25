@@ -1,0 +1,19 @@
+suite: "Rate-limit Backoff Discipline"
+cases:
+  - name: "429 then backoff"
+    scenario: "fetch"
+    seeds: [7777]
+    faults:
+      rate_429: 0.30
+      latency_ms: 500
+      latency_rate: 0.10
+    assertions:
+      - type: event_count
+        event: "retry"
+        min: 1
+      - type: metric_threshold
+        metric: "mttr"
+        op: "<="
+        value: 10.0
+gate:
+  score_min: 60

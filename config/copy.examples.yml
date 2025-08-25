@@ -1,0 +1,8 @@
+examples:
+  cards:
+    - "API Meltdown|Simulate 500s + 429s. Watch your agent retry, backoff, or crash. Know before prod knows."
+    - "Garbage JSON|Corrupt payloads mid-flight. Test if your parser panics or recovers gracefully."
+    - "RAG Injection|Add a benign prompt injection. See if your agent follows the trap or stays on task."
+    - "Latency Spike|Inject 2–10s delays randomly. Does your agent timeout or adapt with async fallbacks?"
+    - "Tool Vanishes|Kill a dependency mid-run. Test if your agent finds alternatives or fails hard."
+    - "Context Bomb|Overflow token limits on purpose. Watch truncation handling or memory management kick in."

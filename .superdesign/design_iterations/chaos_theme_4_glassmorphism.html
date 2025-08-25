@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chaos Lab - Glassmorphism Theme</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Base chaos/hazard palette with transparency */
+      --primary: #fbbf24;
+      --secondary: #fb923c;
+      --danger: #ef4444;
+      --success: #10b981;
+      --background: linear-gradient(135deg, #1e3a8a 0%, #7c2d92 100%);
+      
+      /* Glassmorphic extensions */
+      --glass-surface: rgba(255, 255, 255, 0.1);
+      --glass-surface-hover: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --text: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.7);
+      
+      /* Glass effects */
+      --backdrop-blur: blur(20px);
+      --backdrop-blur-strong: blur(30px);
+      --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      --border-glass: 1px solid rgba(255, 255, 255, 0.18);
+      
+      /* Typography */
+      --font-heading: 'Montserrat', sans-serif;
+      --font-body: 'Nunito Sans', sans-serif;
+      --font-mono: 'Cascadia Code', monospace;
+      
+      /* Rounded glass elements */
+      --border-radius: 20px;
+      --border-radius-lg: 32px;
+    }
+
+    /* Animations */
+    .glass-float { animation: glassFloat 4s ease-in-out infinite; }
+    .shimmer { animation: shimmer 2s linear infinite; }
+    .glass-morph { transition: backdrop-filter 0.3s ease, background 0.3s ease; }
+    .bubble-up { animation: bubbleUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+
+    @keyframes glassFloat { 
+      0%, 100% { transform: translateY(0px); } 
+      50% { transform: translateY(-10px); } 
+    }
+    @keyframes shimmer { 
+      0% { background-position: -200% 0; } 
+      100% { background-position: 200% 0; } 
+    }
+    @keyframes bubbleUp { 
+      from { transform: scale(0) translateY(20px); opacity: 0; } 
+      to { transform: scale(1) translateY(0); opacity: 1; } 
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    .header {
+      background: var(--glass-surface);
+      backdrop-filter: var(--backdrop-blur);
+      border-bottom: var(--border-glass);
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+      letter-spacing: 1px;
+    }
+
+    .theme-selector {
+      background: var(--glass-surface);
+      backdrop-filter: var(--backdrop-blur);
+      border: var(--border-glass);
+      border-radius: var(--border-radius);
+      padding: 0.75rem 1.25rem;
+      color: var(--text);
+      font-size: 0.875rem;
+      font-family: var(--font-body);
+      font-weight: 600;
+    }
+
+    .hero {
+      padding: 4rem 2rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: -1;
+    }
+
+    .hero h1 {
+      font-family: var(--font-heading);
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      text-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
+      letter-spacing: 2px;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      font-weight: 500;
+    }
+
+    .btn {
+      background: var(--glass-surface-hover);
+      backdrop-filter: var(--backdrop-blur);
+      color: var(--primary);
+      border: var(--border-glass);
+      padding: 1rem 2rem;
+      border-radius: var(--border-radius-lg);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: var(--shadow-glass);
+      transition: all 0.3s ease;
+      font-family: var(--font-body);
+      letter-spacing: 1px;
+    }
+
+    .btn:hover {
+      background: var(--glass-surface-hover);
+      backdrop-filter: var(--backdrop-blur-strong);
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+    }
+
+    .story {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      background: var(--glass-surface);
+      backdrop-filter: var(--backdrop-blur);
+      border: var(--border-glass);
+      margin: 2rem;
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-glass);
+    }
+
+    .story .step {
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--glass-surface);
+      backdrop-filter: var(--backdrop-blur);
+      border: var(--border-glass);
+      border-radius: var(--border-radius);
+      transition: all 0.3s ease;
+    }
+
+    .story .step:hover {
+      background: var(--glass-surface-hover);
+      transform: translateY(-3px);
+    }
+
+    .story .step div {
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .story .step span {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--glass-surface);
+      backdrop-filter: var(--backdrop-blur);
+      border: var(--border-glass);
+      border-radius: var(--border-radius-lg);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-glass);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      background: var(--glass-surface-hover);
+      backdrop-filter: var(--backdrop-blur-strong);
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+    }
+
+    .card h3 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 1rem;
+      border: var(--border-glass);
+      border-radius: var(--border-radius);
+      background: var(--glass-surface);
+      backdrop-filter: var(--backdrop-blur);
+      color: var(--text);
+      font-size: 1rem;
+      font-family: var(--font-body);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border: 1px solid var(--primary);
+      background: var(--glass-surface-hover);
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--glass-surface);
+      backdrop-filter: var(--backdrop-blur);
+      border: var(--border-glass);
+      border-radius: var(--border-radius);
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      accent-color: var(--primary);
+    }
+
+    /* Bottom Sheet Focus */
+    .bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--glass-surface);
+      backdrop-filter: var(--backdrop-blur-strong);
+      border-top: var(--border-glass);
+      padding: 2.5rem;
+      box-shadow: 0 -8px 32px 0 rgba(31, 38, 135, 0.37);
+      z-index: 1000;
+      border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+
+    .test-controls {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+      padding: 1.5rem;
+      background: var(--glass-surface-hover);
+      backdrop-filter: var(--backdrop-blur);
+      border: var(--border-glass);
+      border-radius: var(--border-radius);
+    }
+
+    .test-controls input {
+      padding: 0.75rem 1.25rem;
+      border: var(--border-glass);
+      border-radius: var(--border-radius);
+      background: var(--glass-surface);
+      backdrop-filter: var(--backdrop-blur);
+      color: var(--text);
+      font-family: var(--font-body);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-primary {
+      background: var(--glass-surface-hover);
+      backdrop-filter: var(--backdrop-blur);
+      color: var(--primary);
+      border: var(--border-glass);
+      padding: 1rem 2rem;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-body);
+      box-shadow: var(--shadow-glass);
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: rgba(251, 191, 36, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.4);
+    }
+
+    .btn-danger {
+      background: var(--glass-surface-hover);
+      backdrop-filter: var(--backdrop-blur);
+      color: var(--danger);
+      border: var(--border-glass);
+      padding: 1rem 2rem;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-body);
+      box-shadow: var(--shadow-glass);
+      transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--glass-surface);
+      backdrop-filter: var(--backdrop-blur);
+      color: var(--text);
+      border: var(--border-glass);
+      padding: 1rem 2rem;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-body);
+      box-shadow: var(--shadow-glass);
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: var(--glass-surface-hover);
+      transform: translateY(-3px);
+    }
+
+    .results-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .metric-card {
+      background: var(--glass-surface-hover);
+      backdrop-filter: var(--backdrop-blur);
+      border: var(--border-glass);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      box-shadow: var(--shadow-glass);
+      transition: all 0.3s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+    }
+
+    .metric-card h4 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .metric-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .trace-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--glass-surface-hover);
+      backdrop-filter: var(--backdrop-blur);
+      border: var(--border-glass);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-glass);
+    }
+
+    .trace-table th,
+    .trace-table td {
+      padding: 1rem;
+      text-align: left;
+    }
+
+    .trace-table th {
+      background: rgba(251, 191, 36, 0.1);
+      backdrop-filter: var(--backdrop-blur);
+      color: var(--primary);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .trace-table tbody tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .trace-table tbody tr:hover {
+      background: var(--glass-surface-hover);
+    }
+
+    .status-success {
+      color: var(--success);
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+
+    .status-error {
+      color: var(--danger);
+      text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    }
+
+    .view-toggles {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .view-toggle {
+      background: var(--glass-surface);
+      backdrop-filter: var(--backdrop-blur);
+      border: var(--border-glass);
+      color: var(--text);
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .view-toggle.active {
+      background: rgba(251, 191, 36, 0.1);
+      color: var(--primary);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+
+    .view-toggle:hover {
+      background: var(--glass-surface-hover);
+      transform: translateY(-2px);
+    }
+
+    /* Glass particle effects */
+    .glass-particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .glass-particles::before,
+    .glass-particles::after {
+      content: '';
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .glass-particles::before {
+      top: 20%;
+      left: 20%;
+      animation-delay: 0s;
+    }
+
+    .glass-particles::after {
+      top: 80%;
+      right: 20%;
+      animation-delay: 3s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+      50% { transform: translateY(-20px) rotate(180deg); opacity: 0.7; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .results-panel {
+        grid-template-columns: 1fr;
+      }
+      
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .bottom-sheet {
+        padding: 1.5rem;
+      }
+      
+      .test-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glass-particles"></div>
+  
+  <!-- Header -->
+  <div class="header glass-float">
+    <div class="logo shimmer">Chaos Lab</div>
+    <select class="theme-selector glass-morph">
+      <option>Theme ▼</option>
+      <option value="modern">Modern Flat</option>
+      <option value="neumorphic">Neumorphic</option>
+      <option value="geometric">Bold Geometric</option>
+      <option value="glass" selected>Glassmorphism</option>
+      <option value="brutalist">Neo-Brutalist</option>
+    </select>
+  </div>
+
+  <!-- Hero Section -->
+  <div class="hero bubble-up">
+    <h1>Chaos Lab</h1>
+    <p>Experience agent resilience testing through translucent beauty</p>
+    <a href="#" class="btn glass-morph">Get Started →</a>
+  </div>
+
+  <!-- Story Steps -->
+  <div class="story">
+    <div class="step glass-morph">
+      <div>Pick a scenario</div>
+      <span>Web · Mini-RAG · JSON→Table</span>
+    </div>
+    <div class="step glass-morph">
+      <div>Run baseline</div>
+      <span>Clean control metrics</span>
+    </div>
+    <div class="step glass-morph">
+      <div>Toggle chaos</div>
+      <span>500s · 429s · latency · bad JSON</span>
+    </div>
+    <div class="step glass-morph">
+      <div>Compare & Remix</div>
+      <span>Trace + Score + one-click fork</span>
+    </div>
+  </div>
+
+  <!-- Main Configuration Grid -->
+  <div class="main-grid">
+    <div class="card glass-morph">
+      <h3>Choose Test Scenario</h3>
+      <div class="form-group">
+        <label>
+          <input type="radio" name="scenario" value="fetch" checked> 
+          🌐 Web Scraping
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="radio" name="scenario" value="rag"> 
+          📚 Document Q&A
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="radio" name="scenario" value="json"> 
+          🔧 API Processing
+        </label>
+      </div>
+    </div>
+
+    <div class="card glass-morph">
+      <h3>Configure Failures</h3>
+      <div class="form-group">
+        <label>Network Latency (ms)</label>
+        <input type="number" value="2000">
+      </div>
+      <div class="form-group">
+        <label>Error Rate (%)</label>
+        <input type="number" value="10">
+      </div>
+      <div class="form-group">
+        <label>Rate Limiting (%)</label>
+        <input type="number" value="10">
+      </div>
+    </div>
+
+    <div class="card glass-morph">
+      <h3>Recovery Settings</h3>
+      <div class="checkbox-group">
+        <input type="checkbox" checked>
+        <label>✓ Smart Recovery</label>
+      </div>
+      <div class="form-group">
+        <label>Max Retries</label>
+        <input type="number" value="3">
+      </div>
+      <div class="form-group">
+        <label>Backoff (ms)</label>
+        <input type="number" value="250">
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet Focus -->
+  <div class="bottom-sheet">
+    <!-- Test Controls -->
+    <div class="test-controls">
+      <label>Seed:</label>
+      <input type="text" value="1337" placeholder="Test seed">
+      <label>
+        <input type="checkbox"> 🎲 Randomize
+      </label>
+      <button class="btn-secondary glass-morph">↻ Replay</button>
+      <button class="btn-secondary glass-morph">🔗 Share</button>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="btn-group">
+      <button class="btn-primary glass-morph">▶️ Run Baseline</button>
+      <button class="btn-danger glass-morph">⚡ Run Chaos</button>
+      <button class="btn-secondary glass-morph">📊 Export Report</button>
+    </div>
+
+    <!-- Live Results -->
+    <div class="results-panel">
+      <div class="metric-card glass-morph">
+        <h4>Baseline</h4>
+        <div class="metric-value">95</div>
+        <div class="metric-label">Score</div>
+      </div>
+      <div class="metric-card glass-morph">
+        <h4>Chaos</h4>
+        <div class="metric-value">85</div>
+        <div class="metric-label">Score</div>
+      </div>
+      <div class="metric-card glass-morph">
+        <h4>Delta</h4>
+        <div class="metric-value">-10</div>
+        <div class="metric-label">Δ Score</div>
+      </div>
+    </div>
+
+    <!-- View Controls -->
+    <div class="view-toggles">
+      <button class="view-toggle active glass-morph">📊 TABLE</button>
+      <button class="view-toggle glass-morph">🔧 JSON</button>
+      <button class="view-toggle glass-morph">📈 GRAPH</button>
+      <button class="btn-secondary glass-morph">💾 Download</button>
+      <button class="btn-secondary glass-morph">📋 Copy</button>
+    </div>
+
+    <!-- Trace Table -->
+    <table class="trace-table">
+      <thead>
+        <tr>
+          <th>Step</th>
+          <th>Tool</th>
+          <th>Fault</th>
+          <th>Action</th>
+          <th>Duration</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>WebFetch</td>
+          <td>None</td>
+          <td>GET /api</td>
+          <td>1.2s</td>
+          <td class="status-success">✅</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>WebFetch</td>
+          <td>500 ERR</td>
+          <td>GET /data</td>
+          <td>3.1s</td>
+          <td class="status-error">❌</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Retry</td>
+          <td>Backoff</td>
+          <td>Retry GET</td>
+          <td>2.8s</td>
+          <td class="status-success">✅</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

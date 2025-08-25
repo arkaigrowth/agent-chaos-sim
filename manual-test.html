@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manual Test</title>
+</head>
+<body>
+  <h1>Manual Testing Steps</h1>
+  
+  <h2>Test 1: Example Cards Click</h2>
+  <ol>
+    <li>Open browser console (F12)</li>
+    <li>Go to http://localhost:5173</li>
+    <li>Close onboarding modal if it appears</li>
+    <li>Run in console: <code>document.querySelector('#http500Rate').value</code> (note the value)</li>
+    <li>Click on "API Meltdown" card</li>
+    <li>Run in console again: <code>document.querySelector('#http500Rate').value</code></li>
+    <li>Value should have changed to 30</li>
+  </ol>
+  
+  <h2>Test 2: Check if applyFaultConfiguration exists</h2>
+  <ol>
+    <li>In browser console at http://localhost:5173</li>
+    <li>Run: <code>typeof applyFaultConfiguration</code></li>
+    <li>Should return "function"</li>
+    <li>If undefined, the function isn't being loaded</li>
+  </ol>
+  
+  <h2>Test 3: Check example data</h2>
+  <ol>
+    <li>In browser console:</li>
+    <li>Run: <code>
+      document.querySelectorAll('#examplesGrid .ex').forEach((el, i) => {
+        console.log(i, el.getAttribute('data-example-index'), el.querySelector('h3').textContent);
+      })
+    </code></li>
+    <li>Should show 6 examples with indices 0-5</li>
+  </ol>
+  
+  <h2>Test 4: Manual fault application</h2>
+  <ol>
+    <li>In browser console:</li>
+    <li>Run: <code>
+      if (typeof applyFaultConfiguration === 'function') {
+        applyFaultConfiguration({ http500Rate: 0.5, malformedRate: 0.8 });
+        console.log('Applied!');
+      } else {
+        console.log('Function not found!');
+      }
+    </code></li>
+  </ol>
+  
+  <h2>Test 5: Scoring with faults</h2>
+  <ol>
+    <li>Set Malformed Response Rate to 100%</li>
+    <li>Select "JSON → Table" scenario</li>
+    <li>Click "Run with Chaos"</li>
+    <li>Check the score badge - should be less than 100%</li>
+  </ol>
+</body>
+</html>

@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chaos Lab - Agent Resilience Theatre</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0a0a0a;
+  color: #00ff41;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #00ff41;
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+.score-display {
+  font-size: 20px;
+  color: #ffff00;
+  font-weight: bold;
+}
+
+/* Legend Panel - Make it prominent */
+.legend-panel {
+  background: #1a1a1a;
+  border: 2px solid #00ff41;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.legend-title {
+  grid-column: 1 / -1;
+  color: #00ff41;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #888;
+}
+
+.legend-symbol {
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  min-width: 30px;
+}
+
+/* Scenarios */
+.scenarios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.scenario-card {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.scenario-card:hover {
+  border-color: #00ff41;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 255, 65, 0.2);
+}
+
+.scenario-card.active {
+  background: #1f2f1f;
+  border-color: #00ff41;
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+}
+
+/* Theatre Stage */
+#stage {
+  background: #000;
+  border: 2px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+  font-size: 13px;
+  line-height: 1.1;
+  white-space: pre;
+  overflow: hidden;
+  min-height: 300px;
+  margin-bottom: 20px;
+  position: relative;
+  font-family: 'Courier New', monospace;
+  color: #00ff41;
+}
+
+#stage.running {
+  border-color: #00ff41;
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+}
+
+/* Control Buttons */
+.control-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  background: #1a1a1a;
+  border: 1px solid #00ff41;
+  color: #00ff41;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn:hover:not(:disabled) {
+  background: #00ff41;
+  color: #000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 255, 65, 0.3);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn.primary {
+  background: #00ff41;
+  color: #000;
+  font-weight: bold;
+}
+
+/* Timeline */
+.timeline {
+  background: #0a0a0a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 11px;
+  color: #666;
+  white-space: nowrap;
+  overflow-x: auto;
+  margin-bottom: 20px;
+  max-height: 60px;
+}
+
+.timeline-event {
+  display: inline-block;
+  padding: 2px 8px;
+  margin: 0 4px;
+  background: #1a1a1a;
+  border-radius: 3px;
+  border: 1px solid #333;
+}
+
+.timeline-event.fault {
+  border-color: #ff4444;
+  color: #ff4444;
+}
+
+.timeline-event.recovery {
+  border-color: #00ff41;
+  color: #00ff41;
+}
+
+/* Quick fault triggers */
+.quick-triggers {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.trigger-btn {
+  background: #222;
+  color: #888;
+  border: 1px solid #444;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.trigger-btn:hover {
+  background: #333;
+  color: #00ff41;
+  border-color: #00ff41;
+}
+
+/* Collapsible Control Panel */
+.control-panel {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.control-panel-header {
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  color: #00ff41;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s;
+  user-select: none;
+}
+
+.control-panel-header:hover {
+  background: linear-gradient(135deg, #1f1f1f 0%, #2f2f2f 100%);
+}
+
+.control-panel[open] .control-panel-header {
+  border-bottom: 1px solid #333;
+}
+
+.control-panel-content {
+  padding: 20px;
+}
+
+.param-section {
+  margin-bottom: 25px;
+}
+
+.param-section:last-child {
+  margin-bottom: 0;
+}
+
+.param-section-title {
+  color: #00ff41;
+  font-size: 13px;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.param-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+}
+
+.param-box {
+  background: #0f0f0f;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  padding: 10px;
+  transition: all 0.2s;
+}
+
+.param-box:hover {
+  border-color: #00ff41;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+}
+
+.param-box .param-label {
+  display: block;
+  font-size: 11px;
+  color: #00ff41;
+  margin-bottom: 5px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.param-box .param-input {
+  width: 100%;
+  background: #0a0a0a;
+  border: 1px solid #333;
+  color: #00ff41;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.param-box .param-input:focus {
+  outline: none;
+  border-color: #00ff41;
+  box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.1);
+}
+
+.param-box .param-input::placeholder {
+  color: #444;
+}
+
+.param-hint {
+  display: block;
+  font-size: 9px;
+  color: #666;
+  margin-top: 3px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="logo">🎭 CHAOS LAB</div>
+    <div class="score-display">RESILIENCE: <span id="score">100</span>%</div>
+  </div>
+
+  <!-- Legend Panel - Always visible -->
+  <div class="legend-panel">
+    <div class="legend-title">🗺️ Visual Legend</div>
+    <div class="legend-item">
+      <span class="legend-symbol">●</span>
+      <span>Data packet traversing pipeline</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">·</span>
+      <span>Packet trail / motion blur</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">☁500</span>
+      <span>HTTP 500 server error</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">⛔429</span>
+      <span>Rate limit (429) hit</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">~~~</span>
+      <span>Network latency/slowdown</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">{�}</span>
+      <span>Malformed JSON payload</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">⊘</span>
+      <span>Tool/dependency unavailable</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">💣ctx</span>
+      <span>Context truncation/overflow</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">🪤</span>
+      <span>RAG injection trap</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">retry(n)</span>
+      <span>Retry attempt #n</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">🪂</span>
+      <span>Fallback strategy activated</span>
+    </div>
+  </div>
+
+  <!-- Scenario Selector -->
+  <div class="scenarios" id="scenarios"></div>
+
+  <!-- Collapsible Control Panel -->
+  <details class="control-panel" open>
+    <summary class="control-panel-header">
+      ⚙️ Chaos Parameters & Recovery Settings
+      <span style="font-size: 11px; color: #666; margin-left: 10px;">(Click scenarios above to auto-populate)</span>
+    </summary>
+    
+    <div class="control-panel-content">
+      <!-- Fault Injection Parameters -->
+      <div class="param-section">
+        <h4 class="param-section-title">⚡ Fault Injection Parameters</h4>
+        <div class="param-grid">
+          <div class="param-box">
+            <label class="param-label">Latency (ms)</label>
+            <input type="number" class="param-input" id="latencyMs" value="0" min="0" max="10000">
+            <span class="param-hint">Delay duration</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Latency Rate (%)</label>
+            <input type="number" class="param-input" id="latencyRate" value="0" min="0" max="100" step="5">
+            <span class="param-hint">Chance of delay</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">HTTP 500 Rate (%)</label>
+            <input type="number" class="param-input" id="http500Rate" value="0" min="0" max="100" step="5">
+            <span class="param-hint">Server errors</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Rate Limit 429 (%)</label>
+            <input type="number" class="param-input" id="rate429" value="0" min="0" max="100" step="5">
+            <span class="param-hint">Rate limiting</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Malformed JSON (%)</label>
+            <input type="number" class="param-input" id="malformedRate" value="0" min="0" max="100" step="5">
+            <span class="param-hint">Bad payloads</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Tool Unavailable</label>
+            <input type="number" class="param-input" id="toolUnavailableSteps" value="0" min="0" max="10">
+            <span class="param-hint">Steps to fail</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Injection Seed</label>
+            <input type="text" class="param-input" id="injSeed" value="" placeholder="none">
+            <span class="param-hint">RAG injection</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Context Bytes</label>
+            <input type="number" class="param-input" id="ctxBytes" value="8192" min="128" max="32768">
+            <span class="param-hint">Token limit</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recovery & Resilience Parameters -->
+      <div class="param-section">
+        <h4 class="param-section-title">🛡️ Recovery & Resilience Settings</h4>
+        <div class="param-grid">
+          <div class="param-box">
+            <label class="param-label">
+              <input type="checkbox" id="tripwireOn" checked style="margin-right: 5px;">
+              Smart Recovery
+            </label>
+            <span class="param-hint">Enable retries</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Loop Prevention</label>
+            <input type="number" class="param-input" id="loopN" value="3" min="2" max="10">
+            <span class="param-hint">Max iterations</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Retry Base (ms)</label>
+            <input type="number" class="param-input" id="backoffBase" value="250" min="0" max="5000">
+            <span class="param-hint">Initial delay</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Backoff Factor</label>
+            <input type="number" class="param-input" id="backoffFactor" value="2.0" min="1" max="5" step="0.1">
+            <span class="param-hint">Multiplier</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Jitter (0-1)</label>
+            <input type="number" class="param-input" id="jitter" value="0.2" min="0" max="1" step="0.05">
+            <span class="param-hint">Randomness</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Max Retries</label>
+            <input type="number" class="param-input" id="maxRetries" value="3" min="0" max="10">
+            <span class="param-hint">Retry limit</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Fallback Strategy</label>
+            <input type="text" class="param-input" id="fallback" value="use_cached" placeholder="strategy">
+            <span class="param-hint">Backup plan</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Chaos Seed</label>
+            <input type="text" class="param-input" id="seed" value="" placeholder="random">
+            <span class="param-hint">Deterministic</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- Quick Triggers for Testing -->
+  <div class="quick-triggers">
+    <button class="trigger-btn" onclick="sim.injectFault('latency')">🐌 Inject Latency</button>
+    <button class="trigger-btn" onclick="sim.injectFault('500')">☁️ Inject 500</button>
+    <button class="trigger-btn" onclick="sim.injectFault('429')">⛔ Inject 429</button>
+    <button class="trigger-btn" onclick="sim.injectFault('malformed')">📦 Inject Bad JSON</button>
+    <button class="trigger-btn" onclick="sim.injectFault('tool_unavailable')">⊘ Kill Tool</button>
+    <button class="trigger-btn" onclick="sim.injectFault('context_truncate')">💣 Truncate Context</button>
+    <button class="trigger-btn" onclick="sim.injectFault('injection', {seed: 'test'})">🪤 RAG Injection</button>
+  </div>
+
+  <!-- Control Buttons -->
+  <div class="control-buttons">
+    <button class="btn primary" id="runBtn">▶️ RUN SCENARIO</button>
+    <button class="btn" id="pauseBtn" disabled>⏸️ PAUSE</button>
+    <button class="btn" id="resetBtn">🔄 RESET</button>
+    <button class="btn" id="randomBtn">🎲 RANDOM CHAOS</button>
+    <button class="btn" id="clearBtn">🧹 CLEAR PARAMS</button>
+    <button class="btn" id="debugBtn">🐛 DEBUG MODE</button>
+  </div>
+
+  <!-- ASCII Theatre Stage -->
+  <pre id="stage" aria-live="polite"></pre>
+
+  <!-- Timeline -->
+  <div class="timeline" id="timeline">
+    <span style="color: #666;">TIMELINE:</span>
+  </div>
+
+  <!-- Debug Panel -->
+  <div id="debugPanel" style="display:none; background: #111; padding: 10px; border: 1px solid #333; border-radius: 4px; font-size: 11px; color: #666; margin-top: 10px;">
+    <div id="debugInfo"></div>
+  </div>
+</div>
+
+<script>
+// Scenario configurations
+const scenarios = [
+  { 
+    title: "API Meltdown", 
+    body: "Simulate 500s + 429s. Watch retry, backoff, or crash.",
+    faults: { latencyMs: 2000, latencyRate: 20, http500Rate: 30, rate429: 25, malformedRate: 10 },
+    icon: "🔥"
+  },
+  { 
+    title: "Garbage JSON", 
+    body: "Corrupt payloads mid-flight. Test parser recovery.",
+    faults: { latencyMs: 1000, latencyRate: 10, http500Rate: 10, rate429: 10, malformedRate: 40 },
+    icon: "🗑️"
+  },
+  { 
+    title: "RAG Injection", 
+    body: "Benign prompt injection. Does agent stay on task?",
+    faults: { latencyMs: 500, latencyRate: 5, injSeed: "test-injection", ctxBytes: 4096 },
+    icon: "💉"
+  },
+  { 
+    title: "Latency Spike", 
+    body: "10s delays randomly. Test timeout handling.",
+    faults: { latencyMs: 10000, latencyRate: 50, http500Rate: 5, rate429: 5 },
+    icon: "🐌"
+  },
+  { 
+    title: "Tool Vanishes", 
+    body: "Kill dependency mid-run. Test fallback paths.",
+    faults: { toolUnavailableSteps: 3, latencyMs: 1000, latencyRate: 20 },
+    icon: "👻"
+  },
+  { 
+    title: "Context Bomb", 
+    body: "Overflow token limits. Watch truncation handling.",
+    faults: { ctxBytes: 512, injSeed: "context-overflow", latencyMs: 2000, latencyRate: 15 },
+    icon: "💣"
+  }
+];
+
+class ChaosSimulator {
+  constructor() {
+    this.stage = document.getElementById('stage');
+    this.timeline = document.getElementById('timeline');
+    this.scoreEl = document.getElementById('score');
+    this.debugPanel = document.getElementById('debugPanel');
+    this.debugInfo = document.getElementById('debugInfo');
+    
+    this.state = {
+      running: false,
+      paused: false,
+      debugMode: false,
+      scenario: null,
+      packet: { 
+        x: 4, 
+        y: 5, 
+        targetX: 4,
+        velocity: 0,
+        maxSpeed: 15, // pixels per second
+        normalSpeed: 15,
+        slowSpeed: 3
+      },
+      effects: [],
+      score: 100,
+      faultCount: 0,
+      recoveryCount: 0,
+      startTime: 0,
+      nodeVisits: new Set(),
+      lastNodeIndex: -1
+    };
+    
+    this.nodes = [
+      { x: 2, y: 3, w: 10, h: 3, label: 'CLIENT', center: 7 },
+      { x: 18, y: 3, w: 10, h: 3, label: 'FETCH', center: 23 },
+      { x: 34, y: 3, w: 13, h: 3, label: 'PARSE/QA', center: 40 },
+      { x: 53, y: 3, w: 12, h: 3, label: 'SUMMARIZE', center: 59 }
+    ];
+    
+    this.animationFrame = null;
+    this.lastFrame = performance.now();
+    
+    this.init();
+  }
+  
+  init() {
+    // Render scenarios
+    const scenariosEl = document.getElementById('scenarios');
+    scenarios.forEach((scenario, i) => {
+      const card = document.createElement('div');
+      card.className = 'scenario-card';
+      card.innerHTML = `
+        <div style="font-size: 14px; font-weight: bold; color: #00ff41; margin-bottom: 8px;">
+          ${scenario.icon} ${scenario.title}
+        </div>
+        <div style="font-size: 11px; color: #888; line-height: 1.4;">
+          ${scenario.body}
+        </div>
+      `;
+      card.onclick = () => this.loadScenario(i);
+      scenariosEl.appendChild(card);
+    });
+    
+    // Button handlers
+    document.getElementById('runBtn').onclick = () => this.run();
+    document.getElementById('pauseBtn').onclick = () => this.pause();
+    document.getElementById('resetBtn').onclick = () => this.reset();
+    document.getElementById('randomBtn').onclick = () => this.randomChaos();
+    document.getElementById('clearBtn').onclick = () => this.clearParams();
+    document.getElementById('debugBtn').onclick = () => this.toggleDebug();
+    
+    // Initial render
+    this.render();
+  }
+  
+  toggleDebug() {
+    this.state.debugMode = !this.state.debugMode;
+    this.debugPanel.style.display = this.state.debugMode ? 'block' : 'none';
+    document.getElementById('debugBtn').style.background = this.state.debugMode ? '#00ff41' : '#1a1a1a';
+    document.getElementById('debugBtn').style.color = this.state.debugMode ? '#000' : '#00ff41';
+  }
+  
+  loadScenario(index) {
+    const scenario = scenarios[index];
+    this.state.scenario = scenario;
+    
+    document.querySelectorAll('.scenario-card').forEach((el, i) => {
+      el.classList.toggle('active', i === index);
+    });
+    
+    // Update parameter inputs with scenario values
+    Object.keys(scenario.faults).forEach(key => {
+      const input = document.getElementById(key);
+      if (input) {
+        input.value = scenario.faults[key];
+        // Add a pulse effect to show what changed
+        input.style.transition = 'background 0.3s';
+        input.style.background = '#00ff41';
+        input.style.color = '#000';
+        setTimeout(() => {
+          input.style.background = '#0a0a0a';
+          input.style.color = '#00ff41';
+        }, 300);
+      }
+    });
+    
+    this.reset();
+  }
+  
+  readParameters() {
+    // Read fault injection parameters from inputs
+    this.state.faults = {
+      latencyMs: parseInt(document.getElementById('latencyMs').value) || 0,
+      latencyRate: parseInt(document.getElementById('latencyRate').value) || 0,
+      http500Rate: parseInt(document.getElementById('http500Rate').value) || 0,
+      rate429: parseInt(document.getElementById('rate429').value) || 0,
+      malformedRate: parseInt(document.getElementById('malformedRate').value) || 0,
+      toolUnavailableSteps: parseInt(document.getElementById('toolUnavailableSteps').value) || 0,
+      injSeed: document.getElementById('injSeed').value || '',
+      ctxBytes: parseInt(document.getElementById('ctxBytes').value) || 8192
+    };
+    
+    // Read recovery parameters
+    this.state.recovery = {
+      enabled: document.getElementById('tripwireOn').checked,
+      loopN: parseInt(document.getElementById('loopN').value) || 3,
+      backoffBase: parseInt(document.getElementById('backoffBase').value) || 250,
+      backoffFactor: parseFloat(document.getElementById('backoffFactor').value) || 2.0,
+      jitter: parseFloat(document.getElementById('jitter').value) || 0.2,
+      maxRetries: parseInt(document.getElementById('maxRetries').value) || 3,
+      fallback: document.getElementById('fallback').value || 'use_cached',
+      seed: document.getElementById('seed').value || ''
+    };
+  }
+  
+  run() {
+    if (this.state.running) return;
+    
+    // Read parameters from inputs
+    this.readParameters();
+    
+    this.state.running = true;
+    this.state.paused = false;
+    this.state.startTime = performance.now();
+    this.lastFrame = performance.now();
+    
+    // Reset packet
+    this.state.packet.x = 4;
+    this.state.packet.targetX = 70; // End of pipeline
+    this.state.packet.velocity = this.state.packet.normalSpeed;
+    this.state.nodeVisits.clear();
+    this.state.lastNodeIndex = -1;
+    
+    // Update UI
+    document.getElementById('runBtn').disabled = true;
+    document.getElementById('pauseBtn').disabled = false;
+    this.stage.classList.add('running');
+    
+    // Start animation
+    this.animate();
+  }
+  
+  animate() {
+    if (!this.state.running) return;
+    
+    const now = performance.now();
+    const dt = Math.min((now - this.lastFrame) / 1000, 0.1); // Delta time in seconds, capped
+    this.lastFrame = now;
+    
+    if (!this.state.paused) {
+      // Smooth packet movement
+      const packet = this.state.packet;
+      const distance = packet.targetX - packet.x;
+      
+      if (Math.abs(distance) > 0.1) {
+        // Move packet
+        packet.x += packet.velocity * dt;
+        
+        // Check node proximity
+        this.checkNodeProximity();
+        
+        // Check completion
+        if (packet.x >= 68) {
+          this.complete();
+          return;
+        }
+      }
+      
+      // Update effects
+      this.state.effects = this.state.effects.map(e => {
+        e.ttl -= dt * 1000; // Convert back to ms
+        
+        // Animate effect properties
+        if (e.type === 'latency' && e.delay) {
+          e.delay = Math.max(0, e.delay - dt * 1000);
+        }
+        if (e.type === '500' && e.ttl < 1000 && !e.flashed) {
+          e.flashed = true;
+        }
+        if (e.type === 'malformed' && e.ttl < 1500 && !e.rotated) {
+          e.rotated = true;
+        }
+        
+        return e;
+      }).filter(e => e.ttl > 0);
+      
+      // Update debug info
+      if (this.state.debugMode) {
+        this.updateDebug(dt);
+      }
+    }
+    
+    // Render
+    this.render();
+    
+    // Continue
+    this.animationFrame = requestAnimationFrame(() => this.animate());
+  }
+  
+  checkNodeProximity() {
+    const packet = this.state.packet;
+    
+    this.nodes.forEach((node, i) => {
+      const distance = Math.abs(packet.x - node.center);
+      
+      if (distance < 3 && this.state.lastNodeIndex !== i) {
+        this.state.lastNodeIndex = i;
+        
+        // Roll for faults based on configured rates
+        if (this.state.faults) {
+          this.rollForFaults();
+        }
+      }
+    });
+  }
+  
+  rollForFaults() {
+    const faults = this.state.faults;
+    const roll = Math.random() * 100;
+    
+    // Check each fault type based on configured rates
+    if (roll < faults.latencyRate && faults.latencyMs > 0) {
+      this.injectFault('latency', { delay: faults.latencyMs });
+    } else if (roll < faults.http500Rate) {
+      this.injectFault('500');
+    } else if (roll < faults.rate429) {
+      this.injectFault('429');
+    } else if (roll < faults.malformedRate) {
+      this.injectFault('malformed');
+    }
+    
+    // Tool unavailable at specific steps
+    if (faults.toolUnavailableSteps > 0 && this.state.lastNodeIndex === 2) {
+      if (Math.random() < 0.3) {
+        this.injectFault('tool_unavailable');
+      }
+    }
+    
+    // Context truncation
+    if (faults.ctxBytes < 1024 && this.state.lastNodeIndex === 3) {
+      if (Math.random() < 0.3) {
+        this.injectFault('context_truncate');
+      }
+    }
+    
+    // RAG injection
+    if (faults.injSeed && this.state.lastNodeIndex === 1) {
+      if (Math.random() < 0.3) {
+        this.injectFault('injection', { seed: faults.injSeed });
+      }
+    }
+  }
+  
+  
+  injectFault(type, params = {}) {
+    this.state.faultCount++;
+    this.state.score = Math.max(0, this.state.score - 10);
+    
+    // Create effect
+    const effect = {
+      type,
+      x: this.state.packet.x,
+      ttl: 3000,
+      delay: type === 'latency' ? (params.delay || 2000) : 0,
+      flashed: false,
+      rotated: false,
+      ...params
+    };
+    
+    this.state.effects.push(effect);
+    
+    // Add to timeline
+    this.addTimelineEvent(type, 'fault');
+    
+    // Slow packet for latency
+    if (type === 'latency') {
+      this.state.packet.velocity = this.state.packet.slowSpeed;
+      setTimeout(() => {
+        this.state.packet.velocity = this.state.packet.normalSpeed;
+      }, effect.delay);
+    }
+    
+    // Trigger recovery if enabled
+    if (this.state.recovery && this.state.recovery.enabled && Math.random() > 0.5) {
+      setTimeout(() => this.attemptRecovery(), 1500);
+    }
+    
+    this.updateScore();
+  }
+  
+  attemptRecovery() {
+    this.state.recoveryCount++;
+    this.state.score = Math.min(100, this.state.score + 5);
+    
+    const effect = {
+      type: 'retry',
+      x: this.state.packet.x,
+      ttl: 2000,
+      attempt: this.state.recoveryCount
+    };
+    
+    this.state.effects.push(effect);
+    this.addTimelineEvent(`retry(${this.state.recoveryCount})`, 'recovery');
+    this.updateScore();
+  }
+  
+  addTimelineEvent(event, type) {
+    const span = document.createElement('span');
+    span.className = `timeline-event ${type}`;
+    span.textContent = event;
+    this.timeline.appendChild(span);
+    this.timeline.scrollLeft = this.timeline.scrollWidth;
+  }
+  
+  updateScore() {
+    this.scoreEl.textContent = Math.round(this.state.score);
+    this.scoreEl.style.color = 
+      this.state.score >= 80 ? '#00ff41' :
+      this.state.score >= 50 ? '#ffff00' : '#ff4444';
+  }
+  
+  updateDebug(dt) {
+    const packet = this.state.packet;
+    const elapsed = ((performance.now() - this.state.startTime) / 1000).toFixed(1);
+    
+    this.debugInfo.innerHTML = `
+      <strong>Packet:</strong> x=${packet.x.toFixed(2)}, v=${packet.velocity.toFixed(1)}px/s<br>
+      <strong>Time:</strong> ${elapsed}s, dt=${(dt * 1000).toFixed(1)}ms<br>
+      <strong>Effects:</strong> ${this.state.effects.length}<br>
+      <strong>Node:</strong> ${this.state.lastNodeIndex >= 0 ? this.nodes[this.state.lastNodeIndex].label : 'none'}<br>
+      <strong>Score:</strong> ${this.state.score}%
+    `;
+  }
+  
+  render() {
+    const grid = Array(14).fill().map(() => Array(78).fill(' '));
+    
+    // Draw pipeline
+    this.nodes.forEach((node, i) => {
+      this.drawBox(grid, node);
+      if (i < this.nodes.length - 1) {
+        this.drawPipe(grid, node.x + node.w, node.y + 1, 
+                      this.nodes[i + 1].x - (node.x + node.w));
+      }
+    });
+    
+    // Draw packet
+    const px = Math.floor(this.state.packet.x);
+    const py = this.state.packet.y;
+    
+    if (px >= 0 && px < 78) {
+      grid[py][px] = '●';
+      
+      // Trail effect
+      if (this.state.running && !this.state.paused) {
+        for (let i = 1; i <= 3; i++) {
+          const tx = px - i * 2;
+          if (tx >= 0) {
+            grid[py][tx] = '·';
+          }
+        }
+      }
+    }
+    
+    // Draw effects
+    this.state.effects.forEach(effect => {
+      this.renderEffect(grid, effect);
+    });
+    
+    // Status line
+    if (this.state.running) {
+      const status = `[${this.state.paused ? 'PAUSED' : 'RUNNING'}] Faults: ${this.state.faultCount} | Recoveries: ${this.state.recoveryCount}`;
+      for (let i = 0; i < status.length && i < 78; i++) {
+        grid[12][i] = status[i];
+      }
+    }
+    
+    this.stage.textContent = grid.map(row => row.join('')).join('\n');
+  }
+  
+  drawBox(grid, {x, y, w, h, label}) {
+    // Corners
+    grid[y][x] = '┌';
+    grid[y][x + w - 1] = '┐';
+    grid[y + h - 1][x] = '└';
+    grid[y + h - 1][x + w - 1] = '┘';
+    
+    // Edges
+    for (let i = 1; i < w - 1; i++) {
+      grid[y][x + i] = '─';
+      grid[y + h - 1][x + i] = '─';
+    }
+    for (let i = 1; i < h - 1; i++) {
+      grid[y + i][x] = '│';
+      grid[y + i][x + w - 1] = '│';
+    }
+    
+    // Label
+    if (label) {
+      const lx = x + Math.floor((w - label.length) / 2);
+      for (let i = 0; i < label.length && lx + i < 78; i++) {
+        grid[y + 1][lx + i] = label[i];
+      }
+    }
+  }
+  
+  drawPipe(grid, x, y, len) {
+    for (let i = 0; i < len; i++) {
+      grid[y][x + i] = i === len - 1 ? '▶' : '─';
+    }
+  }
+  
+  renderEffect(grid, effect) {
+    const x = Math.floor(effect.x);
+    const y = this.state.packet.y;
+    
+    switch(effect.type) {
+      case 'latency':
+        // Wavy slowdown effect
+        for (let i = 0; i < 5 && x + i < 78; i++) {
+          grid[y + 1][x + i] = '~';
+        }
+        if (effect.delay > 0) {
+          const timer = `⏳${Math.ceil(effect.delay/1000)}s`;
+          for (let i = 0; i < timer.length && x + i < 78; i++) {
+            grid[y - 2][x + i] = timer[i];
+          }
+        }
+        break;
+        
+      case '500':
+        const errorMsg = '☁500';
+        for (let i = 0; i < errorMsg.length && x + i < 78; i++) {
+          grid[y - 3][x + i] = errorMsg[i];
+        }
+        if (effect.flashed) {
+          grid[y - 2][x + 2] = '⚡';
+        }
+        break;
+        
+      case '429':
+        const rateLimit = '⛔429';
+        for (let i = 0; i < rateLimit.length && x + i < 78; i++) {
+          grid[y][x + i] = rateLimit[i];
+        }
+        break;
+        
+      case 'malformed':
+        const badJson = effect.rotated ? '{�}' : '{?}';
+        for (let i = 0; i < badJson.length && x + i < 78; i++) {
+          grid[y + 2][x + i] = badJson[i];
+        }
+        break;
+        
+      case 'tool_unavailable':
+        if (x < 78) grid[y][x] = '⊘';
+        break;
+        
+      case 'context_truncate':
+        const ctx = '💣ctx';
+        for (let i = 0; i < ctx.length && x + i < 78; i++) {
+          grid[y - 2][x + i] = ctx[i];
+        }
+        break;
+        
+      case 'injection':
+        const inj = `🪤${effect.seed || 'inject'}`;
+        for (let i = 0; i < inj.length && x + i < 78; i++) {
+          grid[y - 3][x + i] = inj[i];
+        }
+        break;
+        
+      case 'retry':
+        const retry = `retry(${effect.attempt})`;
+        for (let i = 0; i < retry.length && x + i < 78; i++) {
+          grid[y + 3][x + i] = retry[i];
+        }
+        break;
+        
+      case 'fallback':
+        const fb = '🪂 fallback';
+        for (let i = 0; i < fb.length && x + i < 78; i++) {
+          grid[y + 3][x + i] = fb[i];
+        }
+        break;
+    }
+  }
+  
+  complete() {
+    this.state.running = false;
+    cancelAnimationFrame(this.animationFrame);
+    
+    // Final score
+    const finalScore = Math.min(100, this.state.score + 10);
+    this.state.score = finalScore;
+    this.updateScore();
+    
+    // Update UI
+    document.getElementById('runBtn').disabled = false;
+    document.getElementById('pauseBtn').disabled = true;
+    this.stage.classList.remove('running');
+    
+    this.addTimelineEvent(`COMPLETE - Score: ${finalScore}%`, 'recovery');
+  }
+  
+  pause() {
+    this.state.paused = !this.state.paused;
+    document.getElementById('pauseBtn').textContent = 
+      this.state.paused ? '▶️ RESUME' : '⏸️ PAUSE';
+  }
+  
+  reset() {
+    // Stop animation
+    if (this.animationFrame) {
+      cancelAnimationFrame(this.animationFrame);
+    }
+    
+    // Reset state
+    this.state.running = false;
+    this.state.paused = false;
+    this.state.packet.x = 4;
+    this.state.packet.velocity = this.state.packet.normalSpeed;
+    this.state.effects = [];
+    this.state.score = 100;
+    this.state.faultCount = 0;
+    this.state.recoveryCount = 0;
+    this.state.nodeVisits.clear();
+    this.state.lastNodeIndex = -1;
+    
+    // Reset UI
+    document.getElementById('runBtn').disabled = false;
+    document.getElementById('pauseBtn').disabled = true;
+    document.getElementById('pauseBtn').textContent = '⏸️ PAUSE';
+    this.stage.classList.remove('running');
+    this.timeline.innerHTML = '<span style="color: #666;">TIMELINE:</span>';
+    this.updateScore();
+    
+    this.render();
+  }
+  
+  randomChaos() {
+    // Generate random parameters
+    const randomFaults = {
+      latencyMs: Math.floor(Math.random() * 5000),
+      latencyRate: Math.floor(Math.random() * 50),
+      http500Rate: Math.floor(Math.random() * 30),
+      rate429: Math.floor(Math.random() * 30),
+      malformedRate: Math.floor(Math.random() * 40),
+      toolUnavailableSteps: Math.floor(Math.random() * 3),
+      injSeed: Math.random() > 0.5 ? 'random-' + Date.now() : '',
+      ctxBytes: Math.random() > 0.5 ? 512 : 8192
+    };
+    
+    // Apply to UI
+    Object.keys(randomFaults).forEach(key => {
+      const input = document.getElementById(key);
+      if (input) {
+        input.value = randomFaults[key];
+        // Flash effect
+        input.style.background = '#00ff41';
+        input.style.color = '#000';
+        setTimeout(() => {
+          input.style.background = '#0a0a0a';
+          input.style.color = '#00ff41';
+        }, 300);
+      }
+    });
+    
+    // Clear scenario selection
+    document.querySelectorAll('.scenario-card').forEach(el => {
+      el.classList.remove('active');
+    });
+    
+    this.reset();
+  }
+  
+  clearParams() {
+    // Default/clear values
+    const defaults = {
+      latencyMs: 0,
+      latencyRate: 0,
+      http500Rate: 0,
+      rate429: 0,
+      malformedRate: 0,
+      toolUnavailableSteps: 0,
+      injSeed: '',
+      ctxBytes: 8192,
+      loopN: 3,
+      backoffBase: 250,
+      backoffFactor: 2.0,
+      jitter: 0.2,
+      maxRetries: 3,
+      fallback: 'use_cached',
+      seed: ''
+    };
+    
+    // Apply defaults to UI
+    Object.keys(defaults).forEach(key => {
+      const input = document.getElementById(key);
+      if (input) {
+        input.value = defaults[key];
+      }
+    });
+    
+    // Keep tripwire on by default
+    document.getElementById('tripwireOn').checked = true;
+    
+    // Clear scenario selection
+    document.querySelectorAll('.scenario-card').forEach(el => {
+      el.classList.remove('active');
+    });
+    
+    this.reset();
+  }
+}
+
+// Initialize
+const sim = new ChaosSimulator();
+</script>
+
+</body>
+</html>

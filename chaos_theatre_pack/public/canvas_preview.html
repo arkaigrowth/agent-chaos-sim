@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Chaos Theatre — Canvas Preview</title>
+<link rel="stylesheet" href="./theatre.css"/>
+<style> body{background:#0A0E14;color:#E5E7EB;font:14px ui-monospace,monospace; margin:0; padding:16px;} .wrap{max-width:1000px;margin:0 auto;} canvas{background:#0B0F13;border:1px solid #233042;border-radius:12px;display:block;width:100%;max-width:940px;height:auto;} </style>
+</head>
+<body>
+<div class="wrap card">
+  <h2>Canvas Preview (renders ASCII frames)</h2>
+  <div class="controls">
+    <label>Seed <input id="seed" class="input" value="1337" style="width:100px"></label>
+    <label><input type="checkbox" id="soundOn"> Sound ON</label>
+    <button id="start" class="btn">Start</button>
+  </div>
+  <pre id="stage" class="ascii" aria-live="polite"></pre>
+  <canvas id="cnv" width="936" height="288"></canvas>
+  <div id="timelineRail" class="timeline">Timeline: </div>
+</div>
+<script src="./theatre.js"></script>
+<script>
+const theatre = new ChaosTheatre();
+document.getElementById('start').onclick = ()=> theatre.start(document.getElementById('seed').value || "1337", 'fetch');
+
+// simple "mirror pre to canvas" loop
+const pre = document.getElementById('stage');
+const cnv = document.getElementById('cnv'), ctx = cnv.getContext('2d');
+ctx.font = '14px ui-monospace, monospace';
+ctx.fillStyle = '#E5E7EB';
+function draw(){
+  ctx.clearRect(0,0,cnv.width,cnv.height);
+  const lines = pre.textContent.split('\n');
+  const lh = 16, ch = 11.8; // rough cell size
+  lines.forEach((ln, i)=> ctx.fillText(ln, 10, 24 + i*lh));
+  requestAnimationFrame(draw);
+}
+draw();
+
+// handy demo
+setInterval(()=> theatre.event('fault',{type:'latency', delay_ms: 800}), 4200);
+</script>
+</body>
+</html>

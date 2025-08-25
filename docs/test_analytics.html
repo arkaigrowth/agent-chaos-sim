@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics Test Harness - Agent Chaos Monkey</title>
+<style>
+body {
+  background: #0a0a0a;
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  padding: 20px;
+  line-height: 1.4;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.test-controls {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.btn {
+  background: #1a1a1a;
+  border: 1px solid #00ff41;
+  color: #00ff41;
+  padding: 8px 16px;
+  margin: 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  background: #00ff41;
+  color: #000;
+}
+
+.output {
+  background: #000;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+  white-space: pre-wrap;
+  font-size: 12px;
+  min-height: 400px;
+  overflow-x: auto;
+}
+
+.section-title {
+  color: #00ff41;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 20px 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🧪 Analytics Test Harness</h1>
+  
+  <div class="test-controls">
+    <div class="section-title">Simulation Controls</div>
+    <button class="btn" onclick="runSimulation('light')">Light Chaos (Few Errors)</button>
+    <button class="btn" onclick="runSimulation('moderate')">Moderate Chaos</button>
+    <button class="btn" onclick="runSimulation('heavy')">Heavy Chaos</button>
+    <button class="btn" onclick="runSimulation('catastrophic')">Catastrophic Failure</button>
+    <button class="btn" onclick="runSimulation('adaptive')">Adaptive Agent</button>
+    <button class="btn" onclick="clearData()">Clear Data</button>
+  </div>
+  
+  <div class="test-controls">
+    <div class="section-title">Visualization Tests</div>
+    <button class="btn" onclick="showTimeline()">Timeline Graph</button>
+    <button class="btn" onclick="showSuccessRate()">Success Rate Graph</button>
+    <button class="btn" onclick="showPerformance()">Performance Graph</button>
+    <button class="btn" onclick="showResilienceMeter()">Resilience Meter</button>
+    <button class="btn" onclick="showLiveMonitor()">Live Monitor</button>
+    <button class="btn" onclick="showFullReport()">Full Report</button>
+  </div>
+  
+  <div class="test-controls">
+    <div class="section-title">Export Tests</div>
+    <button class="btn" onclick="exportJSON()">Export JSON</button>
+    <button class="btn" onclick="exportCSV()">Export CSV</button>
+    <button class="btn" onclick="exportReport()">Export Report</button>
+  </div>
+  
+  <div class="section-title">Output</div>
+  <div class="output" id="output">Ready for testing...</div>
+</div>
+
+<script src="chaos_analytics.js"></script>
+<script>
+// Test harness for analytics system
+let dataCollector = null;
+let analytics = null;
+
+// Initialize test environment
+function initTest() {
+  // Create mock DataCollector
+  dataCollector = {
+    traces: [],
+    performance: {
+      startTime: 0,
+      interactions: 0,
+      effectsInjected: 0,
+      recoveryAttempts: 0
+    },
+    sessionId: 'test-' + Date.now(),
+    mode: 'test'
+  };
+  
+  analytics = new ChaosAnalytics(dataCollector);
+  document.getElementById('output').textContent = 'Test environment initialized\n';
+}
+
+// Run different chaos simulations
+function runSimulation(intensity) {
+  initTest();
+  let output = `Running ${intensity} chaos simulation...\n\n`;
+  
+  const scenarios = {
+    light: {
+      errors: 5,
+      recoveryRate: 0.9,
+      avgRecoveryTime: 500,
+      types: ['500_error', 'timeout']
+    },
+    moderate: {
+      errors: 15,
+      recoveryRate: 0.75,
+      avgRecoveryTime: 1000,
+      types: ['500_error', 'timeout', 'rate_limit', 'malformed_json']
+    },
+    heavy: {
+      errors: 30,
+      recoveryRate: 0.6,
+      avgRecoveryTime: 1500,
+      types: ['500_error', 'timeout', 'rate_limit', 'malformed_json', 'network_failure']
+    },
+    catastrophic: {
+      errors: 50,
+      recoveryRate: 0.3,
+      avgRecoveryTime: 2500,
+      types: ['500_error', 'timeout', 'rate_limit', 'malformed_json', 'network_failure', 'auth_failure']
+    },
+    adaptive: {
+      errors: 20,
+      recoveryRate: 0.5, // Starts low but improves
+      avgRecoveryTime: 1200,
+      types: ['500_error', 'timeout', 'rate_limit'],
+      adaptive: true
+    }
+  };
+  
+  const scenario = scenarios[intensity];
+  let time = 0;
+  let recoveryRate = scenario.recoveryRate;
+  
+  // Generate simulated traces
+  for (let i = 0; i < scenario.errors; i++) {
+    // Inject error
+    const errorType = scenario.types[Math.floor(Math.random() * scenario.types.length)];
+    time += Math.random() * 1000 + 500;
+    
+    dataCollector.traces.push({
+      step: dataCollector.traces.length + 1,
+      action: 'effect_injection',
+      effect_type: errorType,
+      relative_time: time,
+      timestamp: new Date().toISOString()
+    });
+    
+    dataCollector.performance.effectsInjected++;
+    
+    // Adaptive improvement
+    if (scenario.adaptive && i > 10) {
+      recoveryRate = Math.min(0.95, recoveryRate + 0.03);
+    }
+    
+    // Attempt recovery
+    const willRecover = Math.random() < recoveryRate;
+    const attempts = willRecover ? Math.floor(Math.random() * 3) + 1 : Math.floor(Math.random() * 5) + 3;
+    
+    for (let j = 0; j < attempts; j++) {
+      time += Math.random() * scenario.avgRecoveryTime / attempts;
+      
+      dataCollector.traces.push({
+        step: dataCollector.traces.length + 1,
+        action: 'recovery_attempt',
+        relative_time: time,
+        timestamp: new Date().toISOString()
+      });
+      
+      dataCollector.performance.recoveryAttempts++;
+    }
+    
+    // Recovery success or failure
+    if (willRecover) {
+      time += Math.random() * 200;
+      dataCollector.traces.push({
+        step: dataCollector.traces.length + 1,
+        action: 'recovery_success',
+        relative_time: time,
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    dataCollector.performance.interactions++;
+  }
+  
+  // Analyze results
+  const analysis = analytics.analyzeResilience();
+  
+  output += `Simulation Complete!\n`;
+  output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+  output += `Errors Injected: ${scenario.errors}\n`;
+  output += `Total Traces: ${dataCollector.traces.length}\n`;
+  output += `Recovery Attempts: ${dataCollector.performance.recoveryAttempts}\n\n`;
+  output += `RESILIENCE SCORES:\n`;
+  output += `Overall: ${analysis.overall_score}/100\n`;
+  output += `Recovery Time: ${analysis.components.recovery_time}/100\n`;
+  output += `Success Rate: ${analysis.components.success_rate}/100\n`;
+  output += `Adaptation: ${analysis.components.adaptation}/100\n`;
+  output += `Robustness: ${analysis.components.robustness}/100\n\n`;
+  
+  if (analysis.weaknesses.length > 0) {
+    output += `WEAKNESSES DETECTED:\n`;
+    analysis.weaknesses.forEach(w => {
+      output += `• ${w}\n`;
+    });
+    output += `\n`;
+  }
+  
+  if (analysis.recommendations.length > 0) {
+    output += `TOP RECOMMENDATIONS:\n`;
+    analysis.recommendations.slice(0, 3).forEach(r => {
+      output += `• ${r}\n`;
+    });
+  }
+  
+  document.getElementById('output').textContent = output;
+}
+
+// Show timeline graph
+function showTimeline() {
+  if (!analytics) initTest();
+  const graph = analytics.generateTimelineGraph();
+  document.getElementById('output').textContent = graph;
+}
+
+// Show success rate graph
+function showSuccessRate() {
+  if (!analytics) initTest();
+  const graph = analytics.generateSuccessRateGraph();
+  document.getElementById('output').textContent = graph;
+}
+
+// Show performance graph
+function showPerformance() {
+  if (!analytics) initTest();
+  const graph = analytics.generatePerformanceGraph();
+  document.getElementById('output').textContent = graph;
+}
+
+// Show resilience meter
+function showResilienceMeter() {
+  if (!analytics) initTest();
+  const analysis = analytics.analyzeResilience();
+  const meter = analytics.generateResilienceMeter(analysis.overall_score);
+  document.getElementById('output').textContent = meter;
+}
+
+// Show live monitor
+function showLiveMonitor() {
+  if (!analytics) initTest();
+  const monitor = analytics.generateLiveMonitor();
+  document.getElementById('output').textContent = monitor;
+}
+
+// Show full report
+function showFullReport() {
+  if (!analytics) initTest();
+  const report = analytics.generateAnalysisReport();
+  document.getElementById('output').textContent = report;
+}
+
+// Export functions
+function exportJSON() {
+  if (!analytics) initTest();
+  const json = analytics.exportAnalytics('json');
+  document.getElementById('output').textContent = json;
+}
+
+function exportCSV() {
+  if (!analytics) initTest();
+  const csv = analytics.exportAnalytics('csv');
+  document.getElementById('output').textContent = csv;
+}
+
+function exportReport() {
+  if (!analytics) initTest();
+  const report = analytics.exportAnalytics('report');
+  document.getElementById('output').textContent = report;
+}
+
+// Clear data
+function clearData() {
+  initTest();
+  document.getElementById('output').textContent = 'Data cleared. Ready for new simulation.';
+}
+
+// Initialize on load
+initTest();
+</script>
+
+</body>
+</html>

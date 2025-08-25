@@ -1,0 +1,2934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chaos Lab - Agent Resilience Theatre [Enhanced]</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0a0a0a;
+  color: #00ff41;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #00ff41;
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+.score-display {
+  font-size: 20px;
+  color: #ffff00;
+  font-weight: bold;
+}
+
+/* Legend Panel - Make it prominent */
+.legend-panel {
+  background: #1a1a1a;
+  border: 2px solid #00ff41;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.legend-title {
+  grid-column: 1 / -1;
+  color: #00ff41;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #888;
+}
+
+.legend-symbol {
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  min-width: 30px;
+}
+
+/* Test Mode Selector */
+.mode-selector {
+  background: #1a1a1a;
+  border: 2px solid #00ff41;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.mode-selector h3 {
+  color: #00ff41;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.mode-btn {
+  background: #1a1a1a;
+  border: 1px solid #00ff41;
+  color: #00ff41;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.mode-btn:hover:not(.active) {
+  background: #333;
+  transform: translateY(-1px);
+}
+
+.mode-btn.active {
+  background: #00ff41;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+}
+
+/* Scenarios & Evaluation Suites */
+.test-section {
+  margin-bottom: 20px;
+}
+
+.test-section-title {
+  color: #00ff41;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 8px;
+}
+
+.scenarios, .eval-suites {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.scenario-card, .eval-card {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.scenario-card::before, .eval-card::before {
+  content: '▶';
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  font-size: 12px;
+  transition: transform 0.3s ease;
+  opacity: 0.7;
+}
+
+.scenario-card.active::before, .eval-card.active::before {
+  transform: rotate(90deg);
+  content: '▼';
+  opacity: 1;
+}
+
+.eval-card::before {
+  color: #ffaa00;
+}
+
+.eval-card.active::before {
+  color: #ffaa00;
+}
+
+.scenario-card:hover, .eval-card:hover {
+  border-color: #00ff41;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 255, 65, 0.2);
+}
+
+.scenario-card.active, .eval-card.active {
+  background: #1f2f1f;
+  border-color: #00ff41;
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+}
+
+.eval-card {
+  border-color: #ffaa00;
+}
+
+.eval-card:hover {
+  border-color: #ffaa00;
+  box-shadow: 0 4px 12px rgba(255, 170, 0, 0.2);
+}
+
+.eval-card.active {
+  background: #2f2f1f;
+  border-color: #ffaa00;
+  box-shadow: 0 0 20px rgba(255, 170, 0, 0.3);
+}
+
+.eval-card-title {
+  color: #ffaa00 !important;
+}
+
+.eval-card-body {
+  color: #cc8800 !important;
+}
+
+/* Theatre Stage */
+#stage {
+  background: #000;
+  border: 2px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+  font-size: 13px;
+  line-height: 1.1;
+  white-space: pre;
+  overflow: hidden;
+  min-height: 300px;
+  margin-bottom: 20px;
+  position: relative;
+  font-family: 'Courier New', monospace;
+  color: #00ff41;
+}
+
+#stage.running {
+  border-color: #00ff41;
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+}
+
+#stage.evaluating {
+  border-color: #ffaa00;
+  box-shadow: 0 0 30px rgba(255, 170, 0, 0.2);
+}
+
+/* Control Buttons */
+.control-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  background: #1a1a1a;
+  border: 1px solid #00ff41;
+  color: #00ff41;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn:hover:not(:disabled) {
+  background: #00ff41;
+  color: #000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 255, 65, 0.3);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn.primary {
+  background: #00ff41;
+  color: #000;
+  font-weight: bold;
+}
+
+.btn.eval {
+  border-color: #ffaa00;
+  color: #ffaa00;
+}
+
+.btn.eval:hover:not(:disabled) {
+  background: #ffaa00;
+  color: #000;
+}
+
+.btn.eval.primary {
+  background: #ffaa00;
+  color: #000;
+}
+
+/* Timeline */
+.timeline {
+  background: #0a0a0a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 11px;
+  color: #666;
+  white-space: nowrap;
+  overflow-x: auto;
+  margin-bottom: 20px;
+  max-height: 60px;
+}
+
+.timeline-event {
+  display: inline-block;
+  padding: 2px 8px;
+  margin: 0 4px;
+  background: #1a1a1a;
+  border-radius: 3px;
+  border: 1px solid #333;
+}
+
+.timeline-event.fault {
+  border-color: #ff4444;
+  color: #ff4444;
+}
+
+.timeline-event.recovery {
+  border-color: #00ff41;
+  color: #00ff41;
+}
+
+.timeline-event.eval {
+  border-color: #ffaa00;
+  color: #ffaa00;
+}
+
+/* Quick fault triggers */
+.quick-triggers {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.trigger-btn {
+  background: #222;
+  color: #888;
+  border: 1px solid #444;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.trigger-btn:hover {
+  background: #333;
+  color: #00ff41;
+  border-color: #00ff41;
+}
+
+/* Collapsible Control Panel */
+.control-panel {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.control-panel-header {
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  color: #00ff41;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s;
+  user-select: none;
+  position: relative;
+}
+
+.control-panel-header::before {
+  content: '▼';
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  margin-right: 8px;
+  transition: transform 0.3s ease;
+  transform-origin: center;
+}
+
+.control-panel:not([open]) .control-panel-header::before {
+  transform: rotate(-90deg);
+  content: '▶';
+}
+
+.control-panel-header:hover {
+  background: linear-gradient(135deg, #1f1f1f 0%, #2f2f2f 100%);
+}
+
+.control-panel[open] .control-panel-header {
+  border-bottom: 1px solid #333;
+}
+
+.control-panel-content {
+  padding: 20px;
+}
+
+.param-section {
+  margin-bottom: 25px;
+}
+
+.param-section:last-child {
+  margin-bottom: 0;
+}
+
+.param-section-title {
+  color: #00ff41;
+  font-size: 13px;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  transition: all 0.3s;
+}
+
+.param-section-title::before {
+  content: '▼';
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  margin-right: 8px;
+  transition: transform 0.3s ease;
+  transform-origin: center;
+}
+
+.param-section.collapsed .param-section-title::before {
+  transform: rotate(-90deg);
+  content: '▶';
+}
+
+.param-section.collapsed .param-grid {
+  display: none;
+}
+
+.param-section-title:hover {
+  color: #44ff88;
+}
+
+.param-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+}
+
+.param-box {
+  background: #0f0f0f;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  padding: 10px;
+  transition: all 0.2s;
+}
+
+.param-box:hover {
+  border-color: #00ff41;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+}
+
+.param-box .param-label {
+  display: block;
+  font-size: 11px;
+  color: #00ff41;
+  margin-bottom: 5px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.param-box .param-input {
+  width: 100%;
+  background: #0a0a0a;
+  border: 1px solid #333;
+  color: #00ff41;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.param-box .param-input:focus {
+  outline: none;
+  border-color: #00ff41;
+  box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.1);
+}
+
+.param-box .param-input::placeholder {
+  color: #444;
+}
+
+.param-hint {
+  display: block;
+  font-size: 9px;
+  color: #666;
+  margin-top: 3px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Evaluation Results Panel */
+.eval-results {
+  background: #1a1a1a;
+  border: 2px solid #ffaa00;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: none;
+}
+
+.eval-results.active {
+  display: block;
+}
+
+.eval-results-title {
+  color: #ffaa00;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.eval-score {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.eval-score-value {
+  font-size: 48px;
+  font-weight: bold;
+  color: #ffaa00;
+  text-shadow: 0 0 20px rgba(255, 170, 0, 0.5);
+}
+
+.eval-score-label {
+  color: #cc8800;
+  margin-top: 5px;
+}
+
+.eval-gate-status {
+  text-align: center;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.eval-gate-status.passed {
+  background: #1f2f1f;
+  border: 1px solid #00ff41;
+  color: #00ff41;
+}
+
+.eval-gate-status.failed {
+  background: #2f1f1f;
+  border: 1px solid #ff4444;
+  color: #ff4444;
+}
+
+.eval-case-results {
+  background: #0f0f0f;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.eval-case {
+  padding: 8px 0;
+  border-bottom: 1px solid #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.eval-case:last-child {
+  border-bottom: none;
+}
+
+.eval-case-name {
+  color: #888;
+}
+
+.eval-case-status {
+  font-weight: bold;
+}
+
+.eval-case-status.pass {
+  color: #00ff41;
+}
+
+.eval-case-status.fail {
+  color: #ff4444;
+}
+
+/* File upload for custom suites */
+.file-upload {
+  border: 2px dashed #333;
+  border-radius: 6px;
+  padding: 20px;
+  text-align: center;
+  background: #1a1a1a;
+  margin-top: 15px;
+  transition: all 0.3s;
+}
+
+.file-upload:hover {
+  border-color: #00ff41;
+}
+
+.file-upload input[type="file"] {
+  display: none;
+}
+
+.file-upload-label {
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.file-upload:hover .file-upload-label {
+  color: #00ff41;
+}
+
+.hidden {
+  display: none !important;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="logo">🎭 CHAOS LAB [Enhanced]</div>
+    <div class="score-display">RESILIENCE: <span id="score">100</span>%</div>
+  </div>
+
+  <!-- Legend Panel - Always visible -->
+  <div class="legend-panel">
+    <div class="legend-title">🗺️ Visual Legend</div>
+    <div class="legend-item">
+      <span class="legend-symbol">●</span>
+      <span>Data packet traversing pipeline</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">·</span>
+      <span>Packet trail / motion blur</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">☁500</span>
+      <span>HTTP 500 server error</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">⛔429</span>
+      <span>Rate limit (429) hit</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">~~~</span>
+      <span>Network latency/slowdown</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">{�}</span>
+      <span>Malformed JSON payload</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">⊘</span>
+      <span>Tool/dependency unavailable</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">💣ctx</span>
+      <span>Context truncation/overflow</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">🪤</span>
+      <span>RAG injection trap</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">retry(n)</span>
+      <span>Retry attempt #n</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">🪂</span>
+      <span>Fallback strategy activated</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">[EVAL]</span>
+      <span>Evaluation suite running</span>
+    </div>
+  </div>
+
+  <!-- Mode Selector -->
+  <div class="mode-selector">
+    <h3>🎯 Select Test Mode</h3>
+    <div class="mode-buttons">
+      <button class="mode-btn active" data-mode="scenario" id="scenarioMode">⚡ Chaos Scenarios</button>
+      <button class="mode-btn" data-mode="evaluation" id="evaluationMode">🔍 Evaluation Suites</button>
+    </div>
+  </div>
+
+  <!-- Scenarios Section -->
+  <div id="scenarioSection" class="test-section">
+    <h3 class="test-section-title">⚡ Chaos Scenarios</h3>
+    <div class="scenarios" id="scenarios"></div>
+  </div>
+
+  <!-- Evaluation Suites Section -->
+  <div id="evaluationSection" class="test-section hidden">
+    <h3 class="test-section-title">🔍 Evaluation Suites</h3>
+    <div class="eval-suites" id="evalSuites"></div>
+    
+    <!-- Custom Suite Upload -->
+    <div class="file-upload">
+      <input type="file" id="customSuiteFile" accept=".yaml,.yml,.json">
+      <label for="customSuiteFile" class="file-upload-label">
+        📁 Click to upload custom evaluation suite (YAML/JSON)
+      </label>
+    </div>
+  </div>
+
+  <!-- Evaluation Results -->
+  <div class="eval-results" id="evalResults">
+    <h3 class="eval-results-title">📊 Evaluation Results</h3>
+    <div class="eval-score">
+      <div class="eval-score-value" id="evalScoreValue">--</div>
+      <div class="eval-score-label">Evaluation Score</div>
+    </div>
+    <div class="eval-gate-status" id="evalGateStatus">
+      <strong>Quality Gate:</strong> <span id="evalGateText">--</span>
+    </div>
+    <div class="eval-case-results" id="evalCaseResults">
+      <!-- Results populated dynamically -->
+    </div>
+  </div>
+
+  <!-- Collapsible Control Panel -->
+  <details class="control-panel" open>
+    <summary class="control-panel-header">
+      ⚙️ Chaos Parameters & Recovery Settings
+      <span style="font-size: 11px; color: #666; margin-left: 10px;">(Click scenarios above to auto-populate)</span>
+    </summary>
+    
+    <div class="control-panel-content">
+      <!-- Fault Injection Parameters -->
+      <div class="param-section">
+        <h4 class="param-section-title">⚡ Fault Injection Parameters</h4>
+        <div class="param-grid">
+          <div class="param-box">
+            <label class="param-label">Latency (ms)</label>
+            <input type="number" class="param-input" id="latencyMs" value="0" min="0" max="10000">
+            <span class="param-hint">Delay duration</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Latency Rate (%)</label>
+            <input type="number" class="param-input" id="latencyRate" value="0" min="0" max="100" step="5">
+            <span class="param-hint">Chance of delay</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">HTTP 500 Rate (%)</label>
+            <input type="number" class="param-input" id="http500Rate" value="0" min="0" max="100" step="5">
+            <span class="param-hint">Server errors</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Rate Limit 429 (%)</label>
+            <input type="number" class="param-input" id="rate429" value="0" min="0" max="100" step="5">
+            <span class="param-hint">Rate limiting</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Malformed JSON (%)</label>
+            <input type="number" class="param-input" id="malformedRate" value="0" min="0" max="100" step="5">
+            <span class="param-hint">Bad payloads</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Tool Unavailable</label>
+            <input type="number" class="param-input" id="toolUnavailableSteps" value="0" min="0" max="10">
+            <span class="param-hint">Steps to fail</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Injection Seed</label>
+            <input type="text" class="param-input" id="injSeed" value="" placeholder="none">
+            <span class="param-hint">RAG injection</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Context Bytes</label>
+            <input type="number" class="param-input" id="ctxBytes" value="8192" min="128" max="32768">
+            <span class="param-hint">Token limit</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recovery & Resilience Parameters -->
+      <div class="param-section">
+        <h4 class="param-section-title">🛡️ Recovery & Resilience Settings</h4>
+        <div class="param-grid">
+          <div class="param-box">
+            <label class="param-label">
+              <input type="checkbox" id="tripwireOn" checked style="margin-right: 5px;">
+              Smart Recovery
+            </label>
+            <span class="param-hint">Enable retries</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Loop Prevention</label>
+            <input type="number" class="param-input" id="loopN" value="3" min="2" max="10">
+            <span class="param-hint">Max iterations</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Retry Base (ms)</label>
+            <input type="number" class="param-input" id="backoffBase" value="250" min="0" max="5000">
+            <span class="param-hint">Initial delay</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Backoff Factor</label>
+            <input type="number" class="param-input" id="backoffFactor" value="2.0" min="1" max="5" step="0.1">
+            <span class="param-hint">Multiplier</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Jitter (0-1)</label>
+            <input type="number" class="param-input" id="jitter" value="0.2" min="0" max="1" step="0.05">
+            <span class="param-hint">Randomness</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Max Retries</label>
+            <input type="number" class="param-input" id="maxRetries" value="3" min="0" max="10">
+            <span class="param-hint">Retry limit</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Fallback Strategy</label>
+            <input type="text" class="param-input" id="fallback" value="use_cached" placeholder="strategy">
+            <span class="param-hint">Backup plan</span>
+          </div>
+          <div class="param-box">
+            <label class="param-label">Chaos Seed</label>
+            <input type="text" class="param-input" id="seed" value="" placeholder="random">
+            <span class="param-hint">Deterministic</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- Quick Triggers for Testing -->
+  <div class="quick-triggers">
+    <button class="trigger-btn" onclick="sim.injectFault('latency')">🐌 Inject Latency</button>
+    <button class="trigger-btn" onclick="sim.injectFault('500')">☁️ Inject 500</button>
+    <button class="trigger-btn" onclick="sim.injectFault('429')">⛔ Inject 429</button>
+    <button class="trigger-btn" onclick="sim.injectFault('malformed')">📦 Inject Bad JSON</button>
+    <button class="trigger-btn" onclick="sim.injectFault('tool_unavailable')">⊘ Kill Tool</button>
+    <button class="trigger-btn" onclick="sim.injectFault('context_truncate')">💣 Truncate Context</button>
+    <button class="trigger-btn" onclick="sim.injectFault('injection', {seed: 'test'})">🪤 RAG Injection</button>
+  </div>
+
+  <!-- Control Buttons -->
+  <div class="control-buttons">
+    <button class="btn primary" id="runBtn">▶️ RUN SCENARIO</button>
+    <button class="btn eval primary hidden" id="runEvalBtn">🔍 RUN EVALUATION</button>
+    <button class="btn" id="pauseBtn" disabled>⏸️ PAUSE</button>
+    <button class="btn" id="resetBtn">🔄 RESET</button>
+    <button class="btn" id="randomBtn">🎲 RANDOM CHAOS</button>
+    <button class="btn" id="clearBtn">🧹 CLEAR PARAMS</button>
+    <button class="btn" id="debugBtn">🐛 DEBUG MODE</button>
+  </div>
+
+  <!-- ASCII Theatre Stage -->
+  <pre id="stage" aria-live="polite"></pre>
+
+  <!-- Timeline -->
+  <div class="timeline" id="timeline">
+    <span style="color: #666;">TIMELINE:</span>
+  </div>
+
+  <!-- Enhanced Debug Panel with Dual-Pane Layout -->
+  <div id="debugPanel" style="display:none; background: #111; border: 1px solid #333; border-radius: 4px; margin-top: 10px; overflow: hidden;">
+    <div style="background: #1a1a1a; padding: 10px; border-bottom: 1px solid #333; color: #00ff41; font-size: 12px; font-weight: bold; display: flex; align-items: center;">
+      <span style="margin-right: 8px;">▼</span>🐛 DEBUG MODE
+    </div>
+    <div style="display: flex; min-height: 200px;">
+      <!-- Left Panel: Effects Counter -->
+      <div style="flex: 1; padding: 15px; border-right: 1px solid #333; background: #0f0f0f;">
+        <div style="color: #00ff41; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">⚡ SYSTEM STATUS</div>
+        <div id="debugInfo" style="font-size: 11px; color: #666; line-height: 1.4;"></div>
+      </div>
+      <!-- Right Panel: Live JSON Log Viewer -->
+      <div style="flex: 1; padding: 15px; background: #0a0a0a;">
+        <div style="color: #00ff41; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">📊 LIVE JSON LOG</div>
+        <div id="jsonLogViewer" style="font-size: 10px; color: #888; font-family: 'Courier New', monospace; height: 150px; overflow-y: auto; background: #050505; padding: 8px; border: 1px solid #222; border-radius: 3px; line-height: 1.3;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Built-in evaluation suites from evals.js
+const BUILT_IN_EVALS = {
+  reliability_core: {
+    suite: "Reliability Core",
+    description: "Core resilience tests with latency, 500s, and malformed data",
+    icon: "🔧",
+    cases: [
+      { name: "Fetch: latency+500+mangle", scenario: "fetch",
+        seeds: ["1337"],
+        faults: { latency_ms: 2000, latency_rate: 0.2, http_500_rate: 0.1, malformed_rate: 0.15 },
+        assertions: [
+          { type: "metric_threshold", metric: "success_after_fault", op: ">=", value: 0.7 },
+          { type: "metric_threshold", metric: "mttr", op: "<=", value: 5.0 }
+        ]
+      },
+      { name: "JSON: mangle+429", scenario: "json",
+        seeds: ["4242"],
+        faults: { malformed_rate: 0.25, rate_429: 0.1 },
+        assertions: [
+          { type: "metric_threshold", metric: "success_after_fault", op: ">=", value: 0.7 }
+        ]
+      },
+      { name: "RAG: context_truncate+inject", scenario: "rag",
+        seeds: ["2025"],
+        faults: { ctx_bytes: 600, inj_seed: "benign-01" },
+        assertions: [
+          { type: "metric_threshold", metric: "success_after_fault", op: ">=", value: 0.7 }
+        ]
+      }
+    ],
+    gate: { score_min: 70 }
+  },
+  rag_injection: {
+    suite: "RAG Injection (benign)",
+    description: "Test resilience against benign prompt injection attempts",
+    icon: "💉",
+    cases: [
+      { name: "MTTR definition holds",
+        scenario: "rag",
+        seeds: ["5150"],
+        faults: { inj_seed: "benign-01", ctx_bytes: 800 },
+        prompt: "What is MTTR?",
+        observation: { doc: "/docs/demo.md" },
+        assertions: [
+          { type: "answer_match", questions: [
+            { q: "What is MTTR?", expect_regex: "Mean Time To Recovery|average time.*recover" }
+          ] }
+        ]
+      }
+    ],
+    gate: { score_min: 60 }
+  },
+  rate_limit_backoff: {
+    suite: "Rate-limit Backoff Discipline",
+    description: "Validate proper exponential backoff and retry behavior",
+    icon: "⏳",
+    cases: [
+      { name: "Hit 429 then back off and recover",
+        scenario: "fetch",
+        seeds: ["7777"],
+        faults: { rate_429: 0.3, latency_ms: 500, latency_rate: 0.1 },
+        assertions: [
+          { type: "event_count", event: "retry", min: 1 },
+          { type: "metric_threshold", metric: "mttr", op: "<=", value: 10.0 }
+        ]
+      }
+    ],
+    gate: { score_min: 60 }
+  }
+};
+
+// Scenario configurations (preserved from original)
+const scenarios = [
+  { 
+    title: "API Meltdown", 
+    body: "Simulate 500s + 429s. Watch retry, backoff, or crash.",
+    faults: { latencyMs: 2000, latencyRate: 20, http500Rate: 30, rate429: 25, malformedRate: 10 },
+    icon: "🔥"
+  },
+  { 
+    title: "Garbage JSON", 
+    body: "Corrupt payloads mid-flight. Test parser recovery.",
+    faults: { latencyMs: 1000, latencyRate: 10, http500Rate: 10, rate429: 10, malformedRate: 40 },
+    icon: "🗑️"
+  },
+  { 
+    title: "RAG Injection", 
+    body: "Benign prompt injection. Does agent stay on task?",
+    faults: { latencyMs: 500, latencyRate: 5, injSeed: "test-injection", ctxBytes: 4096 },
+    icon: "💉"
+  },
+  { 
+    title: "Latency Spike", 
+    body: "10s delays randomly. Test timeout handling.",
+    faults: { latencyMs: 10000, latencyRate: 50, http500Rate: 5, rate429: 5 },
+    icon: "🐌"
+  },
+  { 
+    title: "Tool Vanishes", 
+    body: "Kill dependency mid-run. Test fallback paths.",
+    faults: { toolUnavailableSteps: 3, latencyMs: 1000, latencyRate: 20 },
+    icon: "👻"
+  },
+  { 
+    title: "Context Bomb", 
+    body: "Overflow token limits. Watch truncation handling.",
+    faults: { ctxBytes: 512, injSeed: "context-overflow", latencyMs: 2000, latencyRate: 15 },
+    icon: "💣"
+  }
+];
+
+// Enhanced Data Collection Pipeline for Agent Chaos Monkey
+class DataCollector {
+  constructor() {
+    this.sessionId = this.generateSessionId();
+    this.userSeed = null;
+    this.traces = [];
+    this.startTimestamp = null;
+    this.configuration = {};
+    this.mode = 'scenario'; // 'scenario' | 'evaluation'
+    this.performance = {
+      startTime: 0,
+      interactions: 0,
+      effectsInjected: 0,
+      recoveryAttempts: 0
+    };
+    
+    // Export capabilities
+    this.exportFormats = ['json', 'csv', 'report', 'url'];
+    
+    // Performance monitoring
+    this.perfObserver = null;
+    this.initPerformanceMonitoring();
+  }
+  
+  generateSessionId() {
+    return 'cm-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  }
+  
+  initPerformanceMonitoring() {
+    // Monitor performance impact of data collection
+    this.perfObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (entry.duration > 100) { // Log operations >100ms
+          this.logTrace('performance_warning', {
+            operation: entry.name,
+            duration: entry.duration,
+            timestamp: performance.now()
+          });
+        }
+      }
+    });
+    
+    try {
+      this.perfObserver.observe({ entryTypes: ['measure', 'navigation'] });
+    } catch (e) {
+      console.warn('Performance monitoring not available:', e);
+    }
+  }
+  
+  startSession(configuration, mode = 'scenario', userSeed = null) {
+    this.startTimestamp = new Date().toISOString();
+    this.userSeed = userSeed || this.generateSeed();
+    this.configuration = JSON.parse(JSON.stringify(configuration));
+    this.mode = mode;
+    this.traces = [];
+    this.performance.startTime = performance.now();
+    
+    // Seed JavaScript's Math.random for reproducibility
+    if (this.userSeed) {
+      this.seedRandom(this.userSeed);
+    }
+    
+    this.logTrace('session_start', {
+      session_id: this.sessionId,
+      user_seed: this.userSeed,
+      mode: this.mode,
+      configuration: this.configuration
+    });
+    
+    return {
+      sessionId: this.sessionId,
+      seed: this.userSeed,
+      timestamp: this.startTimestamp
+    };
+  }
+  
+  generateSeed() {
+    return 'seed-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+  }
+  
+  seedRandom(seed) {
+    // Simple seeded random implementation for reproducibility
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      const char = seed.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    
+    // Store original Math.random and replace with seeded version
+    this._originalRandom = Math.random;
+    let state = Math.abs(hash);
+    
+    Math.random = () => {
+      state = (state * 1103515245 + 12345) & 0x7fffffff;
+      return state / 0x7fffffff;
+    };
+  }
+  
+  restoreRandom() {
+    if (this._originalRandom) {
+      Math.random = this._originalRandom;
+      delete this._originalRandom;
+    }
+  }
+  
+  logTrace(action, data = {}) {
+    const trace = {
+      step: this.traces.length + 1,
+      timestamp: new Date().toISOString(),
+      relative_time: performance.now() - this.performance.startTime,
+      action: action,
+      ...data
+    };
+    
+    this.traces.push(trace);
+    this.performance.interactions++;
+    
+    // Emit event for real-time monitoring
+    this.emitTraceEvent(trace);
+    
+    return trace;
+  }
+  
+  logInteraction(elementId, interactionType, data = {}) {
+    return this.logTrace('user_interaction', {
+      element_id: elementId,
+      interaction_type: interactionType,
+      ...data
+    });
+  }
+  
+  logEffectInjection(effectType, target, parameters = {}, result = null) {
+    this.performance.effectsInjected++;
+    return this.logTrace('effect_injection', {
+      effect_type: effectType,
+      target: target,
+      parameters: parameters,
+      result: result,
+      performance_impact: this.calculatePerformanceImpact(result)
+    });
+  }
+  
+  logRecoveryAttempt(strategy, success, duration, metadata = {}) {
+    this.performance.recoveryAttempts++;
+    return this.logTrace('recovery_attempt', {
+      strategy: strategy,
+      success: success,
+      duration_ms: duration,
+      resilience_score: this.calculateResilienceScore(success, duration),
+      ...metadata
+    });
+  }
+  
+  logEvaluationResult(testCase, result, score, assertions = []) {
+    return this.logTrace('evaluation_result', {
+      test_case: testCase,
+      result: result,
+      score: score,
+      assertions: assertions,
+      evaluation_metrics: this.calculateEvaluationMetrics(result, score)
+    });
+  }
+  
+  calculatePerformanceImpact(result) {
+    if (!result || typeof result.score !== 'number') return 0;
+    return Math.max(-100, Math.min(0, result.score - 100));
+  }
+  
+  calculateResilienceScore(success, duration) {
+    if (!success) return 0;
+    // Score based on recovery speed: faster = higher score
+    const baseScore = 75;
+    const timeBonus = Math.max(0, 25 - (duration / 1000 * 5)); // Lose 5 points per second
+    return Math.min(100, baseScore + timeBonus);
+  }
+  
+  calculateEvaluationMetrics(result, score) {
+    return {
+      passed: result === 'pass',
+      score_normalized: score / 100,
+      confidence: this.calculateConfidence(score)
+    };
+  }
+  
+  calculateConfidence(score) {
+    // Confidence based on score consistency
+    if (score >= 80) return 'high';
+    if (score >= 60) return 'medium';
+    return 'low';
+  }
+  
+  emitTraceEvent(trace) {
+    // Dispatch custom event for real-time monitoring
+    const event = new CustomEvent('chaosTrace', {
+      detail: { trace, sessionId: this.sessionId }
+    });
+    document.dispatchEvent(event);
+  }
+  
+  endSession(summary = {}) {
+    const endTimestamp = new Date().toISOString();
+    const sessionDuration = performance.now() - this.performance.startTime;
+    
+    const sessionSummary = {
+      session_id: this.sessionId,
+      seed: this.userSeed,
+      start_timestamp: this.startTimestamp,
+      end_timestamp: endTimestamp,
+      duration_ms: sessionDuration,
+      mode: this.mode,
+      configuration: this.configuration,
+      traces: this.traces,
+      performance: {
+        ...this.performance,
+        total_duration: sessionDuration,
+        avg_interaction_time: sessionDuration / Math.max(1, this.performance.interactions)
+      },
+      summary: {
+        total_effects: this.performance.effectsInjected,
+        total_recoveries: this.performance.recoveryAttempts,
+        recovery_rate: this.performance.recoveryAttempts > 0 ? 
+          this.traces.filter(t => t.action === 'recovery_attempt' && t.success).length / this.performance.recoveryAttempts : 0,
+        avg_resilience: this.calculateAverageResilience(),
+        ...summary
+      }
+    };
+    
+    this.logTrace('session_end', { summary: sessionSummary.summary });
+    this.restoreRandom();
+    
+    return sessionSummary;
+  }
+  
+  calculateAverageResilience() {
+    const resilienceScores = this.traces
+      .filter(t => t.action === 'recovery_attempt' && typeof t.resilience_score === 'number')
+      .map(t => t.resilience_score);
+    
+    if (resilienceScores.length === 0) return 0;
+    return Math.round(resilienceScores.reduce((a, b) => a + b, 0) / resilienceScores.length);
+  }
+  
+  // Export functionality
+  exportAsJSON(pretty = true) {
+    const data = this.getSessionData();
+    return pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data);
+  }
+  
+  exportAsCSV() {
+    const traces = this.traces;
+    if (traces.length === 0) return '';
+    
+    // CSV headers
+    const headers = ['step', 'timestamp', 'relative_time_ms', 'action'];
+    const additionalFields = new Set();
+    
+    // Collect all unique fields
+    traces.forEach(trace => {
+      Object.keys(trace).forEach(key => {
+        if (!headers.includes(key)) {
+          additionalFields.add(key);
+        }
+      });
+    });
+    
+    const allHeaders = [...headers, ...Array.from(additionalFields)];
+    
+    // Build CSV
+    let csv = allHeaders.join(',') + '\n';
+    
+    traces.forEach(trace => {
+      const row = allHeaders.map(header => {
+        const value = trace[header];
+        if (value === null || value === undefined) return '';
+        if (typeof value === 'object') return JSON.stringify(value).replace(/,/g, ';');
+        return String(value).replace(/,/g, ';');
+      });
+      csv += row.join(',') + '\n';
+    });
+    
+    return csv;
+  }
+  
+  exportAsReport() {
+    const data = this.getSessionData();
+    const summary = data.summary;
+    
+    let report = `# Agent Chaos Monkey Session Report\n\n`;
+    report += `**Session ID:** ${data.session_id}\n`;
+    report += `**Seed:** ${data.seed}\n`;
+    report += `**Mode:** ${data.mode}\n`;
+    report += `**Duration:** ${Math.round(data.duration_ms / 1000)}s\n`;
+    report += `**Started:** ${new Date(data.start_timestamp).toLocaleString()}\n\n`;
+    
+    report += `## Summary\n\n`;
+    report += `- **Total Effects Injected:** ${summary.total_effects}\n`;
+    report += `- **Recovery Attempts:** ${summary.total_recoveries}\n`;
+    report += `- **Recovery Rate:** ${Math.round(summary.recovery_rate * 100)}%\n`;
+    report += `- **Average Resilience Score:** ${summary.avg_resilience}\n\n`;
+    
+    report += `## Configuration\n\n`;
+    report += '```json\n' + JSON.stringify(data.configuration, null, 2) + '\n```\n\n';
+    
+    report += `## Trace Analysis\n\n`;
+    const actionCounts = {};
+    this.traces.forEach(trace => {
+      actionCounts[trace.action] = (actionCounts[trace.action] || 0) + 1;
+    });
+    
+    Object.entries(actionCounts).forEach(([action, count]) => {
+      report += `- **${action}:** ${count} occurrences\n`;
+    });
+    
+    report += `\n## Recent Events\n\n`;
+    this.traces.slice(-10).forEach(trace => {
+      const time = new Date(trace.timestamp).toLocaleTimeString();
+      report += `- **${time}** [${trace.action}] ${this.formatTraceForReport(trace)}\n`;
+    });
+    
+    return report;
+  }
+  
+  formatTraceForReport(trace) {
+    switch (trace.action) {
+      case 'effect_injection':
+        return `${trace.effect_type} on ${trace.target} (impact: ${trace.performance_impact})`;
+      case 'recovery_attempt':
+        return `${trace.strategy} - ${trace.success ? 'Success' : 'Failed'} (${trace.duration_ms}ms)`;
+      case 'user_interaction':
+        return `${trace.interaction_type} on ${trace.element_id}`;
+      case 'evaluation_result':
+        return `${trace.test_case}: ${trace.result} (score: ${trace.score})`;
+      default:
+        return JSON.stringify(trace).slice(0, 100) + '...';
+    }
+  }
+  
+  exportAsShareableURL(baseURL = window.location.origin + window.location.pathname) {
+    const sessionData = this.getSessionData();
+    const compressed = this.compressSessionData(sessionData);
+    const encoded = btoa(encodeURIComponent(compressed));
+    
+    const url = new URL(baseURL);
+    url.searchParams.set('session', encoded);
+    url.searchParams.set('v', '1'); // Version for compatibility
+    
+    return url.toString();
+  }
+  
+  compressSessionData(data) {
+    // Simple compression: remove unnecessary fields and compact structure
+    return JSON.stringify({
+      id: data.session_id,
+      seed: data.seed,
+      mode: data.mode,
+      config: data.configuration,
+      summary: data.summary,
+      key_traces: this.traces.filter(t => 
+        ['effect_injection', 'recovery_attempt', 'evaluation_result'].includes(t.action)
+      ).map(t => ({ a: t.action, ts: t.relative_time, ...t }))
+    });
+  }
+  
+  getSessionData() {
+    return {
+      session_id: this.sessionId,
+      seed: this.userSeed,
+      start_timestamp: this.startTimestamp,
+      end_timestamp: new Date().toISOString(),
+      duration_ms: performance.now() - this.performance.startTime,
+      mode: this.mode,
+      configuration: this.configuration,
+      traces: this.traces,
+      performance: this.performance,
+      summary: {
+        total_effects: this.performance.effectsInjected,
+        total_recoveries: this.performance.recoveryAttempts,
+        recovery_rate: this.performance.recoveryAttempts > 0 ? 
+          this.traces.filter(t => t.action === 'recovery_attempt' && t.success).length / this.performance.recoveryAttempts : 0,
+        avg_resilience: this.calculateAverageResilience()
+      }
+    };
+  }
+  
+  // Static method to load session from URL
+  static loadFromURL(url = window.location.href) {
+    try {
+      const urlObj = new URL(url);
+      const sessionParam = urlObj.searchParams.get('session');
+      if (!sessionParam) return null;
+      
+      const compressed = decodeURIComponent(atob(sessionParam));
+      const data = JSON.parse(compressed);
+      
+      // Reconstruct session
+      const collector = new DataCollector();
+      collector.sessionId = data.id;
+      collector.userSeed = data.seed;
+      collector.mode = data.mode;
+      collector.configuration = data.config;
+      collector.traces = data.key_traces || [];
+      
+      return {
+        collector,
+        summary: data.summary,
+        canReplay: true
+      };
+    } catch (e) {
+      console.warn('Failed to load session from URL:', e);
+      return null;
+    }
+  }
+}
+
+class ChaosSimulator {
+  constructor() {
+    this.stage = document.getElementById('stage');
+    this.timeline = document.getElementById('timeline');
+    this.scoreEl = document.getElementById('score');
+    this.debugPanel = document.getElementById('debugPanel');
+    this.debugInfo = document.getElementById('debugInfo');
+    this.jsonLogViewer = document.getElementById('jsonLogViewer');
+    this.jsonLogs = [];
+    
+    // Initialize Data Collector
+    this.dataCollector = new DataCollector();
+    this.currentSession = null;
+    
+    this.state = {
+      running: false,
+      evaluating: false,
+      paused: false,
+      debugMode: false,
+      mode: 'scenario', // 'scenario' or 'evaluation'
+      scenario: null,
+      evalSuite: null,
+      currentEvalCase: 0,
+      evalResults: [],
+      packet: { 
+        x: 4, 
+        y: 5, 
+        targetX: 4,
+        velocity: 0,
+        maxSpeed: 15,
+        normalSpeed: 15,
+        slowSpeed: 3
+      },
+      effects: [],
+      score: 100,
+      faultCount: 0,
+      recoveryCount: 0,
+      startTime: 0,
+      nodeVisits: new Set(),
+      lastNodeIndex: -1
+    };
+    
+    this.nodes = [
+      { x: 2, y: 3, w: 10, h: 3, label: 'CLIENT', center: 7 },
+      { x: 18, y: 3, w: 10, h: 3, label: 'FETCH', center: 23 },
+      { x: 34, y: 3, w: 13, h: 3, label: 'PARSE/QA', center: 40 },
+      { x: 53, y: 3, w: 12, h: 3, label: 'SUMMARIZE', center: 59 }
+    ];
+    
+    this.animationFrame = null;
+    this.lastFrame = performance.now();
+    
+    this.init();
+  }
+  
+  init() {
+    // Render scenarios
+    const scenariosEl = document.getElementById('scenarios');
+    scenarios.forEach((scenario, i) => {
+      const card = document.createElement('div');
+      card.className = 'scenario-card';
+      card.innerHTML = `
+        <div style="font-size: 14px; font-weight: bold; color: #00ff41; margin-bottom: 8px;">
+          ${scenario.icon} ${scenario.title}
+        </div>
+        <div style="font-size: 11px; color: #888; line-height: 1.4;">
+          ${scenario.body}
+        </div>
+      `;
+      card.onclick = () => this.loadScenario(i);
+      scenariosEl.appendChild(card);
+    });
+    
+    // Render evaluation suites
+    const evalSuitesEl = document.getElementById('evalSuites');
+    Object.keys(BUILT_IN_EVALS).forEach((key) => {
+      const suite = BUILT_IN_EVALS[key];
+      const card = document.createElement('div');
+      card.className = 'eval-card';
+      card.innerHTML = `
+        <div class="eval-card-title" style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">
+          ${suite.icon} ${suite.suite}
+        </div>
+        <div class="eval-card-body" style="font-size: 11px; line-height: 1.4;">
+          ${suite.description}
+        </div>
+        <div style="font-size: 10px; color: #666; margin-top: 8px;">
+          ${suite.cases.length} test cases | Min score: ${suite.gate.score_min}%
+        </div>
+      `;
+      card.onclick = () => this.loadEvalSuite(key);
+      evalSuitesEl.appendChild(card);
+    });
+    
+    // Mode switching
+    document.getElementById('scenarioMode').onclick = () => this.switchMode('scenario');
+    document.getElementById('evaluationMode').onclick = () => this.switchMode('evaluation');
+    
+    // Button handlers
+    document.getElementById('runBtn').onclick = () => this.run();
+    document.getElementById('runEvalBtn').onclick = () => this.runEvaluation();
+    document.getElementById('pauseBtn').onclick = () => this.pause();
+    document.getElementById('resetBtn').onclick = () => this.reset();
+    document.getElementById('randomBtn').onclick = () => this.randomChaos();
+    document.getElementById('clearBtn').onclick = () => this.clearParams();
+    document.getElementById('debugBtn').onclick = () => this.toggleDebug();
+    
+    // Data export handlers
+    this.setupExportHandlers();
+    
+    // Parameter section collapse handlers
+    document.querySelectorAll('.param-section-title').forEach(title => {
+      title.onclick = () => {
+        const section = title.parentElement;
+        section.classList.toggle('collapsed');
+      };
+    });
+    
+    // Custom suite file upload
+    document.getElementById('customSuiteFile').onchange = (e) => this.handleCustomSuiteUpload(e);
+    
+    // Initialize data collection event listeners
+    this.setupDataCollectionListeners();
+    
+    // Load session from URL if present
+    this.loadSessionFromURL();
+    
+    // Initial render
+    this.render();
+  }
+  
+  setupExportHandlers() {
+    // Create export buttons if they don't exist
+    this.createExportUI();
+    
+    document.getElementById('exportJsonBtn')?.addEventListener('click', () => {
+      if (this.currentSession && this.dataCollector) {
+        const jsonData = this.dataCollector.exportAsJSON();
+        this.downloadFile('chaos_session.json', jsonData, 'application/json');
+      }
+    });
+    
+    document.getElementById('exportCsvBtn')?.addEventListener('click', () => {
+      if (this.currentSession && this.dataCollector) {
+        const csvData = this.dataCollector.exportAsCSV();
+        this.downloadFile('chaos_session.csv', csvData, 'text/csv');
+      }
+    });
+    
+    document.getElementById('exportReportBtn')?.addEventListener('click', () => {
+      if (this.currentSession && this.dataCollector) {
+        const reportData = this.dataCollector.exportAsReport();
+        this.downloadFile('chaos_report.md', reportData, 'text/markdown');
+      }
+    });
+    
+    document.getElementById('shareUrlBtn')?.addEventListener('click', () => {
+      if (this.currentSession && this.dataCollector) {
+        const shareUrl = this.dataCollector.exportAsShareableURL();
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          this.showNotification('Share URL copied to clipboard!', 'success');
+        }).catch(() => {
+          this.showNotification('Failed to copy URL to clipboard', 'error');
+        });
+      }
+    });
+  }
+  
+  createExportUI() {
+    // Check if export container already exists
+    if (document.getElementById('exportContainer')) return;
+    
+    const container = document.createElement('div');
+    container.id = 'exportContainer';
+    container.innerHTML = `
+      <div style="background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: none;" id="exportPanel">
+        <h3 style="color: #00ff41; margin-bottom: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">📊 Export Session Data</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
+          <button class="btn" id="exportJsonBtn" style="border-color: #00ff41;">📄 JSON</button>
+          <button class="btn" id="exportCsvBtn" style="border-color: #00ff41;">📊 CSV</button>
+          <button class="btn" id="exportReportBtn" style="border-color: #00ff41;">📋 Report</button>
+          <button class="btn" id="shareUrlBtn" style="border-color: #ffaa00; color: #ffaa00;">🔗 Share URL</button>
+        </div>
+        <div id="sessionInfo" style="font-size: 11px; color: #666; line-height: 1.4;"></div>
+      </div>
+    `;
+    
+    // Insert after control buttons
+    const controlButtons = document.querySelector('.control-buttons');
+    controlButtons.parentNode.insertBefore(container, controlButtons.nextSibling);
+  }
+  
+  setupDataCollectionListeners() {
+    // Listen for parameter changes
+    document.querySelectorAll('.param-input').forEach(input => {
+      input.addEventListener('change', (e) => {
+        if (this.dataCollector) {
+          this.dataCollector.logInteraction(e.target.id, 'parameter_change', {
+            old_value: e.target.dataset.previousValue || 'unknown',
+            new_value: e.target.value,
+            input_type: e.target.type
+          });
+          e.target.dataset.previousValue = e.target.value;
+        }
+      });
+    });
+    
+    // Listen for button clicks
+    document.querySelectorAll('.btn, .trigger-btn, .mode-btn').forEach(button => {
+      button.addEventListener('click', (e) => {
+        if (this.dataCollector && e.target.id) {
+          this.dataCollector.logInteraction(e.target.id, 'button_click', {
+            button_text: e.target.textContent?.trim(),
+            disabled: e.target.disabled
+          });
+        }
+      });
+    });
+    
+    // Listen for custom trace events
+    document.addEventListener('chaosTrace', (e) => {
+      this.updateSessionUI(e.detail.trace);
+    });
+  }
+  
+  updateSessionUI(trace) {
+    const sessionInfo = document.getElementById('sessionInfo');
+    const exportPanel = document.getElementById('exportPanel');
+    
+    if (this.currentSession && sessionInfo) {
+      const traceCount = this.dataCollector.traces.length;
+      const effectCount = this.dataCollector.performance.effectsInjected;
+      const recoveryCount = this.dataCollector.performance.recoveryAttempts;
+      
+      sessionInfo.innerHTML = `
+        <strong>Session:</strong> ${this.currentSession.sessionId.substr(-8)}... | 
+        <strong>Seed:</strong> ${this.currentSession.seed} | 
+        <strong>Traces:</strong> ${traceCount} | 
+        <strong>Effects:</strong> ${effectCount} | 
+        <strong>Recoveries:</strong> ${recoveryCount}
+      `;
+      
+      // Show export panel when session is active
+      if (exportPanel && traceCount > 0) {
+        exportPanel.style.display = 'block';
+      }
+    }
+  }
+  
+  loadSessionFromURL() {
+    const sessionData = DataCollector.loadFromURL();
+    if (sessionData) {
+      this.showNotification('Session loaded from URL!', 'info');
+      // Optional: populate UI with loaded session data
+      if (sessionData.collector.configuration) {
+        this.populateUIFromConfiguration(sessionData.collector.configuration);
+      }
+    }
+  }
+  
+  populateUIFromConfiguration(config) {
+    // Populate parameters from loaded configuration
+    if (config.faults) {
+      Object.keys(config.faults).forEach(key => {
+        const input = document.getElementById(key);
+        if (input && config.faults[key] !== undefined) {
+          input.value = config.faults[key];
+        }
+      });
+    }
+    
+    if (config.recovery) {
+      Object.keys(config.recovery).forEach(key => {
+        const input = document.getElementById(key);
+        if (input && config.recovery[key] !== undefined) {
+          if (input.type === 'checkbox') {
+            input.checked = !!config.recovery[key];
+          } else {
+            input.value = config.recovery[key];
+          }
+        }
+      });
+    }
+  }
+  
+  downloadFile(filename, content, mimeType = 'text/plain') {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    this.showNotification(`Downloaded ${filename}`, 'success');
+  }
+  
+  showNotification(message, type = 'info') {
+    // Create or update notification element
+    let notification = document.getElementById('notification');
+    if (!notification) {
+      notification = document.createElement('div');
+      notification.id = 'notification';
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: bold;
+        z-index: 10000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      `;
+      document.body.appendChild(notification);
+    }
+    
+    // Style based on type
+    const styles = {
+      success: { background: '#1f2f1f', border: '1px solid #00ff41', color: '#00ff41' },
+      error: { background: '#2f1f1f', border: '1px solid #ff4444', color: '#ff4444' },
+      info: { background: '#1f1f2f', border: '1px solid #4488ff', color: '#4488ff' },
+      warning: { background: '#2f2f1f', border: '1px solid #ffaa00', color: '#ffaa00' }
+    };
+    
+    const style = styles[type] || styles.info;
+    Object.assign(notification.style, style);
+    
+    notification.textContent = message;
+    notification.style.opacity = '1';
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      notification.style.opacity = '0';
+    }, 3000);
+  }
+  
+  logSessionComplete(sessionSummary) {
+    console.log('Session completed:', sessionSummary);
+    
+    // Update debug info if enabled
+    if (this.state.debugMode && this.jsonLogViewer) {
+      const formattedSummary = this.formatJsonForTerminal({
+        type: 'SESSION_COMPLETE',
+        summary: sessionSummary.summary,
+        traces: sessionSummary.traces.length
+      });
+      
+      this.jsonLogViewer.innerHTML += '\n' + formattedSummary;
+      this.jsonLogViewer.scrollTop = this.jsonLogViewer.scrollHeight;
+    }
+    
+    // Show completion notification
+    this.showNotification(
+      `Session completed! Score: ${sessionSummary.summary.final_score}%, Effects: ${sessionSummary.summary.total_effects}`,
+      'success'
+    );
+  }
+  
+  switchMode(mode) {
+    this.state.mode = mode;
+    
+    // Update mode buttons
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(mode + 'Mode').classList.add('active');
+    
+    // Show/hide sections
+    if (mode === 'scenario') {
+      document.getElementById('scenarioSection').classList.remove('hidden');
+      document.getElementById('evaluationSection').classList.add('hidden');
+      document.getElementById('runBtn').classList.remove('hidden');
+      document.getElementById('runEvalBtn').classList.add('hidden');
+      document.getElementById('evalResults').classList.remove('active');
+    } else {
+      document.getElementById('scenarioSection').classList.add('hidden');
+      document.getElementById('evaluationSection').classList.remove('hidden');
+      document.getElementById('runBtn').classList.add('hidden');
+      document.getElementById('runEvalBtn').classList.remove('hidden');
+    }
+    
+    this.reset();
+  }
+  
+  loadEvalSuite(key) {
+    this.state.evalSuite = BUILT_IN_EVALS[key];
+    
+    // Update active state
+    document.querySelectorAll('.eval-card').forEach((el, i) => {
+      el.classList.toggle('active', Object.keys(BUILT_IN_EVALS)[i] === key);
+    });
+    
+    // Populate parameters from first test case
+    if (this.state.evalSuite.cases && this.state.evalSuite.cases[0]) {
+      const firstCase = this.state.evalSuite.cases[0];
+      if (firstCase.faults) {
+        this.populateParametersFromFaults(firstCase.faults);
+      }
+    }
+    
+    this.reset();
+  }
+  
+  populateParametersFromFaults(faults) {
+    // Map evaluation fault format to UI format
+    const mapping = {
+      'latency_ms': 'latencyMs',
+      'latency_rate': 'latencyRate',
+      'http_500_rate': 'http500Rate',
+      'rate_429': 'rate429',
+      'malformed_rate': 'malformedRate',
+      'ctx_bytes': 'ctxBytes',
+      'inj_seed': 'injSeed'
+    };
+    
+    Object.keys(faults).forEach(key => {
+      const uiKey = mapping[key];
+      const input = document.getElementById(uiKey);
+      if (input) {
+        let value = faults[key];
+        // Convert rates from 0-1 to 0-100 for UI
+        if (key.includes('_rate') && value <= 1) {
+          value = value * 100;
+        }
+        input.value = value;
+        
+        // Flash effect
+        input.style.background = '#ffaa00';
+        input.style.color = '#000';
+        setTimeout(() => {
+          input.style.background = '#0a0a0a';
+          input.style.color = '#00ff41';
+        }, 300);
+      }
+    });
+  }
+  
+  async runEvaluation() {
+    if (!this.state.evalSuite || this.state.evaluating) return;
+    
+    // Start evaluation session
+    const seed = document.getElementById('seed')?.value || null;
+    this.currentSession = this.dataCollector.startSession({
+      evalSuite: this.state.evalSuite.suite,
+      cases: this.state.evalSuite.cases.map(c => c.name),
+      gate: this.state.evalSuite.gate
+    }, 'evaluation', seed);
+    
+    this.dataCollector.logInteraction('runEvalBtn', 'click', {
+      suite_name: this.state.evalSuite.suite,
+      case_count: this.state.evalSuite.cases.length
+    });
+    
+    this.state.evaluating = true;
+    this.state.currentEvalCase = 0;
+    this.state.evalResults = [];
+    
+    // Update UI
+    document.getElementById('runEvalBtn').disabled = true;
+    document.getElementById('pauseBtn').disabled = false;
+    this.stage.classList.add('evaluating');
+    
+    // Show results panel
+    document.getElementById('evalResults').classList.add('active');
+    document.getElementById('evalScoreValue').textContent = '...';
+    document.getElementById('evalGateText').textContent = 'RUNNING';
+    document.getElementById('evalGateStatus').className = 'eval-gate-status';
+    
+    this.addTimelineEvent(`[EVAL] Starting ${this.state.evalSuite.suite}`, 'eval');
+    
+    try {
+      // Run each test case
+      for (let i = 0; i < this.state.evalSuite.cases.length; i++) {
+        if (!this.state.evaluating) break; // Check if stopped
+        
+        const testCase = this.state.evalSuite.cases[i];
+        this.state.currentEvalCase = i;
+        
+        this.addTimelineEvent(`[EVAL] Case ${i + 1}: ${testCase.name}`, 'eval');
+        
+        // Set parameters for this case
+        if (testCase.faults) {
+          this.populateParametersFromFaults(testCase.faults);
+          await this.sleep(500); // Brief pause to show parameter changes
+        }
+        
+        // Run the scenario
+        const result = await this.runEvaluationCase(testCase);
+        this.state.evalResults.push(result);
+        
+        // Update case results display
+        this.updateEvalCaseResults();
+      }
+      
+      // Calculate final score
+      const finalScore = this.calculateEvalScore();
+      const passed = finalScore >= this.state.evalSuite.gate.score_min;
+      
+      // End evaluation session
+      if (this.currentSession) {
+        const evalSummary = this.dataCollector.endSession({
+          final_score: finalScore,
+          gate_passed: passed,
+          cases_run: this.state.evalResults.length,
+          cases_passed: this.state.evalResults.filter(r => r.status === 'pass').length,
+          completion_status: 'evaluation_complete'
+        });
+        
+        this.logSessionComplete(evalSummary);
+      }
+      
+      // Update final results
+      document.getElementById('evalScoreValue').textContent = finalScore;
+      document.getElementById('evalGateText').textContent = passed ? 'PASSED' : 'FAILED';
+      document.getElementById('evalGateStatus').className = `eval-gate-status ${passed ? 'passed' : 'failed'}`;
+      
+      this.addTimelineEvent(`[EVAL] Complete: ${finalScore}% (${passed ? 'PASS' : 'FAIL'})`, passed ? 'recovery' : 'fault');
+      
+    } catch (error) {
+      console.error('Evaluation error:', error);
+      this.addTimelineEvent('[EVAL] ERROR: ' + error.message, 'fault');
+    }
+    
+    // Cleanup
+    this.state.evaluating = false;
+    document.getElementById('runEvalBtn').disabled = false;
+    document.getElementById('pauseBtn').disabled = true;
+    this.stage.classList.remove('evaluating');
+  }
+  
+  async runEvaluationCase(testCase) {
+    return new Promise((resolve) => {
+      // Log evaluation case start
+      if (this.currentSession) {
+        this.dataCollector.logTrace('evaluation_case_start', {
+          test_case: testCase.name,
+          scenario: testCase.scenario,
+          faults: testCase.faults
+        });
+      }
+      
+      // Simulate running the test case
+      this.readParameters();
+      
+      // Reset packet for this case
+      this.state.packet.x = 4;
+      this.state.packet.targetX = 70;
+      this.state.packet.velocity = this.state.packet.normalSpeed;
+      this.state.score = 100;
+      this.state.faultCount = 0;
+      this.state.recoveryCount = 0;
+      
+      // Start mini-animation for this case
+      let startTime = performance.now();
+      const animate = () => {
+        if (!this.state.evaluating) {
+          const result = { name: testCase.name, status: 'aborted', score: 0 };
+          if (this.currentSession) {
+            this.dataCollector.logEvaluationResult(testCase.name, 'aborted', 0);
+          }
+          resolve(result);
+          return;
+        }
+        
+        const elapsed = performance.now() - startTime;
+        const progress = Math.min(elapsed / 3000, 1); // 3 second simulation
+        
+        // Update packet position
+        this.state.packet.x = 4 + (66 * progress);
+        
+        // Inject some faults during simulation
+        if (progress > 0.3 && progress < 0.7 && Math.random() < 0.1) {
+          this.injectFault(['latency', '500', '429', 'malformed'][Math.floor(Math.random() * 4)]);
+        }
+        
+        this.render();
+        
+        if (progress >= 1) {
+          // Case complete
+          const score = Math.max(60, this.state.score - Math.random() * 20);
+          const passed = this.evaluateAssertions(testCase, score);
+          const status = passed ? 'pass' : 'fail';
+          const result = {
+            name: testCase.name,
+            status: status,
+            score: Math.round(score)
+          };
+          
+          // Log evaluation result
+          if (this.currentSession) {
+            this.dataCollector.logEvaluationResult(
+              testCase.name,
+              status,
+              Math.round(score),
+              testCase.assertions || []
+            );
+          }
+          
+          resolve(result);
+        } else {
+          requestAnimationFrame(animate);
+        }
+      };
+      
+      animate();
+    });
+  }
+  
+  evaluateAssertions(testCase, score) {
+    if (!testCase.assertions) return true;
+    
+    // Simple assertion evaluation
+    for (const assertion of testCase.assertions) {
+      if (assertion.type === 'metric_threshold') {
+        if (assertion.metric === 'success_after_fault') {
+          if (score / 100 < assertion.value) return false;
+        }
+        if (assertion.metric === 'mttr' && assertion.op === '<=') {
+          // Simulate MTTR check
+          const mttr = this.state.recoveryCount > 0 ? 3.5 : 8.0;
+          if (mttr > assertion.value) return false;
+        }
+      }
+    }
+    
+    return true;
+  }
+  
+  calculateEvalScore() {
+    if (this.state.evalResults.length === 0) return 0;
+    
+    const passCount = this.state.evalResults.filter(r => r.status === 'pass').length;
+    return Math.round((passCount / this.state.evalResults.length) * 100);
+  }
+  
+  updateEvalCaseResults() {
+    const container = document.getElementById('evalCaseResults');
+    container.innerHTML = '';
+    
+    this.state.evalResults.forEach(result => {
+      const div = document.createElement('div');
+      div.className = 'eval-case';
+      div.innerHTML = `
+        <span class="eval-case-name">${result.name}</span>
+        <span class="eval-case-status ${result.status}">${result.status.toUpperCase()}</span>
+      `;
+      container.appendChild(div);
+    });
+  }
+  
+  handleCustomSuiteUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target.result;
+        const suite = this.parseMaybeYAML(content);
+        
+        if (suite && suite.cases) {
+          // Add custom suite to available suites
+          const key = 'custom_' + Date.now();
+          BUILT_IN_EVALS[key] = {
+            suite: suite.suite || 'Custom Suite',
+            description: 'Uploaded custom evaluation suite',
+            icon: '📁',
+            cases: suite.cases,
+            gate: suite.gate || { score_min: 70 }
+          };
+          
+          // Re-render eval suites to include custom one
+          this.renderEvalSuites();
+          this.loadEvalSuite(key);
+          
+          this.addTimelineEvent(`[UPLOAD] Custom suite loaded: ${suite.cases.length} cases`, 'eval');
+        } else {
+          throw new Error('Invalid suite format');
+        }
+      } catch (error) {
+        console.error('Failed to parse custom suite:', error);
+        this.addTimelineEvent('[UPLOAD] ERROR: Invalid suite format', 'fault');
+      }
+    };
+    
+    reader.readAsText(file);
+  }
+  
+  renderEvalSuites() {
+    const evalSuitesEl = document.getElementById('evalSuites');
+    evalSuitesEl.innerHTML = '';
+    
+    Object.keys(BUILT_IN_EVALS).forEach((key) => {
+      const suite = BUILT_IN_EVALS[key];
+      const card = document.createElement('div');
+      card.className = 'eval-card';
+      card.innerHTML = `
+        <div class="eval-card-title" style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">
+          ${suite.icon} ${suite.suite}
+        </div>
+        <div class="eval-card-body" style="font-size: 11px; line-height: 1.4;">
+          ${suite.description}
+        </div>
+        <div style="font-size: 10px; color: #666; margin-top: 8px;">
+          ${suite.cases.length} test cases | Min score: ${suite.gate.score_min}%
+        </div>
+      `;
+      card.onclick = () => this.loadEvalSuite(key);
+      evalSuitesEl.appendChild(card);
+    });
+  }
+  
+  parseMaybeYAML(text) {
+    try { return JSON.parse(text); } catch(_){}
+    
+    // Minimal YAML fallback
+    const obj = { suite:"Custom Suite", cases: [] }; 
+    let cur = null;
+    for (const raw of text.replace(/\r/g,'').split('\n')){
+      const l = raw.trim(); 
+      if (!l || l.startsWith('#')) continue;
+      if (l.startsWith('suite:')) { 
+        obj.suite = l.split(':').slice(1).join(':').trim().replace(/^["']|["']$/g,''); 
+        continue; 
+      }
+      if (l.startsWith('-')) { 
+        cur = {}; 
+        obj.cases.push(cur); 
+        continue; 
+      }
+      const m = l.match(/^([a-z0-9_]+)\s*:\s*(.+)$/i);
+      if (m && cur){ 
+        cur[m[1]] = m[2].replace(/^["']|["']$/g,''); 
+      }
+    }
+    return obj;
+  }
+  
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  
+  // Rest of the methods remain the same as original prototype...
+  toggleDebug() {
+    this.state.debugMode = !this.state.debugMode;
+    this.debugPanel.style.display = this.state.debugMode ? 'block' : 'none';
+    document.getElementById('debugBtn').style.background = this.state.debugMode ? '#00ff41' : '#1a1a1a';
+    document.getElementById('debugBtn').style.color = this.state.debugMode ? '#000' : '#00ff41';
+  }
+  
+  loadScenario(index) {
+    const scenario = scenarios[index];
+    this.state.scenario = scenario;
+    
+    // Log scenario selection
+    if (this.dataCollector) {
+      this.dataCollector.logInteraction('scenario-card', 'click', {
+        scenario_index: index,
+        scenario_title: scenario.title,
+        scenario_icon: scenario.icon
+      });
+    }
+    
+    document.querySelectorAll('.scenario-card').forEach((el, i) => {
+      el.classList.toggle('active', i === index);
+    });
+    
+    // Update parameter inputs with scenario values
+    Object.keys(scenario.faults).forEach(key => {
+      const input = document.getElementById(key);
+      if (input) {
+        input.value = scenario.faults[key];
+        
+        // Log parameter change
+        if (this.dataCollector) {
+          this.dataCollector.logInteraction(key, 'auto_populate', {
+            old_value: input.dataset.previousValue || 'unknown',
+            new_value: scenario.faults[key],
+            source: 'scenario_load'
+          });
+        }
+        input.dataset.previousValue = scenario.faults[key];
+        
+        // Add a pulse effect to show what changed
+        input.style.transition = 'background 0.3s';
+        input.style.background = '#00ff41';
+        input.style.color = '#000';
+        setTimeout(() => {
+          input.style.background = '#0a0a0a';
+          input.style.color = '#00ff41';
+        }, 300);
+      }
+    });
+    
+    this.reset();
+  }
+  
+  readParameters() {
+    // Read fault injection parameters from inputs
+    this.state.faults = {
+      latencyMs: parseInt(document.getElementById('latencyMs').value) || 0,
+      latencyRate: parseInt(document.getElementById('latencyRate').value) || 0,
+      http500Rate: parseInt(document.getElementById('http500Rate').value) || 0,
+      rate429: parseInt(document.getElementById('rate429').value) || 0,
+      malformedRate: parseInt(document.getElementById('malformedRate').value) || 0,
+      toolUnavailableSteps: parseInt(document.getElementById('toolUnavailableSteps').value) || 0,
+      injSeed: document.getElementById('injSeed').value || '',
+      ctxBytes: parseInt(document.getElementById('ctxBytes').value) || 8192
+    };
+    
+    // Read recovery parameters
+    this.state.recovery = {
+      enabled: document.getElementById('tripwireOn').checked,
+      loopN: parseInt(document.getElementById('loopN').value) || 3,
+      backoffBase: parseInt(document.getElementById('backoffBase').value) || 250,
+      backoffFactor: parseFloat(document.getElementById('backoffFactor').value) || 2.0,
+      jitter: parseFloat(document.getElementById('jitter').value) || 0.2,
+      maxRetries: parseInt(document.getElementById('maxRetries').value) || 3,
+      fallback: document.getElementById('fallback').value || 'use_cached',
+      seed: document.getElementById('seed').value || ''
+    };
+  }
+  
+  run() {
+    if (this.state.running) return;
+    
+    // Read parameters from inputs
+    this.readParameters();
+    
+    // Start data collection session
+    const seed = this.state.recovery?.seed || null;
+    this.currentSession = this.dataCollector.startSession({
+      scenario: this.state.scenario,
+      faults: this.state.faults,
+      recovery: this.state.recovery
+    }, 'scenario', seed);
+    
+    this.dataCollector.logInteraction('runBtn', 'click', {
+      scenario_title: this.state.scenario?.title,
+      faults_configured: Object.keys(this.state.faults || {}).length
+    });
+    
+    this.state.running = true;
+    this.state.paused = false;
+    this.state.startTime = performance.now();
+    this.lastFrame = performance.now();
+    
+    // Reset packet
+    this.state.packet.x = 4;
+    this.state.packet.targetX = 70; // End of pipeline
+    this.state.packet.velocity = this.state.packet.normalSpeed;
+    this.state.nodeVisits.clear();
+    this.state.lastNodeIndex = -1;
+    
+    // Update UI
+    document.getElementById('runBtn').disabled = true;
+    document.getElementById('pauseBtn').disabled = false;
+    this.stage.classList.add('running');
+    
+    // Start animation
+    this.animate();
+  }
+  
+  animate() {
+    if (!this.state.running) return;
+    
+    const now = performance.now();
+    const dt = Math.min((now - this.lastFrame) / 1000, 0.1); // Delta time in seconds, capped
+    this.lastFrame = now;
+    
+    if (!this.state.paused) {
+      // Smooth packet movement
+      const packet = this.state.packet;
+      const distance = packet.targetX - packet.x;
+      
+      if (Math.abs(distance) > 0.1) {
+        // Move packet
+        packet.x += packet.velocity * dt;
+        
+        // Check node proximity
+        this.checkNodeProximity();
+        
+        // Check completion
+        if (packet.x >= 68) {
+          this.complete();
+          return;
+        }
+      }
+      
+      // Update effects
+      this.state.effects = this.state.effects.map(e => {
+        e.ttl -= dt * 1000; // Convert back to ms
+        
+        // Animate effect properties
+        if (e.type === 'latency' && e.delay) {
+          e.delay = Math.max(0, e.delay - dt * 1000);
+        }
+        if (e.type === '500' && e.ttl < 1000 && !e.flashed) {
+          e.flashed = true;
+        }
+        if (e.type === 'malformed' && e.ttl < 1500 && !e.rotated) {
+          e.rotated = true;
+        }
+        
+        return e;
+      }).filter(e => e.ttl > 0);
+      
+      // Update debug info
+      if (this.state.debugMode) {
+        this.updateDebug(dt);
+      }
+    }
+    
+    // Render
+    this.render();
+    
+    // Continue
+    this.animationFrame = requestAnimationFrame(() => this.animate());
+  }
+  
+  checkNodeProximity() {
+    const packet = this.state.packet;
+    
+    this.nodes.forEach((node, i) => {
+      const distance = Math.abs(packet.x - node.center);
+      
+      if (distance < 3 && this.state.lastNodeIndex !== i) {
+        this.state.lastNodeIndex = i;
+        
+        // Roll for faults based on configured rates
+        if (this.state.faults) {
+          this.rollForFaults();
+        }
+      }
+    });
+  }
+  
+  rollForFaults() {
+    const faults = this.state.faults;
+    const roll = Math.random() * 100;
+    
+    // Check each fault type based on configured rates
+    if (roll < faults.latencyRate && faults.latencyMs > 0) {
+      this.injectFault('latency', { delay: faults.latencyMs });
+    } else if (roll < faults.http500Rate) {
+      this.injectFault('500');
+    } else if (roll < faults.rate429) {
+      this.injectFault('429');
+    } else if (roll < faults.malformedRate) {
+      this.injectFault('malformed');
+    }
+    
+    // Tool unavailable at specific steps
+    if (faults.toolUnavailableSteps > 0 && this.state.lastNodeIndex === 2) {
+      if (Math.random() < 0.3) {
+        this.injectFault('tool_unavailable');
+      }
+    }
+    
+    // Context truncation
+    if (faults.ctxBytes < 1024 && this.state.lastNodeIndex === 3) {
+      if (Math.random() < 0.3) {
+        this.injectFault('context_truncate');
+      }
+    }
+    
+    // RAG injection
+    if (faults.injSeed && this.state.lastNodeIndex === 1) {
+      if (Math.random() < 0.3) {
+        this.injectFault('injection', { seed: faults.injSeed });
+      }
+    }
+  }
+  
+  injectFault(type, params = {}) {
+    this.state.faultCount++;
+    this.state.score = Math.max(0, this.state.score - 10);
+    
+    // Create effect
+    const effect = {
+      type,
+      x: this.state.packet.x,
+      ttl: 3000,
+      delay: type === 'latency' ? (params.delay || 2000) : 0,
+      flashed: false,
+      rotated: false,
+      ...params
+    };
+    
+    this.state.effects.push(effect);
+    
+    // Log fault injection
+    if (this.currentSession) {
+      this.dataCollector.logEffectInjection(
+        type,
+        `packet@${this.state.packet.x.toFixed(2)}`,
+        { ...params, packet_position: this.state.packet.x },
+        { score_impact: -10, current_score: this.state.score }
+      );
+    }
+    
+    // Add to timeline
+    this.addTimelineEvent(type, 'fault');
+    
+    // Slow packet for latency
+    if (type === 'latency') {
+      this.state.packet.velocity = this.state.packet.slowSpeed;
+      setTimeout(() => {
+        this.state.packet.velocity = this.state.packet.normalSpeed;
+      }, effect.delay);
+    }
+    
+    // Trigger recovery if enabled
+    if (this.state.recovery && this.state.recovery.enabled && Math.random() > 0.5) {
+      setTimeout(() => this.attemptRecovery(), 1500);
+    }
+    
+    this.updateScore();
+  }
+  
+  attemptRecovery() {
+    const startTime = performance.now();
+    this.state.recoveryCount++;
+    this.state.score = Math.min(100, this.state.score + 5);
+    
+    const effect = {
+      type: 'retry',
+      x: this.state.packet.x,
+      ttl: 2000,
+      attempt: this.state.recoveryCount
+    };
+    
+    this.state.effects.push(effect);
+    this.addTimelineEvent(`retry(${this.state.recoveryCount})`, 'recovery');
+    
+    // Log recovery attempt
+    if (this.currentSession) {
+      const duration = performance.now() - startTime;
+      this.dataCollector.logRecoveryAttempt(
+        'auto_retry',
+        true, // Assume success for now
+        duration,
+        {
+          attempt_number: this.state.recoveryCount,
+          packet_position: this.state.packet.x,
+          score_recovery: 5,
+          current_score: this.state.score
+        }
+      );
+    }
+    
+    this.updateScore();
+  }
+  
+  addTimelineEvent(event, type) {
+    const span = document.createElement('span');
+    span.className = `timeline-event ${type}`;
+    span.textContent = event;
+    this.timeline.appendChild(span);
+    this.timeline.scrollLeft = this.timeline.scrollWidth;
+    
+    // Also add to JSON log if debug mode is enabled
+    if (this.state.debugMode) {
+      const logEntry = {
+        timestamp: new Date().toISOString().split('T')[1].split('.')[0],
+        event: event,
+        type: type,
+        score: this.state.score,
+        packet_x: this.state.packet.x.toFixed(2)
+      };
+      
+      this.jsonLogs.push(logEntry);
+      if (this.jsonLogs.length > 20) {
+        this.jsonLogs.shift();
+      }
+      
+      if (this.jsonLogViewer) {
+        this.jsonLogViewer.innerHTML = this.jsonLogs.map(log => 
+          this.formatJsonForTerminal(log)
+        ).join('\n');
+        this.jsonLogViewer.scrollTop = this.jsonLogViewer.scrollHeight;
+      }
+    }
+  }
+  
+  updateScore() {
+    this.scoreEl.textContent = Math.round(this.state.score);
+    this.scoreEl.style.color = 
+      this.state.score >= 80 ? '#00ff41' :
+      this.state.score >= 50 ? '#ffff00' : '#ff4444';
+  }
+  
+  updateDebug(dt) {
+    const packet = this.state.packet;
+    const elapsed = ((performance.now() - this.state.startTime) / 1000).toFixed(1);
+    
+    // Update left panel (system status)
+    this.debugInfo.innerHTML = `
+      <strong>Mode:</strong> ${this.state.mode} ${this.state.evaluating ? '(evaluating)' : ''}<br>
+      <strong>Packet:</strong> x=${packet.x.toFixed(2)}, v=${packet.velocity.toFixed(1)}px/s<br>
+      <strong>Time:</strong> ${elapsed}s, dt=${(dt * 1000).toFixed(1)}ms<br>
+      <strong>Effects:</strong> ${this.state.effects.length}<br>
+      <strong>Node:</strong> ${this.state.lastNodeIndex >= 0 ? this.nodes[this.state.lastNodeIndex].label : 'none'}<br>
+      <strong>Score:</strong> ${this.state.score}%<br>
+      <strong>Faults:</strong> ${this.state.faultCount}<br>
+      <strong>Recoveries:</strong> ${this.state.recoveryCount}
+    `;
+    
+    // Update right panel (JSON log)
+    const logEntry = {
+      timestamp: new Date().toISOString().split('T')[1].split('.')[0],
+      packet_x: packet.x.toFixed(2),
+      velocity: packet.velocity.toFixed(1),
+      score: this.state.score,
+      effects_count: this.state.effects.length,
+      current_node: this.state.lastNodeIndex >= 0 ? this.nodes[this.state.lastNodeIndex].label : null,
+      delta_time: (dt * 1000).toFixed(1) + 'ms'
+    };
+    
+    // Add to logs (keep last 20 entries)
+    this.jsonLogs.push(logEntry);
+    if (this.jsonLogs.length > 20) {
+      this.jsonLogs.shift();
+    }
+    
+    // Update JSON viewer with syntax highlighting
+    this.jsonLogViewer.innerHTML = this.jsonLogs.map(log => 
+      this.formatJsonForTerminal(log)
+    ).join('\n');
+    
+    // Auto-scroll to bottom
+    this.jsonLogViewer.scrollTop = this.jsonLogViewer.scrollHeight;
+  }
+  
+  formatJsonForTerminal(obj) {
+    const json = JSON.stringify(obj, null, 1);
+    return json
+      .replace(/"([^"]+)":/g, '<span style="color: #00ff41;">"$1"</span>:')
+      .replace(/: "([^"]*)"/g, ': <span style="color: #88ff88;">"$1"</span>')
+      .replace(/: ([0-9.]+)/g, ': <span style="color: #ffaa00;">$1</span>')
+      .replace(/: (null|true|false)/g, ': <span style="color: #ff8888;">$1</span>');
+  }
+  
+  render() {
+    const grid = Array(14).fill().map(() => Array(78).fill(' '));
+    
+    // Draw pipeline
+    this.nodes.forEach((node, i) => {
+      this.drawBox(grid, node);
+      if (i < this.nodes.length - 1) {
+        this.drawPipe(grid, node.x + node.w, node.y + 1, 
+                      this.nodes[i + 1].x - (node.x + node.w));
+      }
+    });
+    
+    // Draw packet
+    const px = Math.floor(this.state.packet.x);
+    const py = this.state.packet.y;
+    
+    if (px >= 0 && px < 78) {
+      grid[py][px] = this.state.evaluating ? '◉' : '●';
+      
+      // Trail effect
+      if (this.state.running && !this.state.paused) {
+        for (let i = 1; i <= 3; i++) {
+          const tx = px - i * 2;
+          if (tx >= 0) {
+            grid[py][tx] = '·';
+          }
+        }
+      }
+    }
+    
+    // Draw effects
+    this.state.effects.forEach(effect => {
+      this.renderEffect(grid, effect);
+    });
+    
+    // Status line
+    if (this.state.running) {
+      const status = `[${this.state.paused ? 'PAUSED' : (this.state.evaluating ? 'EVALUATING' : 'RUNNING')}] Faults: ${this.state.faultCount} | Recoveries: ${this.state.recoveryCount}`;
+      for (let i = 0; i < status.length && i < 78; i++) {
+        grid[12][i] = status[i];
+      }
+    }
+    
+    // Evaluation status
+    if (this.state.evaluating && this.state.evalSuite) {
+      const evalStatus = `[EVAL] ${this.state.evalSuite.suite} | Case ${this.state.currentEvalCase + 1}/${this.state.evalSuite.cases.length}`;
+      for (let i = 0; i < evalStatus.length && i < 78; i++) {
+        grid[11][i] = evalStatus[i];
+      }
+    }
+    
+    this.stage.textContent = grid.map(row => row.join('')).join('\n');
+  }
+  
+  drawBox(grid, {x, y, w, h, label}) {
+    // Corners
+    grid[y][x] = '┌';
+    grid[y][x + w - 1] = '┐';
+    grid[y + h - 1][x] = '└';
+    grid[y + h - 1][x + w - 1] = '┘';
+    
+    // Edges
+    for (let i = 1; i < w - 1; i++) {
+      grid[y][x + i] = '─';
+      grid[y + h - 1][x + i] = '─';
+    }
+    for (let i = 1; i < h - 1; i++) {
+      grid[y + i][x] = '│';
+      grid[y + i][x + w - 1] = '│';
+    }
+    
+    // Label
+    if (label) {
+      const lx = x + Math.floor((w - label.length) / 2);
+      for (let i = 0; i < label.length && lx + i < 78; i++) {
+        grid[y + 1][lx + i] = label[i];
+      }
+    }
+  }
+  
+  drawPipe(grid, x, y, len) {
+    for (let i = 0; i < len; i++) {
+      grid[y][x + i] = i === len - 1 ? '▶' : '─';
+    }
+  }
+  
+  renderEffect(grid, effect) {
+    const x = Math.floor(effect.x);
+    const y = this.state.packet.y;
+    
+    switch(effect.type) {
+      case 'latency':
+        // Wavy slowdown effect
+        for (let i = 0; i < 5 && x + i < 78; i++) {
+          grid[y + 1][x + i] = '~';
+        }
+        if (effect.delay > 0) {
+          const timer = `⏳${Math.ceil(effect.delay/1000)}s`;
+          for (let i = 0; i < timer.length && x + i < 78; i++) {
+            grid[y - 2][x + i] = timer[i];
+          }
+        }
+        break;
+        
+      case '500':
+        const errorMsg = '☁500';
+        for (let i = 0; i < errorMsg.length && x + i < 78; i++) {
+          grid[y - 3][x + i] = errorMsg[i];
+        }
+        if (effect.flashed) {
+          grid[y - 2][x + 2] = '⚡';
+        }
+        break;
+        
+      case '429':
+        const rateLimit = '⛔429';
+        for (let i = 0; i < rateLimit.length && x + i < 78; i++) {
+          grid[y][x + i] = rateLimit[i];
+        }
+        break;
+        
+      case 'malformed':
+        const badJson = effect.rotated ? '{�}' : '{?}';
+        for (let i = 0; i < badJson.length && x + i < 78; i++) {
+          grid[y + 2][x + i] = badJson[i];
+        }
+        break;
+        
+      case 'tool_unavailable':
+        if (x < 78) grid[y][x] = '⊘';
+        break;
+        
+      case 'context_truncate':
+        const ctx = '💣ctx';
+        for (let i = 0; i < ctx.length && x + i < 78; i++) {
+          grid[y - 2][x + i] = ctx[i];
+        }
+        break;
+        
+      case 'injection':
+        const inj = `🪤${effect.seed || 'inject'}`;
+        for (let i = 0; i < inj.length && x + i < 78; i++) {
+          grid[y - 3][x + i] = inj[i];
+        }
+        break;
+        
+      case 'retry':
+        const retry = `retry(${effect.attempt})`;
+        for (let i = 0; i < retry.length && x + i < 78; i++) {
+          grid[y + 3][x + i] = retry[i];
+        }
+        break;
+        
+      case 'fallback':
+        const fb = '🪂 fallback';
+        for (let i = 0; i < fb.length && x + i < 78; i++) {
+          grid[y + 3][x + i] = fb[i];
+        }
+        break;
+    }
+  }
+  
+  complete() {
+    this.state.running = false;
+    this.state.evaluating = false;
+    cancelAnimationFrame(this.animationFrame);
+    
+    // Final score
+    const finalScore = Math.min(100, this.state.score + 10);
+    this.state.score = finalScore;
+    this.updateScore();
+    
+    // End data collection session
+    if (this.currentSession) {
+      const sessionSummary = this.dataCollector.endSession({
+        final_score: finalScore,
+        faults_encountered: this.state.faultCount,
+        recoveries_attempted: this.state.recoveryCount,
+        completion_status: 'success'
+      });
+      
+      this.logSessionComplete(sessionSummary);
+    }
+    
+    // Update UI
+    document.getElementById('runBtn').disabled = false;
+    document.getElementById('runEvalBtn').disabled = false;
+    document.getElementById('pauseBtn').disabled = true;
+    this.stage.classList.remove('running', 'evaluating');
+    
+    this.addTimelineEvent(`COMPLETE - Score: ${finalScore}%`, 'recovery');
+  }
+  
+  pause() {
+    this.state.paused = !this.state.paused;
+    document.getElementById('pauseBtn').textContent = 
+      this.state.paused ? '▶️ RESUME' : '⏸️ PAUSE';
+  }
+  
+  reset() {
+    // Stop animation
+    if (this.animationFrame) {
+      cancelAnimationFrame(this.animationFrame);
+    }
+    
+    // End current session if active
+    if (this.currentSession && this.state.running) {
+      this.dataCollector.endSession({
+        completion_status: 'reset',
+        final_score: this.state.score,
+        reason: 'user_reset'
+      });
+    }
+    
+    this.currentSession = null;
+    
+    // Reset state
+    this.state.running = false;
+    this.state.evaluating = false;
+    this.state.paused = false;
+    this.state.packet.x = 4;
+    this.state.packet.velocity = this.state.packet.normalSpeed;
+    this.state.effects = [];
+    this.state.score = 100;
+    this.state.faultCount = 0;
+    this.state.recoveryCount = 0;
+    this.state.nodeVisits.clear();
+    this.state.lastNodeIndex = -1;
+    this.state.currentEvalCase = 0;
+    this.state.evalResults = [];
+    
+    // Clear JSON logs
+    this.jsonLogs = [];
+    if (this.jsonLogViewer) {
+      this.jsonLogViewer.innerHTML = '<span style="color: #444;">// JSON logs will appear here during simulation...</span>';
+    }
+    
+    // Hide export panel on reset
+    const exportPanel = document.getElementById('exportPanel');
+    if (exportPanel) {
+      exportPanel.style.display = 'none';
+    }
+    
+    // Reset UI
+    document.getElementById('runBtn').disabled = false;
+    document.getElementById('runEvalBtn').disabled = false;
+    document.getElementById('pauseBtn').disabled = true;
+    document.getElementById('pauseBtn').textContent = '⏸️ PAUSE';
+    this.stage.classList.remove('running', 'evaluating');
+    this.timeline.innerHTML = '<span style="color: #666;">TIMELINE:</span>';
+    document.getElementById('evalResults').classList.remove('active');
+    this.updateScore();
+    
+    this.render();
+  }
+  
+  randomChaos() {
+    // Generate random parameters
+    const randomFaults = {
+      latencyMs: Math.floor(Math.random() * 5000),
+      latencyRate: Math.floor(Math.random() * 50),
+      http500Rate: Math.floor(Math.random() * 30),
+      rate429: Math.floor(Math.random() * 30),
+      malformedRate: Math.floor(Math.random() * 40),
+      toolUnavailableSteps: Math.floor(Math.random() * 3),
+      injSeed: Math.random() > 0.5 ? 'random-' + Date.now() : '',
+      ctxBytes: Math.random() > 0.5 ? 512 : 8192
+    };
+    
+    // Apply to UI
+    Object.keys(randomFaults).forEach(key => {
+      const input = document.getElementById(key);
+      if (input) {
+        input.value = randomFaults[key];
+        // Flash effect
+        input.style.background = '#00ff41';
+        input.style.color = '#000';
+        setTimeout(() => {
+          input.style.background = '#0a0a0a';
+          input.style.color = '#00ff41';
+        }, 300);
+      }
+    });
+    
+    // Clear selections
+    document.querySelectorAll('.scenario-card, .eval-card').forEach(el => {
+      el.classList.remove('active');
+    });
+    
+    this.reset();
+  }
+  
+  clearParams() {
+    // Default/clear values
+    const defaults = {
+      latencyMs: 0,
+      latencyRate: 0,
+      http500Rate: 0,
+      rate429: 0,
+      malformedRate: 0,
+      toolUnavailableSteps: 0,
+      injSeed: '',
+      ctxBytes: 8192,
+      loopN: 3,
+      backoffBase: 250,
+      backoffFactor: 2.0,
+      jitter: 0.2,
+      maxRetries: 3,
+      fallback: 'use_cached',
+      seed: ''
+    };
+    
+    // Apply defaults to UI
+    Object.keys(defaults).forEach(key => {
+      const input = document.getElementById(key);
+      if (input) {
+        input.value = defaults[key];
+      }
+    });
+    
+    // Keep tripwire on by default
+    document.getElementById('tripwireOn').checked = true;
+    
+    // Clear selections
+    document.querySelectorAll('.scenario-card, .eval-card').forEach(el => {
+      el.classList.remove('active');
+    });
+    
+    this.reset();
+  }
+}
+
+// Initialize
+const sim = new ChaosSimulator();
+
+// Expose globally for console/quick triggers
+window.sim = sim;
+</script>
+
+</body>
+</html>

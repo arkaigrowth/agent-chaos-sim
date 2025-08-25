@@ -1,0 +1,4 @@
+tooltips:
+  asciiOnly: "Force plain ASCII glyphs for maximum compatibility."
+  soundOn: "Enable tiny WebAudio cues for faults, retries, and recovery."
+  mouseSpice: "Add subtle speed jitter when Surprise Me is ON."

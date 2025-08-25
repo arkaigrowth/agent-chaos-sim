@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chaos Lab - Bold Geometric Theme</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Base chaos/hazard palette with bold modifications */
+      --primary: #fbbf24;
+      --secondary: #fb923c;
+      --danger: #ef4444;
+      --success: #10b981;
+      --background: #000000;
+      
+      /* Geometric extensions */
+      --surface: #1a1a1a;
+      --surface-accent: #2a2a2a;
+      --text: #ffffff;
+      --text-muted: #cccccc;
+      --border: #444444;
+      --accent: #00ffff;
+      
+      /* Sharp geometric elements */
+      --border-radius: 0px;
+      --border-width: 2px;
+      --shadow: none;
+      --outline: 2px solid var(--primary);
+      
+      /* Typography */
+      --font-heading: 'Orbitron', monospace;
+      --font-body: 'Rajdhani', sans-serif;
+      --font-mono: 'Source Code Pro', monospace;
+      
+      /* Geometric patterns */
+      --stripe-angle: 45deg;
+      --grid-size: 20px;
+    }
+
+    /* Animations */
+    .geo-snap { transition: all 0.1s linear; }
+    .geo-slide { animation: geoSlide 0.3s linear; }
+    .strobe { animation: strobe 0.5s linear infinite; }
+    .matrix-scan { animation: matrixScan 2s linear infinite; }
+
+    @keyframes geoSlide { 
+      from { transform: translateX(-100%); } 
+      to { transform: translateX(0); } 
+    }
+    @keyframes strobe { 
+      0%, 50% { opacity: 1; } 
+      51%, 100% { opacity: 0.3; } 
+    }
+    @keyframes matrixScan { 
+      0% { background-position: 0 0; } 
+      100% { background-position: var(--grid-size) var(--grid-size); } 
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.4;
+      background-image: 
+        linear-gradient(var(--stripe-angle), transparent 45%, rgba(68, 68, 68, 0.1) 49%, rgba(68, 68, 68, 0.1) 51%, transparent 55%);
+      background-size: var(--grid-size) var(--grid-size);
+    }
+
+    .header {
+      background: var(--surface);
+      padding: 1rem 2rem;
+      border-bottom: var(--border-width) solid var(--primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 50%, var(--primary) 100%);
+      animation: matrixScan 3s linear infinite;
+    }
+
+    .logo {
+      font-family: var(--font-heading);
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 10px var(--primary);
+    }
+
+    .theme-selector {
+      background: var(--surface-accent);
+      border: var(--border-width) solid var(--border);
+      padding: 0.5rem 1rem;
+      color: var(--text);
+      font-size: 0.875rem;
+      font-family: var(--font-body);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .hero {
+      padding: 4rem 2rem 2rem;
+      text-align: center;
+      background: var(--background);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -50%;
+      right: -50%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        var(--stripe-angle),
+        transparent,
+        transparent 10px,
+        rgba(0, 255, 255, 0.05) 10px,
+        rgba(0, 255, 255, 0.05) 20px
+      );
+      animation: matrixScan 4s linear infinite;
+    }
+
+    .hero h1 {
+      font-family: var(--font-heading);
+      font-size: 4rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      text-shadow: 0 0 20px var(--primary);
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn {
+      background: var(--primary);
+      color: var(--background);
+      border: var(--border-width) solid var(--primary);
+      padding: 1rem 2rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-family: var(--font-body);
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn:hover {
+      background: var(--background);
+      color: var(--primary);
+      box-shadow: 0 0 20px var(--primary);
+    }
+
+    .btn:active {
+      transform: translate(2px, 2px);
+    }
+
+    .story {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0;
+      margin: 2rem;
+      border: var(--border-width) solid var(--border);
+    }
+
+    .story .step {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: var(--surface);
+      border-right: var(--border-width) solid var(--border);
+      position: relative;
+    }
+
+    .story .step:last-child {
+      border-right: none;
+    }
+
+    .story .step::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+
+    .story .step div {
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 1.1rem;
+    }
+
+    .story .step span {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: var(--border-width) solid var(--border);
+      padding: 2rem;
+      position: relative;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+    }
+
+    .card:hover {
+      background: var(--surface-accent);
+      border-color: var(--primary);
+    }
+
+    .card:hover::before {
+      height: 6px;
+      box-shadow: 0 0 10px var(--primary);
+    }
+
+    .card h3 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-family: var(--font-heading);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.875rem;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: var(--border-width) solid var(--border);
+      background: var(--surface-accent);
+      color: var(--text);
+      font-size: 1rem;
+      font-family: var(--font-body);
+      font-weight: 600;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--background);
+      box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--surface-accent);
+      border: var(--border-width) solid var(--border);
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      accent-color: var(--primary);
+    }
+
+    /* Bottom Sheet Focus */
+    .bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 4px solid var(--primary);
+      padding: 2rem;
+      z-index: 1000;
+      box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+    }
+
+    .bottom-sheet::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 50%, var(--accent) 100%);
+      animation: matrixScan 2s linear infinite;
+    }
+
+    .test-controls {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      padding: 1rem;
+      background: var(--surface-accent);
+      border: var(--border-width) solid var(--border);
+    }
+
+    .test-controls input {
+      padding: 0.5rem 1rem;
+      border: var(--border-width) solid var(--border);
+      background: var(--background);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 600;
+    }
+
+    .test-controls input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 5px var(--primary);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--background);
+      border: var(--border-width) solid var(--primary);
+      padding: 1rem 2rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary:hover {
+      background: var(--background);
+      color: var(--primary);
+      box-shadow: 0 0 15px var(--primary);
+    }
+
+    .btn-primary:active {
+      transform: translate(2px, 2px);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: var(--background);
+      border: var(--border-width) solid var(--danger);
+      padding: 1rem 2rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-danger:hover {
+      background: var(--background);
+      color: var(--danger);
+      box-shadow: 0 0 15px var(--danger);
+    }
+
+    .btn-danger:active {
+      transform: translate(2px, 2px);
+    }
+
+    .btn-secondary {
+      background: var(--surface-accent);
+      color: var(--text);
+      border: var(--border-width) solid var(--border);
+      padding: 1rem 2rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font-body);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-secondary:hover {
+      background: var(--background);
+      border-color: var(--accent);
+      box-shadow: 0 0 15px var(--accent);
+    }
+
+    .btn-secondary:active {
+      transform: translate(2px, 2px);
+    }
+
+    .results-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2px;
+      margin-bottom: 2rem;
+    }
+
+    .metric-card {
+      background: var(--surface-accent);
+      padding: 2rem;
+      text-align: center;
+      border: var(--border-width) solid var(--border);
+      position: relative;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+
+    .metric-card h4 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: var(--font-heading);
+    }
+
+    .metric-value {
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+      font-family: var(--font-heading);
+      text-shadow: 0 0 10px currentColor;
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .trace-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface-accent);
+      border: var(--border-width) solid var(--border);
+    }
+
+    .trace-table th,
+    .trace-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+      font-weight: 600;
+    }
+
+    .trace-table th {
+      background: var(--primary);
+      color: var(--background);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: var(--font-heading);
+    }
+
+    .trace-table tbody tr {
+      background: var(--surface);
+    }
+
+    .trace-table tbody tr:nth-child(even) {
+      background: var(--surface-accent);
+    }
+
+    .trace-table tbody tr:hover {
+      background: var(--background);
+      color: var(--primary);
+    }
+
+    .status-success {
+      color: var(--success);
+      text-shadow: 0 0 10px var(--success);
+      font-weight: 900;
+    }
+
+    .status-error {
+      color: var(--danger);
+      text-shadow: 0 0 10px var(--danger);
+      font-weight: 900;
+    }
+
+    .view-toggles {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 2rem;
+    }
+
+    .view-toggle {
+      background: var(--surface-accent);
+      border: var(--border-width) solid var(--border);
+      color: var(--text);
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .view-toggle.active {
+      background: var(--primary);
+      color: var(--background);
+      border-color: var(--primary);
+    }
+
+    .view-toggle:hover {
+      background: var(--accent);
+      color: var(--background);
+      border-color: var(--accent);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+        gap: 2px;
+      }
+      
+      .results-panel {
+        grid-template-columns: 1fr;
+        gap: 2px;
+      }
+      
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .bottom-sheet {
+        padding: 1rem;
+      }
+      
+      .test-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .story {
+        grid-template-columns: 1fr;
+      }
+
+      .story .step {
+        border-right: none;
+        border-bottom: var(--border-width) solid var(--border);
+      }
+
+      .story .step:last-child {
+        border-bottom: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header geo-slide">
+    <div class="logo strobe">CHAOS LAB</div>
+    <select class="theme-selector geo-snap">
+      <option>Theme ▼</option>
+      <option value="modern">Modern Flat</option>
+      <option value="neumorphic">Neumorphic</option>
+      <option value="geometric" selected>Bold Geometric</option>
+      <option value="glass">Glassmorphism</option>
+      <option value="brutalist">Neo-Brutalist</option>
+    </select>
+  </div>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>CHAOS LAB</h1>
+    <p>PRECISION TESTING FOR AGENT RESILIENCE</p>
+    <a href="#" class="btn geo-snap">INITIATE SEQUENCE</a>
+  </div>
+
+  <!-- Story Steps -->
+  <div class="story">
+    <div class="step">
+      <div>PICK SCENARIO</div>
+      <span>WEB · MINI-RAG · JSON→TABLE</span>
+    </div>
+    <div class="step">
+      <div>RUN BASELINE</div>
+      <span>CLEAN CONTROL METRICS</span>
+    </div>
+    <div class="step">
+      <div>TOGGLE CHAOS</div>
+      <span>500S · 429S · LATENCY · BAD JSON</span>
+    </div>
+    <div class="step">
+      <div>COMPARE & REMIX</div>
+      <span>TRACE + SCORE + ONE-CLICK FORK</span>
+    </div>
+  </div>
+
+  <!-- Main Configuration Grid -->
+  <div class="main-grid">
+    <div class="card geo-snap">
+      <h3>TEST SCENARIO</h3>
+      <div class="form-group">
+        <label>
+          <input type="radio" name="scenario" value="fetch" checked> 
+          🌐 WEB SCRAPING
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="radio" name="scenario" value="rag"> 
+          📚 DOCUMENT Q&A
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="radio" name="scenario" value="json"> 
+          🔧 API PROCESSING
+        </label>
+      </div>
+    </div>
+
+    <div class="card geo-snap">
+      <h3>FAILURE CONFIG</h3>
+      <div class="form-group">
+        <label>NETWORK LATENCY (MS)</label>
+        <input type="number" value="2000">
+      </div>
+      <div class="form-group">
+        <label>ERROR RATE (%)</label>
+        <input type="number" value="10">
+      </div>
+      <div class="form-group">
+        <label>RATE LIMITING (%)</label>
+        <input type="number" value="10">
+      </div>
+    </div>
+
+    <div class="card geo-snap">
+      <h3>RECOVERY SETTINGS</h3>
+      <div class="checkbox-group">
+        <input type="checkbox" checked>
+        <label>✓ SMART RECOVERY</label>
+      </div>
+      <div class="form-group">
+        <label>MAX RETRIES</label>
+        <input type="number" value="3">
+      </div>
+      <div class="form-group">
+        <label>BACKOFF (MS)</label>
+        <input type="number" value="250">
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet Focus -->
+  <div class="bottom-sheet">
+    <!-- Test Controls -->
+    <div class="test-controls">
+      <label>SEED:</label>
+      <input type="text" value="1337" placeholder="TEST SEED">
+      <label>
+        <input type="checkbox"> 🎲 RANDOMIZE
+      </label>
+      <button class="btn-secondary geo-snap">↻ REPLAY</button>
+      <button class="btn-secondary geo-snap">🔗 SHARE</button>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="btn-group">
+      <button class="btn-primary geo-snap">▶️ RUN BASELINE</button>
+      <button class="btn-danger geo-snap">⚡ RUN CHAOS</button>
+      <button class="btn-secondary geo-snap">📊 EXPORT REPORT</button>
+    </div>
+
+    <!-- Live Results -->
+    <div class="results-panel">
+      <div class="metric-card">
+        <h4>BASELINE</h4>
+        <div class="metric-value">95</div>
+        <div class="metric-label">SCORE</div>
+      </div>
+      <div class="metric-card">
+        <h4>CHAOS</h4>
+        <div class="metric-value">85</div>
+        <div class="metric-label">SCORE</div>
+      </div>
+      <div class="metric-card">
+        <h4>DELTA</h4>
+        <div class="metric-value">-10</div>
+        <div class="metric-label">Δ SCORE</div>
+      </div>
+    </div>
+
+    <!-- View Controls -->
+    <div class="view-toggles">
+      <button class="view-toggle active geo-snap">📊 TABLE</button>
+      <button class="view-toggle geo-snap">🔧 JSON</button>
+      <button class="view-toggle geo-snap">📈 GRAPH</button>
+      <button class="btn-secondary geo-snap">💾 DOWNLOAD</button>
+      <button class="btn-secondary geo-snap">📋 COPY</button>
+    </div>
+
+    <!-- Trace Table -->
+    <table class="trace-table">
+      <thead>
+        <tr>
+          <th>STEP</th>
+          <th>TOOL</th>
+          <th>FAULT</th>
+          <th>ACTION</th>
+          <th>DURATION</th>
+          <th>RESULT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>WEBFETCH</td>
+          <td>NONE</td>
+          <td>GET /API</td>
+          <td>1.2S</td>
+          <td class="status-success">✅</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>WEBFETCH</td>
+          <td>500 ERR</td>
+          <td>GET /DATA</td>
+          <td>3.1S</td>
+          <td class="status-error">❌</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>RETRY</td>
+          <td>BACKOFF</td>
+          <td>RETRY GET</td>
+          <td>2.8S</td>
+          <td class="status-success">✅</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

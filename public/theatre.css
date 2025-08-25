@@ -1,0 +1,20 @@
+/* Chaos Theatre styles */
+.ascii{
+  background:#0A0E14; border:1px solid #233042;
+  color:#E5E7EB; font:14px/1.12 ui-monospace, Menlo, Consolas, monospace;
+  padding:10px; border-radius:10px; white-space:pre; overflow:auto; height:240px;
+}
+.timeline{
+  height:22px; border-top:1px solid #233042; color:#94A3B8;
+  font:11px ui-monospace, monospace; padding-top:6px; white-space:nowrap; overflow-x:auto; margin-top:6px;
+}
+.controls{ display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin:6px 0 10px; }
+.controls label{ font:12px ui-monospace, monospace; color:#9CA3AF; display:flex; align-items:center; gap:6px; }
+.toolbar{ display:flex; gap:8px; flex-wrap:wrap; margin:8px 0; }
+.btn{ background:#0F172A; color:#E5E7EB; border:1px solid #334155; padding:6px 10px; border-radius:6px; cursor:pointer; font:12px ui-monospace, monospace; }
+.btn:hover{ background:#1E293B; }
+.input{ background:#0B1220; color:#E5E7EB; border:1px solid #334155; padding:6px 8px; border-radius:6px; font:12px ui-monospace, monospace; }
+.select{ background:#0B1220; color:#E5E7EB; border:1px solid #334155; padding:6px 8px; border-radius:6px; font:12px ui-monospace, monospace; }
+.hint{ color:#94A3B8; font:11px ui-monospace, monospace; margin-top:6px; }
+.card{ background:#0B0F13; border:1px solid #233042; border-radius:12px; padding:12px; }
+h2{ margin:0 0 6px 0; font:600 14px/1 ui-monospace, monospace; color:#E5E7EB; }

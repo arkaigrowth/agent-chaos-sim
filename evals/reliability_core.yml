@@ -1,0 +1,21 @@
+suite: "Reliability Core"
+cases:
+  - name: "Fetch—Latency & 500"
+    scenario: "fetch"
+    seeds: [1337]
+    faults:
+      latency_ms: 2000
+      latency_rate: 0.20
+      http_500_rate: 0.10
+      malformed_rate: 0.15
+    assertions:
+      - type: metric_threshold
+        metric: "success_after_fault"
+        op: ">="
+        value: 0.7
+      - type: metric_threshold
+        metric: "mttr"
+        op: "<="
+        value: 5.0
+gate:
+  score_min: 70

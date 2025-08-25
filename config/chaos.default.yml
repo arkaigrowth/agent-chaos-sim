@@ -1,0 +1,28 @@
+mode: chaos_monkey
+seed: 1337
+targets:
+  - name: web.fetch
+    faults:
+      - type: latency_spike
+        probability: 0.20
+        params: { delay_ms: 2000 }
+      - type: http_500
+        probability: 0.10
+      - type: rate_limit_429
+        probability: 0.10
+  - name: extract_structured
+    faults:
+      - type: malformed_json
+        probability: 0.15
+  - name: memory.context
+    faults:
+      - type: context_truncate
+        probability: 0.10
+        params: { bytes: 8192 }
+stop_conditions:
+  max_faults: 3
+  max_runtime_s: 120
+tripwire:
+  loop_arrest_n: 3
+  backoff: { base_ms: 250, factor: 2.0, jitter: 0.2, max_retries: 3 }
+  fallback: "use_cached_summary"

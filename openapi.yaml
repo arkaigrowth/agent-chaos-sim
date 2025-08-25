@@ -1,0 +1,1317 @@
+openapi: 3.1.0
+info:
+  title: Chaos Testing API
+  description: |
+    Comprehensive API for chaos engineering and resilience testing of AI agents.
+    
+    This API provides tools for:
+    - Running chaos testing scenarios on AI agents
+    - Managing evaluation suites and test cases
+    - Real-time monitoring of test execution
+    - Batch processing of multiple test suites
+    - Generating detailed analysis reports
+    - Comparing test runs over time
+    
+    The API supports both synchronous and asynchronous operations, with real-time
+    streaming capabilities for long-running tests.
+  version: 1.0.0
+  contact:
+    name: Chaos Testing API Support
+    email: support@chaostesting.dev
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.chaostesting.dev/v1
+    description: Production server
+  - url: https://staging-api.chaostesting.dev/v1
+    description: Staging server
+  - url: http://localhost:8080/v1
+    description: Local development server
+
+paths:
+  /suites:
+    get:
+      summary: List available evaluation suites
+      description: Retrieve a list of all available evaluation suites, including built-in and custom suites.
+      tags:
+        - Suites
+      parameters:
+        - name: type
+          in: query
+          description: Filter suites by type
+          schema:
+            type: string
+            enum: [builtin, custom, all]
+            default: all
+        - name: complexity
+          in: query
+          description: Filter by complexity level
+          schema:
+            type: string
+            enum: [low, medium, high]
+        - name: tags
+          in: query
+          description: Filter by tags (comma-separated)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of evaluation suites
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  suites:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SuiteMetadata'
+                  total:
+                    type: integer
+                  filtered:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Create a new evaluation suite
+      description: Create a new custom evaluation suite with specified test cases and configuration.
+      tags:
+        - Suites
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuiteDefinition'
+          application/x-yaml:
+            schema:
+              type: string
+      responses:
+        '201':
+          description: Suite created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Unique suite identifier
+                  metadata:
+                    $ref: '#/components/schemas/SuiteMetadata'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /suites/{suiteId}:
+    get:
+      summary: Get evaluation suite details
+      description: Retrieve detailed information about a specific evaluation suite.
+      tags:
+        - Suites
+      parameters:
+        - $ref: '#/components/parameters/SuiteId'
+      responses:
+        '200':
+          description: Suite details
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuiteDefinition'
+                  - type: object
+                    properties:
+                      metadata:
+                        $ref: '#/components/schemas/SuiteMetadata'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      summary: Update evaluation suite
+      description: Update an existing evaluation suite configuration.
+      tags:
+        - Suites
+      parameters:
+        - $ref: '#/components/parameters/SuiteId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuiteDefinition'
+      responses:
+        '200':
+          description: Suite updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuiteMetadata'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      summary: Delete evaluation suite
+      description: Delete a custom evaluation suite (built-in suites cannot be deleted).
+      tags:
+        - Suites
+      parameters:
+        - $ref: '#/components/parameters/SuiteId'
+      responses:
+        '204':
+          description: Suite deleted successfully
+        '403':
+          description: Cannot delete built-in suite
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /suites/{suiteId}/validate:
+    post:
+      summary: Validate evaluation suite
+      description: Validate suite structure and configuration without running tests.
+      tags:
+        - Suites
+      parameters:
+        - $ref: '#/components/parameters/SuiteId'
+      responses:
+        '200':
+          description: Validation results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /runs:
+    get:
+      summary: List evaluation runs
+      description: Get a list of evaluation runs with filtering and pagination.
+      tags:
+        - Runs
+      parameters:
+        - name: suite
+          in: query
+          description: Filter by suite ID
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Filter by run status
+          schema:
+            type: string
+            enum: [pending, running, completed, failed, cancelled]
+        - name: since
+          in: query
+          description: Filter runs since timestamp
+          schema:
+            type: string
+            format: date-time
+        - name: limit
+          in: query
+          description: Maximum number of results
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: Number of results to skip
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: List of evaluation runs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  runs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RunSummary'
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Start evaluation run
+      description: Start a new evaluation run for a specified suite.
+      tags:
+        - Runs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunRequest'
+      responses:
+        '202':
+          description: Run started successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  runId:
+                    type: string
+                    description: Unique run identifier
+                  status:
+                    type: string
+                    enum: [pending, running]
+                  estimatedDuration:
+                    type: integer
+                    description: Estimated duration in seconds
+                  streamUrl:
+                    type: string
+                    format: uri
+                    description: WebSocket URL for real-time updates
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /runs/{runId}:
+    get:
+      summary: Get evaluation run details
+      description: Retrieve detailed information about a specific evaluation run.
+      tags:
+        - Runs
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200':
+          description: Run details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      summary: Cancel evaluation run
+      description: Cancel a running evaluation (completed runs cannot be cancelled).
+      tags:
+        - Runs
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '202':
+          description: Run cancellation initiated
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Run cannot be cancelled (already completed)
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /runs/{runId}/stream:
+    get:
+      summary: Stream run progress
+      description: WebSocket endpoint for streaming real-time run progress and results.
+      tags:
+        - Runs
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '101':
+          description: WebSocket connection established
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '410':
+          description: Run completed, no streaming available
+
+  /runs/batch:
+    post:
+      summary: Start batch evaluation
+      description: Start multiple evaluation runs in batch with specified concurrency.
+      tags:
+        - Runs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchRunRequest'
+      responses:
+        '202':
+          description: Batch run started successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  batchId:
+                    type: string
+                    description: Unique batch identifier
+                  runIds:
+                    type: array
+                    items:
+                      type: string
+                    description: Individual run identifiers
+                  estimatedDuration:
+                    type: integer
+                    description: Estimated total duration in seconds
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /runs/compare:
+    post:
+      summary: Compare evaluation runs
+      description: Compare multiple evaluation runs to identify trends and changes.
+      tags:
+        - Analysis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - runIds
+              properties:
+                runIds:
+                  type: array
+                  items:
+                    type: string
+                  minItems: 2
+                  maxItems: 10
+                baseline:
+                  type: string
+                  description: Run ID to use as baseline (defaults to first run)
+                metrics:
+                  type: array
+                  items:
+                    type: string
+                  description: Specific metrics to compare
+      responses:
+        '200':
+          description: Comparison results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComparisonResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: One or more runs not found
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /reports/{runId}:
+    get:
+      summary: Generate evaluation report
+      description: Generate a comprehensive report for an evaluation run.
+      tags:
+        - Reports
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+        - name: format
+          in: query
+          description: Report format
+          schema:
+            type: string
+            enum: [json, markdown, html, pdf]
+            default: json
+        - name: include_charts
+          in: query
+          description: Include visualization charts
+          schema:
+            type: boolean
+            default: true
+        - name: include_recommendations
+          in: query
+          description: Include improvement recommendations
+          schema:
+            type: boolean
+            default: true
+        - name: include_raw_data
+          in: query
+          description: Include raw test data
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Generated report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationReport'
+            text/markdown:
+              schema:
+                type: string
+            text/html:
+              schema:
+                type: string
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /schedules:
+    get:
+      summary: List scheduled evaluations
+      description: Get a list of scheduled evaluation runs.
+      tags:
+        - Schedules
+      responses:
+        '200':
+          description: List of scheduled evaluations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schedules:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScheduleInfo'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Schedule evaluation
+      description: Schedule an evaluation run for future execution.
+      tags:
+        - Schedules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleRequest'
+      responses:
+        '201':
+          description: Evaluation scheduled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scheduleId:
+                    type: string
+                    description: Unique schedule identifier
+                  scheduledTime:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /schedules/{scheduleId}:
+    get:
+      summary: Get schedule details
+      description: Retrieve details about a scheduled evaluation.
+      tags:
+        - Schedules
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Schedule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleInfo'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      summary: Cancel scheduled evaluation
+      description: Cancel a scheduled evaluation before it runs.
+      tags:
+        - Schedules
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Schedule cancelled successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Schedule cannot be cancelled (already executed)
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /config:
+    get:
+      summary: Get system configuration
+      description: Retrieve current system configuration and limits.
+      tags:
+        - Configuration
+      responses:
+        '200':
+          description: System configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemConfig'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /health:
+    get:
+      summary: Health check
+      description: Check system health and status.
+      tags:
+        - Health
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy, degraded, unhealthy]
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                  uptime:
+                    type: integer
+                    description: Uptime in seconds
+                  components:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          enum: [healthy, degraded, unhealthy]
+                        responseTime:
+                          type: number
+                          description: Response time in ms
+        '503':
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [unhealthy]
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
+components:
+  parameters:
+    SuiteId:
+      name: suiteId
+      in: path
+      required: true
+      description: Unique suite identifier
+      schema:
+        type: string
+    
+    RunId:
+      name: runId
+      in: path
+      required: true
+      description: Unique run identifier
+      schema:
+        type: string
+
+  schemas:
+    SuiteDefinition:
+      type: object
+      required:
+        - suite
+        - cases
+      properties:
+        suite:
+          type: string
+          description: Suite name
+          example: "API Resilience Tests"
+        description:
+          type: string
+          description: Suite description
+          example: "Comprehensive tests for API endpoint resilience"
+        version:
+          type: string
+          description: Suite version
+          example: "1.0.0"
+        author:
+          type: string
+          description: Suite author
+          example: "QA Team"
+        tags:
+          type: array
+          items:
+            type: string
+          description: Suite tags
+          example: ["reliability", "api", "performance"]
+        cases:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestCase'
+        gate:
+          $ref: '#/components/schemas/Gate'
+
+    TestCase:
+      type: object
+      required:
+        - name
+        - scenario
+        - seeds
+        - faults
+        - assertions
+      properties:
+        name:
+          type: string
+          description: Test case name
+          example: "High Load Response Test"
+        scenario:
+          type: string
+          enum: [fetch, rag, json]
+          description: Test scenario type
+          example: "fetch"
+        seeds:
+          type: array
+          items:
+            type: string
+          description: Test seeds for reproducibility
+          example: ["load_test_1", "load_test_2"]
+        faults:
+          $ref: '#/components/schemas/FaultConfiguration'
+        assertions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Assertion'
+
+    FaultConfiguration:
+      type: object
+      description: Fault injection configuration
+      properties:
+        latency_ms:
+          type: integer
+          minimum: 0
+          description: Network latency in milliseconds
+          example: 2000
+        latency_rate:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Rate of latency injection (0-1)
+          example: 0.2
+        http_500_rate:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: HTTP 500 error injection rate (0-1)
+          example: 0.1
+        rate_429:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: HTTP 429 (rate limit) error rate (0-1)
+          example: 0.1
+        malformed_rate:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Malformed response injection rate (0-1)
+          example: 0.15
+        inj_seed:
+          type: string
+          description: RAG injection seed
+          example: "benign-01"
+        ctx_bytes:
+          type: integer
+          minimum: 0
+          description: Context truncation size in bytes
+          example: 800
+
+    Assertion:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum: 
+            - metric_threshold
+            - event_count
+            - answer_match
+            - score_threshold
+            - success_rate
+            - recovery_time
+            - no_sensitive_leak
+            - graceful_degradation
+            - backoff_pattern
+            - eventual_success
+            - no_infinite_retry
+          description: Assertion type
+        metric:
+          type: string
+          description: Metric to evaluate (for metric_threshold)
+          example: "success_after_fault"
+        op:
+          type: string
+          enum: [">=", "<=", ">", "<", "=="]
+          description: Comparison operator (for metric_threshold)
+          example: ">="
+        value:
+          type: number
+          description: Expected value
+          example: 0.7
+        event:
+          type: string
+          description: Event type to count (for event_count)
+          example: "retry"
+        min:
+          type: integer
+          description: Minimum count (for event_count)
+          example: 1
+        pattern:
+          type: string
+          description: Pattern to match (for answer_match, no_sensitive_leak)
+          example: "password|secret|key"
+        expected:
+          type: string
+          description: Expected pattern or behavior
+          example: "exponential"
+        within_attempts:
+          type: integer
+          description: Maximum attempts (for eventual_success)
+          example: 10
+        max_attempts:
+          type: integer
+          description: Maximum attempts (for no_infinite_retry)
+          example: 20
+
+    Gate:
+      type: object
+      description: Pass/fail criteria for the suite
+      properties:
+        score_min:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: Minimum required score
+          example: 70
+        pass_rate:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Required pass rate (0-1)
+          example: 0.8
+
+    SuiteMetadata:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique suite identifier
+        name:
+          type: string
+          description: Suite name
+        description:
+          type: string
+          description: Suite description
+        version:
+          type: string
+          description: Suite version
+        author:
+          type: string
+          description: Suite author
+        caseCount:
+          type: integer
+          description: Number of test cases
+        scenarios:
+          type: array
+          items:
+            type: string
+          description: List of scenarios used
+        estimatedRunTime:
+          type: integer
+          description: Estimated run time in milliseconds
+        complexity:
+          type: string
+          enum: [low, medium, high]
+          description: Suite complexity level
+        requirements:
+          type: array
+          items:
+            type: string
+          description: System requirements
+        tags:
+          type: array
+          items:
+            type: string
+          description: Suite tags
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        source:
+          type: string
+          description: Suite source (builtin, custom, url)
+
+    ValidationResult:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          description: Whether the suite is valid
+        errors:
+          type: array
+          items:
+            type: string
+          description: Validation errors
+        warnings:
+          type: array
+          items:
+            type: string
+          description: Validation warnings
+        details:
+          type: object
+          properties:
+            caseCount:
+              type: integer
+            hasGate:
+              type: boolean
+            estimatedRunTime:
+              type: integer
+
+    RunRequest:
+      type: object
+      required:
+        - suiteId
+      properties:
+        suiteId:
+          type: string
+          description: Suite to run
+        includeBaseline:
+          type: boolean
+          description: Whether to run baseline tests
+          default: false
+        options:
+          type: object
+          properties:
+            timeout:
+              type: integer
+              description: Maximum run time in seconds
+              default: 3600
+            concurrency:
+              type: integer
+              description: Concurrent test execution limit
+              minimum: 1
+              maximum: 10
+              default: 1
+            tags:
+              type: array
+              items:
+                type: string
+              description: Tags for this run
+
+    BatchRunRequest:
+      type: object
+      required:
+        - suites
+      properties:
+        suites:
+          type: array
+          items:
+            type: string
+          description: Suite IDs to run
+          minItems: 1
+          maxItems: 10
+        concurrency:
+          type: integer
+          description: Maximum concurrent suite runs
+          minimum: 1
+          maximum: 5
+          default: 1
+        failFast:
+          type: boolean
+          description: Stop on first failure
+          default: false
+        includeBaseline:
+          type: boolean
+          description: Whether to run baseline tests
+          default: false
+
+    ScheduleRequest:
+      type: object
+      required:
+        - suiteId
+        - scheduledTime
+      properties:
+        suiteId:
+          type: string
+          description: Suite to run
+        scheduledTime:
+          type: string
+          format: date-time
+          description: When to run the evaluation
+        includeBaseline:
+          type: boolean
+          description: Whether to run baseline tests
+          default: false
+        notifications:
+          type: array
+          items:
+            type: string
+          description: Notification endpoints
+        retryPolicy:
+          type: object
+          properties:
+            maxRetries:
+              type: integer
+              minimum: 0
+              maximum: 5
+              default: 0
+            retryDelay:
+              type: integer
+              description: Delay between retries in seconds
+              minimum: 60
+              default: 300
+
+    RunSummary:
+      type: object
+      properties:
+        runId:
+          type: string
+        suiteId:
+          type: string
+        suiteName:
+          type: string
+        status:
+          type: string
+          enum: [pending, running, completed, failed, cancelled]
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        duration:
+          type: integer
+          description: Duration in seconds
+        overallScore:
+          type: number
+        passedGate:
+          type: boolean
+        casesPassed:
+          type: integer
+        casesTotal:
+          type: integer
+
+    EvaluationResult:
+      type: object
+      properties:
+        runId:
+          type: string
+        suite:
+          type: string
+        started:
+          type: string
+          format: date-time
+        finished:
+          type: string
+          format: date-time
+        overall_score:
+          type: number
+        passed_gate:
+          type: boolean
+        cases:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaseResult'
+
+    CaseResult:
+      type: object
+      properties:
+        name:
+          type: string
+        scenario:
+          type: string
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeedResult'
+        scoreAvg:
+          type: number
+        pass:
+          type: boolean
+
+    SeedResult:
+      type: object
+      properties:
+        seed:
+          type: string
+        metrics:
+          type: object
+          properties:
+            score:
+              type: number
+            mttr:
+              type: number
+            success_after_fault:
+              type: number
+        baseline:
+          type: object
+          properties:
+            score:
+              type: number
+            mttr:
+              type: number
+        assertions:
+          type: array
+          items:
+            type: object
+        pass:
+          type: boolean
+
+    ComparisonResult:
+      type: object
+      properties:
+        runIds:
+          type: array
+          items:
+            type: string
+        comparedAt:
+          type: string
+          format: date-time
+        baseline:
+          $ref: '#/components/schemas/EvaluationResult'
+        comparisons:
+          type: array
+          items:
+            type: object
+            properties:
+              runId:
+                type: string
+              delta:
+                type: object
+                properties:
+                  scoreChange:
+                    type: number
+                  mttrChange:
+                    type: number
+                  passRateChange:
+                    type: number
+              verdict:
+                type: string
+                enum: [improvement, regression, stable]
+        summary:
+          type: object
+          properties:
+            trends:
+              type: object
+            improvements:
+              type: array
+              items:
+                type: string
+            regressions:
+              type: array
+              items:
+                type: string
+            stability:
+              type: object
+
+    EvaluationReport:
+      type: object
+      properties:
+        metadata:
+          type: object
+        executive_summary:
+          type: object
+        detailed_analysis:
+          type: object
+        performance_metrics:
+          type: object
+        reliability_assessment:
+          type: object
+        recommendations:
+          type: array
+          items:
+            type: string
+        visualizations:
+          type: object
+        appendices:
+          type: object
+
+    ScheduleInfo:
+      type: object
+      properties:
+        scheduleId:
+          type: string
+        suiteId:
+          type: string
+        scheduledTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [scheduled, running, completed, failed, cancelled]
+        createdAt:
+          type: string
+          format: date-time
+        runId:
+          type: string
+          description: Run ID if executed
+
+    SystemConfig:
+      type: object
+      properties:
+        version:
+          type: string
+        maxConcurrentRuns:
+          type: integer
+        maxRunDuration:
+          type: integer
+          description: Maximum run duration in seconds
+        supportedScenarios:
+          type: array
+          items:
+            type: string
+        defaultTimeout:
+          type: integer
+        retentionPeriod:
+          type: integer
+          description: Result retention period in days
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: boolean
+          example: true
+        code:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "Suite validation failed"
+        details:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - ApiKey: []
+  - BearerAuth: []
+
+tags:
+  - name: Suites
+    description: Evaluation suite management
+  - name: Runs
+    description: Test execution and monitoring
+  - name: Analysis
+    description: Result analysis and comparison
+  - name: Reports
+    description: Report generation
+  - name: Schedules
+    description: Scheduled evaluations
+  - name: Configuration
+    description: System configuration
+  - name: Health
+    description: System health monitoring

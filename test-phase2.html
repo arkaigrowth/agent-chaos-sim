@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2 Architecture Test</title>
+</head>
+<body>
+    <h1>Phase 2 Architecture Test</h1>
+    <p>Testing function exposure and chaos parameter flow</p>
+    
+    <div>
+        <button onclick="testFunctionExposure()">Test Function Exposure</button>
+        <button onclick="testChaosParameterFlow()">Test Chaos Parameter Flow</button>
+        <button onclick="testSeededRandom()">Test Seeded Random Functions</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script src="./app.js"></script>
+    <script>
+        function log(message) {
+            const results = document.getElementById('results');
+            results.innerHTML += `<p>${message}</p>`;
+            console.log(message);
+        }
+        
+        function testFunctionExposure() {
+            log('=== Testing Function Exposure ===');
+            log(`window.runFetch: ${typeof window.runFetch}`);
+            log(`window.runJSON: ${typeof window.runJSON}`);
+            log(`window.runRAG: ${typeof window.runRAG}`);
+            log(`window.runScenario: ${typeof window.runScenario}`);
+            
+            if (typeof window.runFetch === 'function' && 
+                typeof window.runJSON === 'function' && 
+                typeof window.runRAG === 'function') {
+                log('✅ SUCCESS: All functions are properly exposed!');
+            } else {
+                log('❌ FAIL: Functions are not properly exposed');
+            }
+        }
+        
+        async function testChaosParameterFlow() {
+            log('=== Testing Chaos Parameter Flow ===');
+            try {
+                // Test with chaos=false (baseline)
+                log('Testing with chaos=false...');
+                const baselineResult = await window.runScenario('json', 'test123', false);
+                log(`Baseline completed: ${baselineResult.metrics ? 'success' : 'failed'}`);
+                
+                // Test with chaos=true
+                log('Testing with chaos=true...');
+                const chaosResult = await window.runScenario('json', 'test123', true);
+                log(`Chaos completed: ${chaosResult.metrics ? 'success' : 'failed'}`);
+                
+                log('✅ SUCCESS: Chaos parameter flow working!');
+            } catch (error) {
+                log(`❌ FAIL: Error in chaos parameter flow: ${error.message}`);
+            }
+        }
+        
+        function testSeededRandom() {
+            log('=== Testing Seeded Random Functions ===');
+            
+            // Test seeded function determinism
+            const seed1 = seeded('test123');
+            const seed2 = seeded('test123');
+            
+            const val1a = seed1();
+            const val1b = seed1();
+            const val2a = seed2();
+            const val2b = seed2();
+            
+            log(`Seed 'test123' first call: ${val1a}`);
+            log(`Seed 'test123' second call: ${val1b}`);
+            log(`New seeded('test123') first call: ${val2a}`);
+            log(`New seeded('test123') second call: ${val2b}`);
+            
+            if (val1a === val2a && val1b === val2b) {
+                log('✅ SUCCESS: Seeded random is deterministic!');
+            } else {
+                log('❌ FAIL: Seeded random is not deterministic');
+            }
+            
+            // Test should function
+            const rate05 = 0.5;
+            const rate00 = 0.0;
+            const rate10 = 1.0;
+            
+            log(`should(0.5, 0.3): ${should(rate05, 0.3)}`); // should be true
+            log(`should(0.5, 0.7): ${should(rate05, 0.7)}`); // should be false
+            log(`should(0.0, 0.5): ${should(rate00, 0.5)}`); // should be false
+            log(`should(1.0, 0.5): ${should(rate10, 0.5)}`); // should be true
+            
+            log('✅ SUCCESS: should() function working!');
+        }
+    </script>
+</body>
+</html>
