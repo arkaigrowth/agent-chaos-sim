@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AGENT CHAOS LAB</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+<script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
 <style>
 * {
   box-sizing: border-box;
@@ -84,6 +86,106 @@ body {
   font-family: 'Courier New', monospace;
   font-weight: bold;
   min-width: 30px;
+}
+
+/* Driver.js Terminal Theme Overrides */
+.driver-popover {
+  background: #0a0a0a !important;
+  border: 2px solid #00ff41 !important;
+  color: #00ff41 !important;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace !important;
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.4) !important;
+  border-radius: 0 !important;
+  z-index: 10000 !important;
+}
+
+.driver-popover-title {
+  color: #00ff41 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 2px !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  margin-bottom: 10px !important;
+}
+
+.driver-popover-description {
+  color: #00cc33 !important;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
+
+.driver-popover-navigation-btns {
+  margin-top: 15px !important;
+}
+
+.driver-popover-navigation-btns button {
+  background: #00ff41 !important;
+  color: #000 !important;
+  border: none !important;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace !important;
+  text-transform: uppercase !important;
+  padding: 8px 16px !important;
+  margin-right: 8px !important;
+  cursor: pointer !important;
+  font-size: 11px !important;
+  letter-spacing: 1px !important;
+  font-weight: bold !important;
+}
+
+.driver-popover-navigation-btns button:hover {
+  background: #00cc33 !important;
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.6) !important;
+}
+
+.driver-popover-close-btn {
+  background: transparent !important;
+  color: #00ff41 !important;
+  border: 1px solid #00ff41 !important;
+  top: 8px !important;
+  right: 8px !important;
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 14px !important;
+}
+
+.driver-highlighted {
+  box-shadow: 0 0 0 2px #00ff41 !important;
+  animation: terminal-pulse 2s infinite !important;
+  z-index: 9999 !important;
+}
+
+@keyframes terminal-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 2px #00ff41, 0 0 20px rgba(0, 255, 65, 0.4) !important;
+  }
+  50% { 
+    box-shadow: 0 0 0 2px #00ff41, 0 0 40px rgba(0, 255, 65, 0.8) !important;
+  }
+}
+
+.driver-overlay {
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Tour button */
+#tourBtn {
+  background: transparent;
+  border: 1px solid #00ff41;
+  color: #00ff41;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  font-size: 12px;
+  margin-left: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+#tourBtn:hover {
+  background: rgba(0, 255, 65, 0.1);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.4);
 }
 
 /* Test Mode Selector */
@@ -661,7 +763,7 @@ body {
 
 <div class="container">
   <div class="header">
-    <div class="logo">AGENT CHAOS LAB</div>
+    <div class="logo">AGENT CHAOS LAB<button id="tourBtn">? TOUR</button></div>
     <div class="score-display">RESILIENCE: <span id="score">100</span>%</div>
   </div>
 
@@ -2938,6 +3040,220 @@ const sim = new ChaosSimulator();
 
 // Expose globally for console/quick triggers
 window.sim = sim;
+
+// Chaos Lab Tour Implementation
+class ChaosLabTour {
+  constructor() {
+    this.driver = new Driver({
+      showProgress: true,
+      showButtons: ['next', 'previous', 'close'],
+      keyboardControl: true,
+      smoothScroll: true,
+      allowClose: true,
+      doneBtnText: 'COMPLETE',
+      closeBtnText: 'ESC',
+      nextBtnText: 'NEXT >',
+      prevBtnText: '< BACK',
+      steps: this.getTourSteps()
+    });
+
+    this.setupEventHandlers();
+    this.checkFirstVisit();
+  }
+
+  getTourSteps() {
+    return [
+      {
+        element: '.logo',
+        popover: {
+          title: 'Welcome to Agent Chaos Lab',
+          description: 'A terminal-themed chaos engineering platform for testing AI agent resilience under controlled failure conditions.',
+          position: 'bottom'
+        }
+      },
+      {
+        element: '.mode-selector',
+        popover: {
+          title: 'Test Mode Selection',
+          description: 'Choose between Scenarios (pre-configured chaos patterns) or Evaluations (comprehensive test suites with scoring).',
+          position: 'bottom'
+        }
+      },
+      {
+        element: '.test-section',
+        popover: {
+          title: 'Chaos Scenarios',
+          description: 'Select from curated chaos scenarios that auto-populate parameters. Each scenario simulates real-world failure patterns.',
+          position: 'bottom'
+        },
+        onHighlight: () => {
+          // Auto-expand scenarios section if collapsed
+          const scenarioSection = document.getElementById('scenarioSection');
+          if (scenarioSection && !scenarioSection.classList.contains('active')) {
+            document.getElementById('scenarioMode').click();
+          }
+        }
+      },
+      {
+        element: '#stage',
+        popover: {
+          title: 'ASCII Theatre',
+          description: 'Real-time packet visualization showing data flow through your system with live chaos effects and failure animations.',
+          position: 'top'
+        }
+      },
+      {
+        element: '#debugBtn',
+        popover: {
+          title: 'Debug Mode',
+          description: 'Toggle live JSON logs, system metrics, and detailed trace information for deep analysis of chaos effects.',
+          position: 'top'
+        },
+        onHighlight: () => {
+          // Auto-enable debug mode if not active
+          if (!sim.state.debugMode) {
+            sim.toggleDebug();
+          }
+        }
+      },
+      {
+        element: '.control-panel',
+        popover: {
+          title: 'Chaos Controls',
+          description: 'Fine-tune fault injection parameters, recovery settings, and resilience thresholds. Start tests, pause execution, or randomize chaos parameters.',
+          position: 'top'
+        },
+        onHighlight: () => {
+          // Auto-expand control panel if collapsed
+          const controlPanel = document.querySelector('.control-panel');
+          if (controlPanel && !controlPanel.hasAttribute('open')) {
+            controlPanel.setAttribute('open', 'true');
+          }
+        }
+      },
+      {
+        element: '#exportContainer',
+        popover: {
+          title: 'Export Results',
+          description: 'Export session data in multiple formats: JSON for analysis, CSV for spreadsheets, reports for documentation, or shareable URLs for collaboration.',
+          position: 'top'
+        },
+        onHighlight: () => {
+          // Show export panel if hidden
+          const exportPanel = document.getElementById('exportPanel');
+          if (exportPanel) {
+            exportPanel.style.display = 'block';
+          }
+        }
+      }
+    ];
+  }
+
+  setupEventHandlers() {
+    // Tour button click handler
+    document.getElementById('tourBtn').addEventListener('click', () => {
+      this.startTour();
+    });
+
+    // Driver.js event handlers
+    this.driver.on('completed', () => {
+      localStorage.setItem('chaosLabTourCompleted', 'true');
+      this.showCompletionMessage();
+    });
+
+    this.driver.on('reset', () => {
+      // Clean up any changes made during tour
+      this.restoreOriginalState();
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'F1' || (e.key === '?' && e.shiftKey)) {
+        e.preventDefault();
+        this.startTour();
+      }
+    });
+  }
+
+  checkFirstVisit() {
+    // Auto-start tour for first-time visitors
+    if (!localStorage.getItem('chaosLabTourCompleted')) {
+      setTimeout(() => {
+        this.startTour();
+      }, 1500); // Delay to let page fully load
+    }
+  }
+
+  startTour() {
+    // Ensure we're on scenarios mode for the tour
+    const scenarioMode = document.getElementById('scenarioMode');
+    if (scenarioMode && !scenarioMode.classList.contains('active')) {
+      scenarioMode.click();
+    }
+
+    // Start the tour
+    this.driver.start();
+  }
+
+  showCompletionMessage() {
+    // Create a terminal-style completion notification
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #0a0a0a;
+      border: 2px solid #00ff41;
+      color: #00ff41;
+      padding: 15px 20px;
+      font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+      font-size: 12px;
+      z-index: 10001;
+      animation: fadeInOut 4s ease-in-out;
+    `;
+    notification.textContent = '✅ TOUR COMPLETED - READY FOR CHAOS TESTING';
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 4000);
+  }
+
+  restoreOriginalState() {
+    // Restore any UI changes made during the tour
+    const exportPanel = document.getElementById('exportPanel');
+    if (exportPanel && exportPanel.style.display === 'block') {
+      exportPanel.style.display = 'none';
+    }
+  }
+}
+
+// Add CSS animation for completion notification
+const tourStyles = document.createElement('style');
+tourStyles.textContent = `
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(100%); }
+    20%, 80% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(100%); }
+  }
+`;
+document.head.appendChild(tourStyles);
+
+// Initialize tour when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  window.chaosLabTour = new ChaosLabTour();
+});
+
+// Fallback initialization if DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+  // DOMContentLoaded will fire
+} else {
+  // Document is already loaded
+  window.chaosLabTour = new ChaosLabTour();
+}
 </script>
 
 </body>
