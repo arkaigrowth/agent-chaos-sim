@@ -78,7 +78,7 @@ body {
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #888;
+  color: #999;
 }
 
 .legend-symbol {
@@ -421,7 +421,7 @@ body {
   border-radius: 4px;
   padding: 10px;
   font-size: 11px;
-  color: #666;
+  color: #777;
   white-space: nowrap;
   overflow-x: auto;
   margin-bottom: 20px;
@@ -462,7 +462,7 @@ body {
 
 .trigger-btn {
   background: #222;
-  color: #888;
+  color: #999;
   border: 1px solid #444;
   padding: 6px 12px;
   border-radius: 4px;
@@ -625,7 +625,7 @@ body {
 .param-hint {
   display: block;
   font-size: 9px;
-  color: #666;
+  color: #777;
   margin-top: 3px;
   text-transform: none;
   letter-spacing: normal;
@@ -710,7 +710,7 @@ body {
 }
 
 .eval-case-name {
-  color: #888;
+  color: #999;
 }
 
 .eval-case-status {
@@ -745,7 +745,7 @@ body {
 }
 
 .file-upload-label {
-  color: #888;
+  color: #999;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -767,58 +767,6 @@ body {
     <div class="score-display">RESILIENCE: <span id="score">100</span>%</div>
   </div>
 
-  <!-- Legend Panel - Always visible -->
-  <div class="legend-panel">
-    <div class="legend-title">🗺️ Visual Legend</div>
-    <div class="legend-item">
-      <span class="legend-symbol">●</span>
-      <span>Data packet traversing pipeline</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-symbol">·</span>
-      <span>Packet trail / motion blur</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-symbol">☁500</span>
-      <span>HTTP 500 server error</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-symbol">⛔429</span>
-      <span>Rate limit (429) hit</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-symbol">~~~</span>
-      <span>Network latency/slowdown</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-symbol">{�}</span>
-      <span>Malformed JSON payload</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-symbol">⊘</span>
-      <span>Tool/dependency unavailable</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-symbol">💣ctx</span>
-      <span>Context truncation/overflow</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-symbol">🪤</span>
-      <span>RAG injection trap</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-symbol">retry(n)</span>
-      <span>Retry attempt #n</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-symbol">🪂</span>
-      <span>Fallback strategy activated</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-symbol">[EVAL]</span>
-      <span>Evaluation suite running</span>
-    </div>
-  </div>
 
   <!-- Mode Selector -->
   <div class="mode-selector">
@@ -868,7 +816,7 @@ body {
   <details class="control-panel" open>
     <summary class="control-panel-header">
       ⚙️ Chaos Parameters & Recovery Settings
-      <span style="font-size: 11px; color: #666; margin-left: 10px;">(Click scenarios above to auto-populate)</span>
+      <span style="font-size: 11px; color: #777; margin-left: 10px;">(Click scenarios above to auto-populate)</span>
     </summary>
     
     <div class="control-panel-content">
@@ -970,17 +918,6 @@ body {
     </div>
   </details>
 
-  <!-- Quick Triggers for Testing -->
-  <div class="quick-triggers">
-    <button class="trigger-btn" onclick="sim.injectFault('latency')">🐌 Inject Latency</button>
-    <button class="trigger-btn" onclick="sim.injectFault('500')">☁️ Inject 500</button>
-    <button class="trigger-btn" onclick="sim.injectFault('429')">⛔ Inject 429</button>
-    <button class="trigger-btn" onclick="sim.injectFault('malformed')">📦 Inject Bad JSON</button>
-    <button class="trigger-btn" onclick="sim.injectFault('tool_unavailable')">⊘ Kill Tool</button>
-    <button class="trigger-btn" onclick="sim.injectFault('context_truncate')">💣 Truncate Context</button>
-    <button class="trigger-btn" onclick="sim.injectFault('injection', {seed: 'test'})">🪤 RAG Injection</button>
-  </div>
-
   <!-- Control Buttons -->
   <div class="control-buttons">
     <button class="btn primary" id="runBtn">▶️ RUN SCENARIO</button>
@@ -992,12 +929,76 @@ body {
     <button class="btn" id="debugBtn" style="background: #00ff41; color: #000;">🐛 DEBUG MODE</button>
   </div>
 
+  <!-- Quick Triggers for Testing -->
+  <div class="quick-triggers">
+    <button class="trigger-btn" onclick="sim.injectFault('latency')">🐌 Inject Latency</button>
+    <button class="trigger-btn" onclick="sim.injectFault('500')">☁️ Inject 500</button>
+    <button class="trigger-btn" onclick="sim.injectFault('429')">⛔ Inject 429</button>
+    <button class="trigger-btn" onclick="sim.injectFault('malformed')">📦 Inject Bad JSON</button>
+    <button class="trigger-btn" onclick="sim.injectFault('tool_unavailable')">⊘ Kill Tool</button>
+    <button class="trigger-btn" onclick="sim.injectFault('context_truncate')">💣 Truncate Context</button>
+    <button class="trigger-btn" onclick="sim.injectFault('injection', {seed: 'test'})">🪤 RAG Injection</button>
+  </div>
+
   <!-- ASCII Theatre Stage -->
   <pre id="stage" aria-live="polite"></pre>
 
+  <!-- Legend Panel - Always visible -->
+  <div class="legend-panel">
+    <div class="legend-title">🗺️ Visual Legend</div>
+    <div class="legend-item">
+      <span class="legend-symbol">●</span>
+      <span>Data packet traversing pipeline</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">·</span>
+      <span>Packet trail / motion blur</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">☁500</span>
+      <span>HTTP 500 server error</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">⛔429</span>
+      <span>Rate limit (429) hit</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">~~~</span>
+      <span>Network latency/slowdown</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">{�}</span>
+      <span>Malformed JSON payload</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">⊘</span>
+      <span>Tool/dependency unavailable</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">💣ctx</span>
+      <span>Context truncation/overflow</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">🪤</span>
+      <span>RAG injection trap</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">retry(n)</span>
+      <span>Retry attempt #n</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">🪂</span>
+      <span>Fallback strategy activated</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-symbol">[EVAL]</span>
+      <span>Evaluation suite running</span>
+    </div>
+  </div>
+
   <!-- Timeline -->
   <div class="timeline" id="timeline">
-    <span style="color: #666;">TIMELINE:</span>
+    <span style="color: #00ff41;">TIMELINE:</span>
   </div>
 
   <!-- Enhanced Debug Panel with Dual-Pane Layout -->
@@ -1009,12 +1010,12 @@ body {
       <!-- Left Panel: Effects Counter -->
       <div style="flex: 1; padding: 15px; border-right: 1px solid #333; background: #0f0f0f;">
         <div style="color: #00ff41; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">⚡ SYSTEM STATUS</div>
-        <div id="debugInfo" style="font-size: 11px; color: #666; line-height: 1.4;"></div>
+        <div id="debugInfo" style="font-size: 11px; color: #777; line-height: 1.4;"></div>
       </div>
       <!-- Right Panel: Live JSON Log Viewer -->
       <div style="flex: 1; padding: 15px; background: #0a0a0a;">
         <div style="color: #00ff41; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">📊 LIVE JSON LOG</div>
-        <div id="jsonLogViewer" style="font-size: 10px; color: #888; font-family: 'Courier New', monospace; height: 150px; overflow-y: auto; background: #050505; padding: 8px; border: 1px solid #222; border-radius: 3px; line-height: 1.3;"></div>
+        <div id="jsonLogViewer" style="font-size: 10px; color: #999; font-family: 'Courier New', monospace; height: 150px; overflow-y: auto; background: #050505; padding: 8px; border: 1px solid #222; border-radius: 3px; line-height: 1.3;"></div>
       </div>
     </div>
   </div>
@@ -1612,7 +1613,7 @@ class ChaosSimulator {
         <div style="font-size: 14px; font-weight: bold; color: #00ff41; margin-bottom: 8px;">
           ${scenario.icon} ${scenario.title}
         </div>
-        <div style="font-size: 11px; color: #888; line-height: 1.4;">
+        <div style="font-size: 11px; color: #999; line-height: 1.4;">
           ${scenario.body}
         </div>
       `;
@@ -1633,7 +1634,7 @@ class ChaosSimulator {
         <div class="eval-card-body" style="font-size: 11px; line-height: 1.4;">
           ${suite.description}
         </div>
-        <div style="font-size: 10px; color: #666; margin-top: 8px;">
+        <div style="font-size: 10px; color: #777; margin-top: 8px;">
           ${suite.cases.length} test cases | Min score: ${suite.gate.score_min}%
         </div>
       `;
@@ -1730,7 +1731,7 @@ class ChaosSimulator {
           <button class="btn" id="exportReportBtn" style="border-color: #00ff41;">📋 Report</button>
           <button class="btn" id="shareUrlBtn" style="border-color: #ffaa00; color: #ffaa00;">🔗 Share URL</button>
         </div>
-        <div id="sessionInfo" style="font-size: 11px; color: #666; line-height: 1.4;"></div>
+        <div id="sessionInfo" style="font-size: 11px; color: #777; line-height: 1.4;"></div>
       </div>
     `;
     
@@ -2253,7 +2254,7 @@ class ChaosSimulator {
         <div class="eval-card-body" style="font-size: 11px; line-height: 1.4;">
           ${suite.description}
         </div>
-        <div style="font-size: 10px; color: #666; margin-top: 8px;">
+        <div style="font-size: 10px; color: #777; margin-top: 8px;">
           ${suite.cases.length} test cases | Min score: ${suite.gate.score_min}%
         </div>
       `;
@@ -2952,7 +2953,7 @@ class ChaosSimulator {
     document.getElementById('pauseBtn').disabled = true;
     document.getElementById('pauseBtn').textContent = '⏸️ PAUSE';
     this.stage.classList.remove('running', 'evaluating');
-    this.timeline.innerHTML = '<span style="color: #666;">TIMELINE:</span>';
+    this.timeline.innerHTML = '<span style="color: #00ff41;">TIMELINE:</span>';
     document.getElementById('evalResults').classList.remove('active');
     this.updateScore();
     
