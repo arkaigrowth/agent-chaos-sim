@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chaos Lab - Agent Resilience Theatre [Enhanced]</title>
+<title>AGENT CHAOS LAB</title>
 <style>
 * {
   box-sizing: border-box;
@@ -661,7 +661,7 @@ body {
 
 <div class="container">
   <div class="header">
-    <div class="logo">🎭 CHAOS LAB [Enhanced]</div>
+    <div class="logo">AGENT CHAOS LAB</div>
     <div class="score-display">RESILIENCE: <span id="score">100</span>%</div>
   </div>
 
@@ -887,7 +887,7 @@ body {
     <button class="btn" id="resetBtn">🔄 RESET</button>
     <button class="btn" id="randomBtn">🎲 RANDOM CHAOS</button>
     <button class="btn" id="clearBtn">🧹 CLEAR PARAMS</button>
-    <button class="btn" id="debugBtn">🐛 DEBUG MODE</button>
+    <button class="btn" id="debugBtn" style="background: #00ff41; color: #000;">🐛 DEBUG MODE</button>
   </div>
 
   <!-- ASCII Theatre Stage -->
@@ -899,7 +899,7 @@ body {
   </div>
 
   <!-- Enhanced Debug Panel with Dual-Pane Layout -->
-  <div id="debugPanel" style="display:none; background: #111; border: 1px solid #333; border-radius: 4px; margin-top: 10px; overflow: hidden;">
+  <div id="debugPanel" style="display:block; background: #111; border: 1px solid #333; border-radius: 4px; margin-top: 10px; overflow: hidden;">
     <div style="background: #1a1a1a; padding: 10px; border-bottom: 1px solid #333; color: #00ff41; font-size: 12px; font-weight: bold; display: flex; align-items: center;">
       <span style="margin-right: 8px;">▼</span>🐛 DEBUG MODE
     </div>
@@ -1463,7 +1463,7 @@ class ChaosSimulator {
       running: false,
       evaluating: false,
       paused: false,
-      debugMode: false,
+      debugMode: true, // ON by default
       mode: 'scenario', // 'scenario' or 'evaluation'
       scenario: null,
       evalSuite: null,
@@ -2593,6 +2593,16 @@ class ChaosSimulator {
   
   render() {
     const grid = Array(14).fill().map(() => Array(78).fill(' '));
+    
+    // Add title in top-left corner
+    const title = 'Agent Chaos Theater 🎭';
+    const version = 'v1.1';
+    for (let i = 0; i < title.length && i < 78; i++) {
+      grid[0][i + 2] = title[i];
+    }
+    for (let i = 0; i < version.length && i < 78; i++) {
+      grid[1][i + 2] = version[i];
+    }
     
     // Draw pipeline
     this.nodes.forEach((node, i) => {
