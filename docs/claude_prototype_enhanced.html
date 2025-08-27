@@ -164,7 +164,23 @@ body {
 }
 
 .driver-overlay {
-  background: rgba(0, 0, 0, 0.8) !important;
+  background: rgba(0, 0, 0, 0) !important;
+}
+
+.driver-highlighted-element {
+  box-shadow: 0 0 0 3px #00ff41, 0 0 20px rgba(0, 255, 65, 0.8) !important;
+  border-radius: 4px !important;
+  animation: terminal-glow 2s infinite !important;
+  z-index: 9999 !important;
+}
+
+@keyframes terminal-glow {
+  0%, 100% { 
+    box-shadow: 0 0 0 3px #00ff41, 0 0 20px rgba(0, 255, 65, 0.6) !important;
+  }
+  50% { 
+    box-shadow: 0 0 0 3px #00ff41, 0 0 30px rgba(0, 255, 65, 1) !important;
+  }
 }
 
 /* Tour button */
@@ -770,10 +786,10 @@ body {
 
   <!-- Mode Selector -->
   <div class="mode-selector">
-    <h3>🎯 Select Test Mode</h3>
+    <h3>🎯 Choose Your Testing Mode</h3>
     <div class="mode-buttons">
-      <button class="mode-btn active" data-mode="scenario" id="scenarioMode">⚡ Chaos Scenarios</button>
-      <button class="mode-btn" data-mode="evaluation" id="evaluationMode">🔍 Evaluation Suites</button>
+      <button class="mode-btn active" data-mode="scenario" id="scenarioMode">⚡ Chaos Simulation Playground</button>
+      <button class="mode-btn" data-mode="evaluation" id="evaluationMode">🔍 Real Agent Testing</button>
     </div>
   </div>
 
@@ -3073,6 +3089,14 @@ class ChaosLabTour {
   getTourSteps() {
     return [
       {
+        element: '.mode-selector',
+        popover: {
+          title: 'Choose Your Testing Mode',
+          description: 'Start here! Choose between Chaos Simulation Playground (visual learning with scenarios) or Real Agent Testing (actual agent testing with evaluations).',
+          position: 'bottom'
+        }
+      },
+      {
         element: '.logo',
         popover: {
           title: 'Welcome to Agent Chaos Lab',
@@ -3081,18 +3105,10 @@ class ChaosLabTour {
         }
       },
       {
-        element: '.mode-selector',
-        popover: {
-          title: 'Test Mode Selection',
-          description: 'Choose between Scenarios (pre-configured chaos patterns) or Evaluations (comprehensive test suites with scoring).',
-          position: 'bottom'
-        }
-      },
-      {
         element: '.test-section',
         popover: {
-          title: 'Chaos Scenarios',
-          description: 'Select from curated chaos scenarios that auto-populate parameters. Each scenario simulates real-world failure patterns.',
+          title: 'Simulation Scenarios',
+          description: 'In Simulation mode: Select from curated chaos scenarios for visual learning. Each scenario demonstrates real-world failure patterns through ASCII theatre.',
           position: 'bottom'
         },
         onHighlight: () => {

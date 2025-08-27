@@ -1,5 +1,5 @@
 /**
- * Task Mode Enhanced - Practical Chaos Testing for LLM Applications
+ * Real Agent Testing Enhanced - Practical Chaos Testing for LLM Applications
  * Builds on Chad's foundation with real-world scenarios and actionable insights
  */
 

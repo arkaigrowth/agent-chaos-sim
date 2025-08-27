@@ -389,8 +389,8 @@
     <header class="nav-header">
         <div class="nav-brand">🔥 AGENT CHAOS MONKEY</div>
         <nav class="nav-links">
-            <a class="nav-link active" data-page="basic" id="basic-link">Basic Testing</a>
-            <a class="nav-link" data-page="task" id="task-link">Task Mode</a>
+            <a class="nav-link active" data-page="basic" id="basic-link">Chaos Simulation Playground</a>
+            <a class="nav-link" data-page="task" id="task-link">Real Agent Testing</a>
             <button class="tour-button" id="start-tour">🎯 Start Tour</button>
         </nav>
     </header>
@@ -507,14 +507,14 @@
                         element: '.nav-links',
                         popover: {
                             title: 'Navigation',
-                            description: 'Switch between Basic Testing for interactive scenarios and Task Mode for advanced LLM testing with actionable insights.',
+                            description: 'Switch between Chaos Simulation Playground for interactive scenarios and Real Agent Testing for advanced LLM testing with actionable insights.',
                             position: 'bottom'
                         }
                     },
                     {
                         element: '#basic-link',
                         popover: {
-                            title: 'Basic Testing Mode',
+                            title: 'Chaos Simulation Playground',
                             description: 'Interactive chaos scenarios with real-time monitoring. Perfect for learning chaos engineering principles.',
                             position: 'bottom'
                         },
@@ -524,15 +524,15 @@
                     },
                     {
                         popover: {
-                            title: 'Basic Testing Features',
-                            description: 'In Basic Testing, you can select scenarios, watch the ASCII theatre visualization, and monitor real-time chaos effects. The iframe below shows the testing interface.',
+                            title: 'Simulation Features',
+                            description: 'In the Chaos Simulation Playground, you can select scenarios, watch the ASCII theatre visualization, and monitor real-time chaos effects. The iframe below shows the testing interface.',
                             position: 'center'
                         }
                     },
                     {
                         element: '#task-link',
                         popover: {
-                            title: 'Task Mode',
+                            title: 'Real Agent Testing',
                             description: 'Advanced chaos testing for LLM applications. Get actionable insights and specific code fixes for handling failures.',
                             position: 'bottom'
                         },
@@ -542,8 +542,8 @@
                     },
                     {
                         popover: {
-                            title: 'Task Mode Features',
-                            description: 'Task Mode provides real-world scenarios, pipeline visualization, and actionable recommendations for improving resilience.',
+                            title: 'Real Agent Testing Features',
+                            description: 'Real Agent Testing provides real-world scenarios, pipeline visualization, and actionable recommendations for improving resilience.',
                             position: 'center'
                         }
                     },
@@ -566,7 +566,7 @@
                     {
                         popover: {
                             title: 'Ready to Test!',
-                            description: 'You\'re all set! Start with Basic Testing to learn the fundamentals, then advance to Task Mode for production-ready chaos testing.',
+                            description: 'You\'re all set! Start with the Chaos Simulation Playground to learn the fundamentals, then advance to Real Agent Testing for production-ready chaos testing.',
                             position: 'center'
                         }
                     },
@@ -635,10 +635,10 @@
                 const stepTitles = [
                     'Welcome to Agent Chaos Monkey',
                     'Navigation Overview',
-                    'Basic Testing Mode',
-                    'Basic Testing Features',
-                    'Task Mode',
-                    'Task Mode Features',
+                    'Chaos Simulation Playground',
+                    'Simulation Features',
+                    'Real Agent Testing',
+                    'Real Agent Testing Features',
                     'Testing Interface',
                     'Tour Progress',
                     'Ready to Test!',

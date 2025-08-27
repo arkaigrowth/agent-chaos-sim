@@ -1,5 +1,5 @@
 /**
- * Enhanced Mock HTTP Agent for Task Mode
+ * Enhanced Mock HTTP Agent for Real Agent Testing
  * Extends Chad's basic mock with resilience patterns and chaos simulation
  */
 
