@@ -1,0 +1,18 @@
+
+/* Minimal Task Mode panel styles */
+#taskMode { margin-top: 24px; }
+#taskMode .tm-row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+#taskMode textarea { width:100%; font-family: var(--font-mono, monospace); background:#0b0f13; color:#cde; border:1px solid #223; border-radius:6px; padding:10px; }
+#taskMode .tm-col { flex:1 1 280px; }
+#taskMode .mini { font-size:12px; opacity:0.8; }
+#taskMode .kbd { font-family: var(--font-mono, monospace); background:#111; border:1px solid #333; border-radius:4px; padding:2px 6px; }
+#taskMode .tm-controls { display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+#taskMode .tm-controls button { padding:8px 12px; border-radius:6px; cursor:pointer; border:1px solid #334; background:#222; color:#cde; }
+#taskMode .tm-controls button.primary { background:#244b; border-color:#3a6; }
+#taskMode .tm-controls button.danger { background:#4b2222; border-color:#a33; }
+#taskMode .tm-out { background:#06080c; border:1px dashed #355; color:#9fe; padding:10px; border-radius:6px; white-space:pre-wrap; max-height:260px; overflow:auto; }
+#taskMode .tm-hint { font-size:12px; color:#9aa; margin:6px 0 0; }
+#taskMode .tm-badge { display:inline-block; padding:4px 8px; border-radius:6px; margin-right:8px; font-weight:600; }
+.tm-badge.green { background:#073; color:#cff; }
+.tm-badge.amber { background:#734; color:#ffd; }
+.tm-badge.red { background:#700; color:#fee; }

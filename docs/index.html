@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Chaos Monkey - Navigation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+    <script src="environment-detector.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header Navigation */
+        .nav-header {
+            background: rgba(12, 12, 12, 0.95);
+            border-bottom: 2px solid #00ff41;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff41;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #666;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: #00cc33;
+            border-color: #00cc33;
+            box-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+            transform: scale(1.05);
+        }
+
+        .nav-link.active {
+            color: #00ff41;
+            border-color: #00ff41;
+            background: rgba(0, 255, 65, 0.1);
+            box-shadow: 0 0 10px #00ff41;
+        }
+
+        .tour-button {
+            background: #1a1a1a;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            text-transform: uppercase;
+        }
+
+        .tour-button:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 10px #00ff41;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .content-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #0a0a0a;
+        }
+
+        /* Tour Progress */
+        .tour-progress {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(12, 12, 12, 0.95);
+            border-top: 1px solid #00ff41;
+            padding: 1rem 2rem;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .tour-progress.active {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41 0%, #008f11 100%);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px #00ff41;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .tour-step {
+            color: #ffb000;
+            font-weight: 600;
+        }
+
+        .end-tour {
+            background: transparent;
+            border: 1px solid #ff4141;
+            color: #ff4141;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .end-tour:hover {
+            background: #ff4141;
+            color: #000;
+        }
+
+        /* Environment Banner */
+        .environment-banner {
+            background: linear-gradient(90deg, #1a1a00 0%, #2a2a00 100%);
+            border-bottom: 2px solid #ffb000;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .environment-banner.demo {
+            background: linear-gradient(90deg, #2a1a00 0%, #3a2a00 100%);
+            border-color: #ffb000;
+        }
+
+        .environment-banner.local {
+            background: linear-gradient(90deg, #002a00 0%, #003a00 100%);
+            border-color: #00ff41;
+        }
+
+        .environment-banner.local-offline {
+            background: linear-gradient(90deg, #2a0000 0%, #3a0000 100%);
+            border-color: #ff4141;
+        }
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .banner-icon {
+            font-size: 1.2rem;
+        }
+
+        .banner-link {
+            color: #00ff41;
+            margin-left: auto;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .banner-link:hover {
+            border-color: #00ff41;
+        }
+
+        .banner-close {
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 1rem;
+            transition: color 0.3s;
+        }
+
+        .banner-close:hover {
+            color: #ff4141;
+        }
+
+        .banner-status {
+            margin-left: auto;
+            color: #999;
+        }
+
+        /* Feature Indicators */
+        .feature-limited {
+            position: relative;
+            border: 1px dashed #ffb000 !important;
+        }
+
+        .feature-limited::after {
+            content: '⚠️';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ffb000;
+            color: #000;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .feature-disabled {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+            position: relative;
+        }
+
+        .feature-disabled::after {
+            content: '✗';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4141;
+            color: #fff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .feature-mock {
+            position: relative;
+            border: 1px dotted #00ccff !important;
+        }
+
+        .feature-mock::after {
+            content: '🎭';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #00ccff;
+            color: #000;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Driver.js Overrides - Fixed dimming issue */
+        
+        /* Reduce overlay opacity for better visibility */
+        .driver-overlay {
+            background: rgba(0, 0, 0, 0.4) !important; /* Reduced from default 0.75 */
+        }
+        
+        /* Keep highlighted elements bright and visible */
+        .driver-highlighted-element {
+            opacity: 1 !important;
+            filter: brightness(1.1) !important;
+            z-index: 99999 !important;
+            position: relative !important;
+        }
+        
+        /* Alternative highlight method if needed */
+        .driver-active-element {
+            opacity: 1 !important;
+            filter: none !important;
+            z-index: 10001 !important;
+        }
+        
+        .driver-popover {
+            background: #0a0a0a !important;
+            border: 2px solid #00ff41 !important;
+            color: #00ff41 !important;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace !important;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.6), 
+                        0 0 60px rgba(0, 255, 65, 0.3) !important;
+            z-index: 100000 !important; /* Ensure popover stays on top */
+        }
+
+        .driver-popover-title {
+            color: #00ff41 !important;
+            font-weight: bold !important;
+        }
+
+        .driver-popover-description {
+            color: #999 !important;
+        }
+
+        .driver-popover-navigation-btns button {
+            background: #00ff41 !important;
+            color: #000 !important;
+            border: none !important;
+            padding: 8px 16px !important;
+            font-weight: bold !important;
+            text-transform: uppercase !important;
+        }
+
+        .driver-popover-navigation-btns button:hover {
+            background: #00cc33 !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-header {
+                padding: 0.75rem 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .nav-link {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="nav-header">
+        <div class="nav-brand">🔥 AGENT CHAOS MONKEY</div>
+        <nav class="nav-links">
+            <a class="nav-link active" data-page="basic" id="basic-link">Basic Testing</a>
+            <a class="nav-link" data-page="task" id="task-link">Task Mode</a>
+            <button class="tour-button" id="start-tour">🎯 Start Tour</button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <iframe id="content-frame" class="content-frame" src="claude_prototype_enhanced.html"></iframe>
+    </main>
+
+    <!-- Tour Progress -->
+    <div class="tour-progress" id="tour-progress">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        <div class="progress-info">
+            <span class="tour-step" id="tour-step">Step 1 of 10</span>
+            <span id="tour-title">Welcome to Agent Chaos Monkey</span>
+            <button class="end-tour" id="end-tour">✕ End Tour</button>
+        </div>
+    </div>
+
+    <script>
+        // Navigation Manager
+        class NavigationManager {
+            constructor() {
+                this.currentPage = 'basic';
+                this.tourActive = false;
+                this.tourStep = 0;
+                this.driver = null;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.initializeTour();
+                this.checkTourState();
+            }
+
+            bindEvents() {
+                // Navigation links
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        const page = e.target.dataset.page;
+                        this.switchPage(page);
+                    });
+                });
+
+                // Tour controls
+                document.getElementById('start-tour').addEventListener('click', () => {
+                    this.startTour();
+                });
+
+                document.getElementById('end-tour').addEventListener('click', () => {
+                    this.endTour();
+                });
+
+                // Listen for messages from iframes
+                window.addEventListener('message', (event) => {
+                    if (event.data.type === 'tour-continue') {
+                        this.continueTour(event.data.step);
+                    }
+                });
+            }
+
+            switchPage(page) {
+                if (this.currentPage === page) return;
+                
+                this.currentPage = page;
+                const iframe = document.getElementById('content-frame');
+                
+                // Update navigation
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.toggle('active', link.dataset.page === page);
+                });
+
+                // Switch iframe source
+                if (page === 'basic') {
+                    iframe.src = 'claude_prototype_enhanced.html';
+                } else if (page === 'task') {
+                    iframe.src = 'task_mode_standalone.html';
+                }
+
+                // Store page state for tour
+                if (this.tourActive) {
+                    localStorage.setItem('tourPage', page);
+                }
+            }
+
+            initializeTour() {
+                const DriverConstructor = window.driver?.js?.driver || window.Driver;
+                if (!DriverConstructor) {
+                    console.warn('Driver.js not available');
+                    return;
+                }
+
+                this.driver = DriverConstructor({
+                    showProgress: true,
+                    showButtons: ['next', 'previous', 'close'],
+                    steps: this.getTourSteps()
+                });
+            }
+
+            getTourSteps() {
+                return [
+                    {
+                        element: '.nav-brand',
+                        popover: {
+                            title: 'Welcome to Agent Chaos Monkey',
+                            description: 'A comprehensive chaos engineering platform for testing AI agents. Let\'s explore the features together!',
+                            position: 'bottom'
+                        }
+                    },
+                    {
+                        element: '.nav-links',
+                        popover: {
+                            title: 'Navigation',
+                            description: 'Switch between Basic Testing for interactive scenarios and Task Mode for advanced LLM testing with actionable insights.',
+                            position: 'bottom'
+                        }
+                    },
+                    {
+                        element: '#basic-link',
+                        popover: {
+                            title: 'Basic Testing Mode',
+                            description: 'Interactive chaos scenarios with real-time monitoring. Perfect for learning chaos engineering principles.',
+                            position: 'bottom'
+                        },
+                        onHighlighted: () => {
+                            this.switchPage('basic');
+                        }
+                    },
+                    {
+                        popover: {
+                            title: 'Basic Testing Features',
+                            description: 'In Basic Testing, you can select scenarios, watch the ASCII theatre visualization, and monitor real-time chaos effects. The iframe below shows the testing interface.',
+                            position: 'center'
+                        }
+                    },
+                    {
+                        element: '#task-link',
+                        popover: {
+                            title: 'Task Mode',
+                            description: 'Advanced chaos testing for LLM applications. Get actionable insights and specific code fixes for handling failures.',
+                            position: 'bottom'
+                        },
+                        onHighlighted: () => {
+                            this.switchPage('task');
+                        }
+                    },
+                    {
+                        popover: {
+                            title: 'Task Mode Features',
+                            description: 'Task Mode provides real-world scenarios, pipeline visualization, and actionable recommendations for improving resilience.',
+                            position: 'center'
+                        }
+                    },
+                    {
+                        element: '#content-frame',
+                        popover: {
+                            title: 'Testing Interface',
+                            description: 'This is where you\'ll interact with the chaos testing tools. Each mode has its own specialized interface.',
+                            position: 'left'
+                        }
+                    },
+                    {
+                        element: '#tour-progress',
+                        popover: {
+                            title: 'Tour Progress',
+                            description: 'Track your progress through the tour. You can end the tour at any time or navigate between steps.',
+                            position: 'top'
+                        }
+                    },
+                    {
+                        popover: {
+                            title: 'Ready to Test!',
+                            description: 'You\'re all set! Start with Basic Testing to learn the fundamentals, then advance to Task Mode for production-ready chaos testing.',
+                            position: 'center'
+                        }
+                    },
+                    {
+                        element: '#start-tour',
+                        popover: {
+                            title: 'Tour Complete',
+                            description: 'Great job! You can restart this tour anytime. Now explore the chaos testing features and build resilient AI systems!',
+                            position: 'left'
+                        }
+                    }
+                ];
+            }
+
+            startTour() {
+                this.tourActive = true;
+                this.tourStep = 0;
+                localStorage.setItem('tourActive', 'true');
+                localStorage.setItem('tourStep', '0');
+                
+                // Show progress bar
+                document.getElementById('tour-progress').classList.add('active');
+                
+                // Start Driver.js tour
+                if (this.driver) {
+                    this.driver.drive();
+                    this.updateProgress();
+                }
+            }
+
+            continueTour(step) {
+                this.tourStep = step;
+                localStorage.setItem('tourStep', step.toString());
+                
+                if (this.driver) {
+                    this.driver.moveNext();
+                    this.updateProgress();
+                }
+            }
+
+            endTour() {
+                this.tourActive = false;
+                localStorage.removeItem('tourActive');
+                localStorage.removeItem('tourStep');
+                localStorage.removeItem('tourPage');
+                
+                // Hide progress bar
+                document.getElementById('tour-progress').classList.remove('active');
+                
+                // Stop Driver.js tour
+                if (this.driver) {
+                    this.driver.destroy();
+                }
+            }
+
+            updateProgress() {
+                if (!this.driver) return;
+                
+                const currentStep = this.driver.getActiveIndex() + 1;
+                const totalSteps = this.driver.getSteps().length;
+                const progress = (currentStep / totalSteps) * 100;
+                
+                document.getElementById('progress-fill').style.width = `${progress}%`;
+                document.getElementById('tour-step').textContent = `Step ${currentStep} of ${totalSteps}`;
+                
+                const stepTitles = [
+                    'Welcome to Agent Chaos Monkey',
+                    'Navigation Overview',
+                    'Basic Testing Mode',
+                    'Basic Testing Features',
+                    'Task Mode',
+                    'Task Mode Features',
+                    'Testing Interface',
+                    'Tour Progress',
+                    'Ready to Test!',
+                    'Tour Complete'
+                ];
+                
+                document.getElementById('tour-title').textContent = stepTitles[currentStep - 1] || '';
+            }
+
+            checkTourState() {
+                // Resume tour if it was active
+                const tourActive = localStorage.getItem('tourActive');
+                const tourStep = localStorage.getItem('tourStep');
+                const tourPage = localStorage.getItem('tourPage');
+                
+                if (tourActive === 'true' && tourStep) {
+                    // Resume tour
+                    this.tourActive = true;
+                    this.tourStep = parseInt(tourStep);
+                    
+                    if (tourPage) {
+                        this.switchPage(tourPage);
+                    }
+                    
+                    // Show progress
+                    document.getElementById('tour-progress').classList.add('active');
+                    
+                    // Note: Driver.js doesn't support resuming mid-tour
+                    // User needs to restart tour
+                }
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for Driver.js to load
+            setTimeout(() => {
+                new NavigationManager();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

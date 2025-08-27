@@ -1,0 +1,480 @@
+<!-- Task Mode Enhanced UI Panel -->
+<section class="task-mode-panel" id="taskModeEnhanced">
+  <h2 class="panel-title">🎯 Task Mode - Real-World Chaos Testing</h2>
+  
+  <!-- Scenario Selector -->
+  <div class="scenario-section">
+    <h3>Select Real-World Scenario</h3>
+    <select id="scenarioSelect" class="scenario-select">
+      <option value="">Custom Chaos Configuration</option>
+    </select>
+    <div id="scenarioDetails" class="scenario-details"></div>
+  </div>
+  
+  <!-- Pipeline Visualization -->
+  <div class="pipeline-section">
+    <h3>Execution Pipeline</h3>
+    <div id="pipelineViz" class="pipeline-viz"></div>
+  </div>
+  
+  <!-- Data Input Section -->
+  <div class="data-section">
+    <h3>Dataset Configuration</h3>
+    <div class="input-row">
+      <label>
+        Upload Dataset (JSONL/CSV/MD)
+        <input type="file" id="tmDatasetFile" accept=".jsonl,.json,.csv,.md,.markdown">
+      </label>
+      <button class="btn-secondary" onclick="TaskModeEnhanced.loadSampleData()">
+        📁 Load Sample Dataset
+      </button>
+    </div>
+    <div id="tmOut" class="output-message"></div>
+  </div>
+  
+  <!-- Adapter Configuration -->
+  <div class="adapter-section">
+    <h3>LLM Adapter</h3>
+    <div class="adapter-options">
+      <label>
+        <input type="radio" name="tmAdapter" value="local" checked> Local Mock
+      </label>
+      <label>
+        <input type="radio" name="tmAdapter" value="openai"> OpenAI API
+      </label>
+      <label>
+        <input type="radio" name="tmAdapter" value="http"> HTTP Agent
+      </label>
+    </div>
+    <input id="tmOpenAIKey" placeholder="OpenAI API Key" class="api-key-input" style="display:none">
+    <input id="tmBaseUrl" placeholder="HTTP Agent URL (e.g., http://localhost:9009)" class="url-input" style="display:none">
+  </div>
+  
+  <!-- Prompt Template -->
+  <div class="prompt-section">
+    <h3>Prompt Template</h3>
+    <textarea id="tmPrompt" rows="6" placeholder="{{#context}}
+Answer the following question based on the context:
+{{question}}
+
+Context: {{context}}
+{{/context}}
+
+{{^context}}
+{{question}}
+{{/context}}"></textarea>
+    <div class="hint">Use Mustache syntax: {{variable}}, {{#section}}...{{/section}}</div>
+  </div>
+  
+  <!-- Test Controls -->
+  <div class="test-controls">
+    <button class="btn btn-primary" onclick="TaskModeEnhanced.runBaseline()">
+      ▶️ Run Baseline
+    </button>
+    <button class="btn btn-warning" onclick="TaskModeEnhanced.runWithChaos()">
+      ⚡ Run with Chaos
+    </button>
+    <button class="btn btn-secondary" onclick="TaskModeEnhanced.compareResults()">
+      📊 Compare Results
+    </button>
+    <button class="btn btn-info" onclick="TaskModeEnhanced.previewEffects()">
+      👁️ Preview Effects
+    </button>
+  </div>
+  
+  <!-- Results Display -->
+  <div class="results-section">
+    <div class="score-grid">
+      <div class="score-card">
+        <h4>Baseline</h4>
+        <div id="baselineScore" class="score-value">--</div>
+      </div>
+      <div class="score-card">
+        <h4>With Chaos</h4>
+        <div id="chaosScore" class="score-value">--</div>
+      </div>
+      <div class="score-card">
+        <h4>UX Score</h4>
+        <div id="uxScore" class="score-value">--</div>
+      </div>
+      <div class="score-card">
+        <h4>Degradation</h4>
+        <div id="degradationPercent" class="score-value">--</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Insights Container -->
+  <div id="insightsContainer" class="insights-container"></div>
+  
+  <!-- Test Builder Modal -->
+  <div id="testBuilder" class="modal" style="display:none">
+    <div class="modal-content">
+      <h3>Interactive Test Builder</h3>
+      <div class="builder-workspace">
+        <div class="failure-patterns">
+          <h4>Failure Patterns</h4>
+          <div class="pattern-list">
+            <div class="failure-pattern" draggable="true">☁️ 500 Error</div>
+            <div class="failure-pattern" draggable="true">⛔ Rate Limit</div>
+            <div class="failure-pattern" draggable="true">🐌 Latency</div>
+            <div class="failure-pattern" draggable="true">💾 Malformed Data</div>
+            <div class="failure-pattern" draggable="true">⊘ Tool Unavailable</div>
+            <div class="failure-pattern" draggable="true">💣 Context Overflow</div>
+          </div>
+        </div>
+        <div class="timeline-builder">
+          <h4>Test Timeline</h4>
+          <div id="testTimeline" class="test-timeline"></div>
+        </div>
+      </div>
+      <div class="builder-controls">
+        <input id="testSuiteName" placeholder="Test Suite Name">
+        <button onclick="TaskModeEnhanced.saveTestSuite()">💾 Save Test Suite</button>
+        <button onclick="TaskModeEnhanced.closeBuilder()">✖️ Close</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Chaos Preview Modal -->
+  <div id="chaosPreview" class="modal" style="display:none">
+    <div class="modal-content">
+      <h3>Chaos Effect Preview</h3>
+      <div id="previewContent"></div>
+      <button onclick="TaskModeEnhanced.closePreview()">Close</button>
+    </div>
+  </div>
+</section>
+
+<style>
+.task-mode-panel {
+  background: #0a0a0a;
+  border: 1px solid #00ff41;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  font-family: 'Courier New', monospace;
+  color: #00ff41;
+}
+
+.panel-title {
+  color: #00ff41;
+  border-bottom: 2px solid #00ff41;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.scenario-section, .pipeline-section, .data-section, 
+.adapter-section, .prompt-section, .results-section {
+  margin: 20px 0;
+  padding: 15px;
+  background: #050505;
+  border: 1px solid #222;
+  border-radius: 4px;
+}
+
+.scenario-select {
+  width: 100%;
+  padding: 10px;
+  background: #0a0a0a;
+  color: #00ff41;
+  border: 1px solid #00ff41;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.scenario-details {
+  margin-top: 15px;
+  padding: 10px;
+  background: #111;
+  border-left: 3px solid #00ff41;
+}
+
+.pipeline-viz {
+  padding: 20px;
+  background: #050505;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.pipeline-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: fit-content;
+}
+
+.pipeline-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  background: #0a0a0a;
+  border: 2px solid #333;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.pipeline-stage.active {
+  border-color: #00ff41;
+  box-shadow: 0 0 10px #00ff41;
+  animation: pulse 1s infinite;
+}
+
+.pipeline-stage.success {
+  border-color: #00ff41;
+  background: #001a00;
+}
+
+.pipeline-stage.failure {
+  border-color: #ff4141;
+  background: #1a0000;
+}
+
+.pipeline-stage.passed {
+  opacity: 0.6;
+}
+
+.stage-icon {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.stage-name {
+  font-size: 12px;
+  color: #999;
+}
+
+.stage-details {
+  font-size: 10px;
+  color: #777;
+  margin-top: 5px;
+  text-align: center;
+}
+
+.pipeline-arrow {
+  color: #00ff41;
+  font-size: 20px;
+}
+
+.pipeline-retries, .pipeline-fallbacks {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background: #1a1a00;
+  border: 1px solid #ffff41;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.test-controls {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 10px 20px;
+  background: #00ff41;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s;
+}
+
+.btn:hover {
+  background: #41ff00;
+  box-shadow: 0 0 10px #00ff41;
+}
+
+.btn-warning {
+  background: #ff9941;
+}
+
+.btn-warning:hover {
+  background: #ffaa41;
+}
+
+.btn-secondary {
+  background: #333;
+  color: #00ff41;
+  border: 1px solid #00ff41;
+}
+
+.btn-info {
+  background: #4199ff;
+  color: #fff;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.score-card {
+  background: #0a0a0a;
+  border: 1px solid #00ff41;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+}
+
+.score-card h4 {
+  color: #999;
+  font-size: 12px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.score-value {
+  font-size: 32px;
+  color: #00ff41;
+  font-weight: bold;
+}
+
+.insights-container {
+  margin-top: 30px;
+}
+
+.insights-report {
+  background: #050505;
+  border: 1px solid #00ff41;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.insights-summary {
+  font-size: 16px;
+  color: #00ff41;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #0a0a0a;
+  border-left: 3px solid #00ff41;
+}
+
+.insights-section {
+  margin: 15px 0;
+  padding: 15px;
+  background: #0a0a0a;
+  border-radius: 4px;
+}
+
+.insights-section.successes {
+  border-left: 3px solid #00ff41;
+}
+
+.insights-section.failures {
+  border-left: 3px solid #ff4141;
+}
+
+.insights-section.recommendations {
+  border-left: 3px solid #4199ff;
+}
+
+.insights-section h4 {
+  color: #00ff41;
+  margin-bottom: 10px;
+}
+
+.insights-section ul {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.insights-section li {
+  color: #999;
+  margin: 5px 0;
+}
+
+.code-snippet {
+  margin: 15px 0;
+  background: #000;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.code-snippet h5 {
+  color: #00ff41;
+  margin-bottom: 10px;
+}
+
+.code-snippet pre {
+  overflow-x: auto;
+  color: #999;
+  font-size: 12px;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #0a0a0a;
+  border: 2px solid #00ff41;
+  border-radius: 8px;
+  padding: 30px;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.builder-workspace {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.failure-patterns {
+  background: #050505;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+.failure-pattern {
+  padding: 8px 12px;
+  margin: 5px 0;
+  background: #0a0a0a;
+  border: 1px solid #00ff41;
+  border-radius: 4px;
+  cursor: move;
+  transition: all 0.3s;
+}
+
+.failure-pattern:hover {
+  background: #00ff41;
+  color: #000;
+}
+
+.test-timeline {
+  min-height: 200px;
+  background: #050505;
+  border: 2px dashed #00ff41;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+</style>

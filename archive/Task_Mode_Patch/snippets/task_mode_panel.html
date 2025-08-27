@@ -1,0 +1,77 @@
+
+<section class="card" id="taskMode">
+  <h2>Task Mode — Bring Your Own Data</h2>
+  <div class="tm-row">
+    <div class="tm-col">
+      <label>Dataset (JSONL/CSV/MD)<br>
+        <input id="tmDatasetFile" type="file" accept=".jsonl,.json,.csv,.md,.markdown">
+      </label>
+      <div class="tm-hint">We map top-level fields to <span class="kbd">{{variables}}</span> in your prompt.</div>
+    </div>
+    <div class="tm-col">
+      <label>Task Type<br>
+        <select id="tmTaskType">
+          <option value="qa">qa</option>
+          <option value="extract">extract</option>
+          <option value="classify">classify</option>
+          <option value="freeform">freeform</option>
+        </select>
+      </label>
+    </div>
+    <div class="tm-col">
+      <label>Adapter<br>
+        <label><input type="radio" name="tmAdapter" value="local" checked> Local JS</label>
+        <label><input type="radio" name="tmAdapter" value="openai"> OpenAI</label>
+        <label><input type="radio" name="tmAdapter" value="http"> HTTP Agent</label>
+      </label>
+      <input id="tmOpenAIKey" placeholder="OpenAI API key (local only)" class="tm-input mini" style="display:none">
+      <input id="tmBaseUrl" placeholder="HTTP Agent Base URL" class="tm-input mini" style="display:none">
+    </div>
+  </div>
+
+  <div class="tm-row">
+    <div class="tm-col">
+      <label>Prompt Template</label>
+      <textarea id="tmPrompt" rows="8" placeholder="Write your prompt template here..."></textarea>
+      <div class="tm-hint">Use fields like <span class="kbd">{{question}}</span>, <span class="kbd">{{context}}</span>, etc.</div>
+    </div>
+  </div>
+
+  <div class="tm-row">
+    <div class="tm-col">
+      <label>Metric<br>
+        <select id="tmMetric">
+          <option value="regex">regex</option>
+          <option value="exact">exact</option>
+          <option value="json_schema">json_schema</option>
+        </select>
+      </label>
+    </div>
+    <div class="tm-col">
+      <label>Expected (regex or exact override)<br>
+        <input id="tmExpect" placeholder="optional: overrides row.expected/expected_regex">
+      </label>
+    </div>
+    <div class="tm-col">
+      <label>JSON Schema Path (for json_schema)<br>
+        <input id="tmSchemaPath" placeholder="/schemas/user.json">
+      </label>
+    </div>
+  </div>
+
+  <div class="tm-controls">
+    <button id="btnTaskBaseline" class="primary">Run Task Baseline</button>
+    <button id="btnTaskChaos" class="danger">Run Task with Chaos</button>
+    <button id="btnTaskSample">Load Sample</button>
+  </div>
+
+  <div class="tm-row">
+    <div class="tm-col">
+      <span class="tm-badge green" id="tmTaskScore">Task: —</span>
+      <span class="tm-badge amber" id="tmResScore">Resilience: —</span>
+      <span class="tm-badge green" id="tmJointScore">Joint: —</span>
+    </div>
+  </div>
+
+  <pre id="tmOut" class="tm-out" aria-live="polite"></pre>
+</section>

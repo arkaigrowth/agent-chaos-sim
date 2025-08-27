@@ -4,19 +4,37 @@
   <meta charset="utf-8" />
   <title>Chaos Lab — Agent Resilience Tester</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="hero">
-    <h1 data-copy="hero.title">Chaos Lab</h1>
+    <h1 data-copy="hero.title">Agent Chaos Monkey</h1>
     <p class="sub" data-copy="hero.sub">
       Test your AI agent's resilience by simulating real-world failures. 
       See how well your agent handles API errors, network issues, and unexpected responses.
     </p>
     <div class="hero-actions">
-      <button id="btnRemixTop" class="link">Get Started →</button>
+      <a href="docs/" class="link" style="text-decoration: none;">🚀 Launch Testing Suite →</a>
+      <a href="#setup" class="link" style="text-decoration: none; margin-left: 1rem;">📚 Run Locally</a>
     </div>
   </header>
+
+  <!-- Testing Modes Showcase -->
+  <section class="modes-showcase" style="padding: 2rem; text-align: center;">
+    <h2 style="color: #00ff41; margin-bottom: 2rem;">Choose Your Testing Mode</h2>
+    <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap;">
+      <div class="mode-card" style="background: #1a1a1a; border: 1px solid #00ff41; padding: 1.5rem; border-radius: 8px; max-width: 300px;">
+        <h3 style="color: #00ff41;">🎮 Basic Testing</h3>
+        <p>Interactive chaos scenarios with real-time ASCII theatre visualization</p>
+        <a href="docs/" class="link">Try Basic Mode →</a>
+      </div>
+      <div class="mode-card" style="background: #1a1a1a; border: 1px solid #00ff41; padding: 1.5rem; border-radius: 8px; max-width: 300px;">
+        <h3 style="color: #00ff41;">🔬 Task Mode</h3>
+        <p>Advanced LLM testing with actionable insights and code recommendations</p>
+        <a href="docs/" class="link">Try Task Mode →</a>
+      </div>
+    </div>
+  </section>
 
   <!-- 60s storytelling strip -->
   <section class="story">

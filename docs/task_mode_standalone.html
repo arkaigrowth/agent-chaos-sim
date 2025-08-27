@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Chaos Lab - Task Mode</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #000;
+      color: #00ff41;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      border-bottom: 2px solid #00ff41;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      color: #00ff41;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 10px #00ff41; }
+      50% { text-shadow: 0 0 20px #00ff41, 0 0 30px #00ff41; }
+    }
+    
+    .info-box {
+      background: #0a0a0a;
+      border: 1px solid #00ff41;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+    
+    .info-box h2 {
+      color: #00ff41;
+      margin-top: 0;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      background: #00ff41;
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      font-family: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      margin: 10px 5px;
+      transition: all 0.3s;
+    }
+    
+    .btn:hover {
+      background: #41ff00;
+      box-shadow: 0 0 15px #00ff41;
+    }
+    
+    .btn-secondary {
+      background: #333;
+      color: #00ff41;
+      border: 1px solid #00ff41;
+    }
+    
+    .btn-secondary:hover {
+      background: #00ff41;
+      color: #000;
+    }
+    
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .scenario-card {
+      background: #0a0a0a;
+      border: 1px solid #333;
+      padding: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .scenario-card:hover {
+      border-color: #00ff41;
+      box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+    }
+    
+    .scenario-card.selected {
+      border-color: #00ff41;
+      background: #001a00;
+    }
+    
+    .scenario-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    
+    .scenario-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .scenario-desc {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .pipeline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px;
+      background: #050505;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+    
+    .pipeline-stage {
+      min-width: 100px;
+      padding: 10px;
+      background: #0a0a0a;
+      border: 2px solid #333;
+      border-radius: 8px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    
+    .pipeline-stage.active {
+      border-color: #00ff41;
+      animation: pulse 1s infinite;
+    }
+    
+    .pipeline-stage.success {
+      border-color: #00ff41;
+      background: #001a00;
+    }
+    
+    .pipeline-stage.failure {
+      border-color: #ff4141;
+      background: #1a0000;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    .insights {
+      background: #050505;
+      border: 1px solid #00ff41;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .insights h3 {
+      color: #00ff41;
+      margin-top: 0;
+    }
+    
+    .insights-section {
+      margin: 15px 0;
+      padding: 10px;
+      background: #0a0a0a;
+      border-radius: 4px;
+    }
+    
+    .insights-section h4 {
+      margin: 0 0 10px 0;
+    }
+    
+    .success-item {
+      color: #00ff41;
+      margin: 5px 0;
+    }
+    
+    .failure-item {
+      color: #ff4141;
+      margin: 5px 0;
+    }
+    
+    .recommendation-item {
+      color: #4199ff;
+      margin: 5px 0;
+    }
+    
+    pre {
+      background: #000;
+      border: 1px solid #333;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎯 Agent Chaos Lab - Task Mode</h1>
+      <p style="text-align: center; color: #999;">Test your LLM applications against real-world failure scenarios</p>
+    </div>
+    
+    <div class="info-box">
+      <h2>How This Works</h2>
+      <p>This is a <strong>demonstration</strong> of how chaos testing should work for LLM applications:</p>
+      <ol>
+        <li>Select a real-world failure scenario (not abstract chaos parameters)</li>
+        <li>See the pipeline visualization showing where failures occur</li>
+        <li>Get actionable insights on what failed and how to fix it</li>
+        <li>Receive actual code snippets for implementing fixes</li>
+      </ol>
+      <p><strong>Note:</strong> This demo runs entirely in your browser. For full functionality with real LLM testing, you'd need the Node.js server version.</p>
+    </div>
+    
+    <div class="info-box">
+      <h2>Select a Real-World Scenario</h2>
+      <div class="scenario-grid" id="scenarioGrid"></div>
+    </div>
+    
+    <div class="info-box">
+      <h2>Pipeline Visualization</h2>
+      <div class="pipeline" id="pipeline">
+        <div class="pipeline-stage" id="stage-input">
+          <div>📥</div>
+          <div>Input</div>
+        </div>
+        <div>→</div>
+        <div class="pipeline-stage" id="stage-prompt">
+          <div>📝</div>
+          <div>Prompt</div>
+        </div>
+        <div>→</div>
+        <div class="pipeline-stage" id="stage-llm">
+          <div>🤖</div>
+          <div>LLM Call</div>
+        </div>
+        <div>→</div>
+        <div class="pipeline-stage" id="stage-parse">
+          <div>🔍</div>
+          <div>Parse</div>
+        </div>
+        <div>→</div>
+        <div class="pipeline-stage" id="stage-validate">
+          <div>✅</div>
+          <div>Validate</div>
+        </div>
+        <div>→</div>
+        <div class="pipeline-stage" id="stage-output">
+          <div>📤</div>
+          <div>Output</div>
+        </div>
+      </div>
+      
+      <div style="text-align: center; margin: 20px 0;">
+        <button class="btn" onclick="runDemo()">▶️ Run Demo</button>
+        <button class="btn btn-secondary" onclick="resetDemo()">🔄 Reset</button>
+      </div>
+    </div>
+    
+    <div class="insights" id="insights" style="display: none;">
+      <h3>📊 Chaos Test Report</h3>
+      <div id="insightsContent"></div>
+    </div>
+    
+    <div class="info-box" style="margin-top: 40px; border-color: #999;">
+      <h2>Want the Full Version?</h2>
+      <p>This demo shows the concept. The full implementation includes:</p>
+      <ul>
+        <li>✅ Real LLM integration (OpenAI, Anthropic, Cohere)</li>
+        <li>✅ Custom dataset upload (JSONL, CSV, MD)</li>
+        <li>✅ Actual chaos injection with configurable parameters</li>
+        <li>✅ Baseline vs chaos comparison</li>
+        <li>✅ Export reports and test suites</li>
+        <li>✅ CI/CD integration with GitHub Actions</li>
+      </ul>
+      <p>To run the full version:</p>
+      <pre>npm install express cors
+node server.js
+# Open http://localhost:8080</pre>
+    </div>
+  </div>
+  
+  <script>
+    // Real-world scenarios
+    const scenarios = {
+      openai_outage: {
+        name: "OpenAI Service Outage",
+        icon: "🔥",
+        description: "Complete API unavailability",
+        failureStage: "llm",
+        insights: {
+          successes: [
+            "Retry logic triggered correctly (3 attempts)",
+            "Exponential backoff prevented API hammering"
+          ],
+          failures: [
+            "No fallback mechanism after retries exhausted",
+            "User received error instead of degraded response",
+            "No circuit breaker pattern detected"
+          ],
+          recommendations: [
+            "Implement circuit breaker to prevent cascading failures",
+            "Add fallback to cached responses or alternative model",
+            "Consider using multiple LLM providers for redundancy"
+          ],
+          codeSnippet: `// Circuit Breaker Implementation
+class CircuitBreaker {
+  constructor(threshold = 5, timeout = 60000) {
+    this.failures = 0;
+    this.threshold = threshold;
+    this.timeout = timeout;
+    this.state = 'CLOSED';
+    this.nextAttempt = Date.now();
+  }
+  
+  async call(fn) {
+    if (this.state === 'OPEN') {
+      if (Date.now() < this.nextAttempt) {
+        throw new Error('Circuit breaker is OPEN');
+      }
+      this.state = 'HALF_OPEN';
+    }
+    
+    try {
+      const result = await fn();
+      this.onSuccess();
+      return result;
+    } catch (err) {
+      this.onFailure();
+      throw err;
+    }
+  }
+}`
+        }
+      },
+      rate_limit: {
+        name: "Rate Limit Tuesday",
+        icon: "🚦",
+        description: "Heavy rate limiting during peak usage",
+        failureStage: "llm",
+        insights: {
+          successes: [
+            "Rate limit detection working correctly",
+            "Retry-After header respected"
+          ],
+          failures: [
+            "No exponential backoff implemented",
+            "Request queue not managed properly",
+            "Missing jitter in retry timing"
+          ],
+          recommendations: [
+            "Implement exponential backoff with jitter",
+            "Add request queuing and rate limiting",
+            "Use multiple API keys for load distribution"
+          ],
+          codeSnippet: `// Exponential Backoff with Jitter
+async function retryWithBackoff(fn, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (error.status === 429 && i < maxRetries - 1) {
+        const baseDelay = Math.pow(2, i) * 1000;
+        const jitter = Math.random() * 1000;
+        await sleep(baseDelay + jitter);
+      } else {
+        throw error;
+      }
+    }
+  }
+}`
+        }
+      },
+      degraded_model: {
+        name: "Model Quality Degradation",
+        icon: "📉",
+        description: "Lower quality or truncated responses",
+        failureStage: "validate",
+        insights: {
+          successes: [
+            "Response validation detected quality issues",
+            "Metrics tracked degradation correctly"
+          ],
+          failures: [
+            "No automatic quality scoring implemented",
+            "Missing retry with different parameters",
+            "User not notified of degraded quality"
+          ],
+          recommendations: [
+            "Implement semantic similarity scoring",
+            "Add quality thresholds and alerts",
+            "Retry with adjusted temperature/top_p parameters"
+          ],
+          codeSnippet: `// Response Quality Validation
+function validateResponseQuality(response, expected) {
+  const qualityChecks = {
+    length: response.length > 50,
+    coherence: !response.includes('�'),
+    completeness: !response.endsWith('..'),
+    relevance: cosineSimilarity(response, expected) > 0.7
+  };
+  
+  const score = Object.values(qualityChecks)
+    .filter(v => v).length / 4;
+    
+  if (score < 0.6) {
+    throw new Error('Response quality below threshold');
+  }
+  
+  return score;
+}`
+        }
+      },
+      network_instability: {
+        name: "Network Instability",
+        icon: "📡",
+        description: "Timeouts and connection issues",
+        failureStage: "llm",
+        insights: {
+          successes: [
+            "Timeout detection working",
+            "Connection retry attempted"
+          ],
+          failures: [
+            "Timeout values not optimized",
+            "No adaptive timeout strategy",
+            "Missing connection pooling"
+          ],
+          recommendations: [
+            "Implement adaptive timeout based on latency",
+            "Add connection pooling and keep-alive",
+            "Use regional failover endpoints"
+          ],
+          codeSnippet: `// Adaptive Timeout Strategy
+class AdaptiveTimeout {
+  constructor() {
+    this.history = [];
+    this.baseTimeout = 5000;
+  }
+  
+  getTimeout() {
+    if (this.history.length === 0) {
+      return this.baseTimeout;
+    }
+    
+    const avg = this.history.reduce((a, b) => a + b) / this.history.length;
+    const stdDev = Math.sqrt(
+      this.history.reduce((sq, n) => sq + Math.pow(n - avg, 2), 0) / this.history.length
+    );
+    
+    return Math.min(avg + (2 * stdDev), 30000);
+  }
+  
+  recordLatency(ms) {
+    this.history.push(ms);
+    if (this.history.length > 100) {
+      this.history.shift();
+    }
+  }
+}`
+        }
+      }
+    };
+    
+    let selectedScenario = null;
+    
+    // Initialize scenario grid
+    function initScenarios() {
+      const grid = document.getElementById('scenarioGrid');
+      for (const [key, scenario] of Object.entries(scenarios)) {
+        const card = document.createElement('div');
+        card.className = 'scenario-card';
+        card.innerHTML = `
+          <div class="scenario-icon">${scenario.icon}</div>
+          <div class="scenario-name">${scenario.name}</div>
+          <div class="scenario-desc">${scenario.description}</div>
+        `;
+        card.onclick = () => selectScenario(key, card);
+        grid.appendChild(card);
+      }
+    }
+    
+    function selectScenario(key, card) {
+      // Clear previous selection
+      document.querySelectorAll('.scenario-card').forEach(c => 
+        c.classList.remove('selected')
+      );
+      card.classList.add('selected');
+      selectedScenario = key;
+      resetDemo();
+    }
+    
+    function resetDemo() {
+      // Reset pipeline stages
+      document.querySelectorAll('.pipeline-stage').forEach(stage => {
+        stage.classList.remove('active', 'success', 'failure');
+      });
+      
+      // Hide insights
+      document.getElementById('insights').style.display = 'none';
+    }
+    
+    async function runDemo() {
+      if (!selectedScenario) {
+        alert('Please select a scenario first!');
+        return;
+      }
+      
+      resetDemo();
+      
+      const scenario = scenarios[selectedScenario];
+      const stages = ['input', 'prompt', 'llm', 'parse', 'validate', 'output'];
+      
+      // Animate through pipeline
+      for (let i = 0; i < stages.length; i++) {
+        const stage = stages[i];
+        const stageEl = document.getElementById(`stage-${stage}`);
+        
+        // Activate stage
+        stageEl.classList.add('active');
+        
+        await sleep(500);
+        
+        // Check if this is the failure stage
+        if (stage === scenario.failureStage) {
+          stageEl.classList.remove('active');
+          stageEl.classList.add('failure');
+          
+          // Show retry animation
+          await sleep(1000);
+          stageEl.classList.remove('failure');
+          stageEl.classList.add('active');
+          await sleep(500);
+          stageEl.classList.remove('active');
+          stageEl.classList.add('failure');
+          
+          // Show insights
+          showInsights(scenario.insights);
+          return;
+        } else {
+          stageEl.classList.remove('active');
+          stageEl.classList.add('success');
+        }
+      }
+      
+      // If we got here, show success insights
+      showInsights({
+        successes: ["All stages completed successfully"],
+        failures: [],
+        recommendations: ["System performed well under normal conditions"]
+      });
+    }
+    
+    function showInsights(insights) {
+      const insightsEl = document.getElementById('insights');
+      const contentEl = document.getElementById('insightsContent');
+      
+      let html = '';
+      
+      if (insights.successes && insights.successes.length > 0) {
+        html += `
+          <div class="insights-section">
+            <h4>✅ What Worked</h4>
+            ${insights.successes.map(s => `<div class="success-item">• ${s}</div>`).join('')}
+          </div>
+        `;
+      }
+      
+      if (insights.failures && insights.failures.length > 0) {
+        html += `
+          <div class="insights-section">
+            <h4>❌ What Failed</h4>
+            ${insights.failures.map(f => `<div class="failure-item">• ${f}</div>`).join('')}
+          </div>
+        `;
+      }
+      
+      if (insights.recommendations && insights.recommendations.length > 0) {
+        html += `
+          <div class="insights-section">
+            <h4>📝 Recommendations</h4>
+            ${insights.recommendations.map(r => `<div class="recommendation-item">• ${r}</div>`).join('')}
+          </div>
+        `;
+      }
+      
+      if (insights.codeSnippet) {
+        html += `
+          <div class="insights-section">
+            <h4>💻 Code Suggestion</h4>
+            <pre>${insights.codeSnippet}</pre>
+          </div>
+        `;
+      }
+      
+      contentEl.innerHTML = html;
+      insightsEl.style.display = 'block';
+      
+      // Scroll to insights
+      insightsEl.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    
+    // Initialize on load
+    initScenarios();
+  </script>
+</body>
+</html>

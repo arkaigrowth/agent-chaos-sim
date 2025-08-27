@@ -18,10 +18,14 @@
     "test:e2e": "playwright test e2e-complete.spec.ts",
     "test:performance": "playwright test performance-new.spec.ts",
     "test:cross-browser": "playwright test cross-browser.spec.ts",
+    "test:task-mode": "playwright test tests/task-mode-enhanced.spec.ts",
+    "test:smoke": "playwright test tests/smoke.taskmode.spec.ts",
     "test:report": "playwright show-report",
     "test:install": "playwright install",
     "dev": "python -m http.server 8080",
+    "dev:node": "node server.js",
     "start": "python -m http.server 8080",
+    "mock-agent": "node tests/mock-agent/enhanced-server.js",
     "lint:tests": "npx eslint tests/**/*.ts",
     "format:tests": "npx prettier --write tests/**/*.ts"
   },
@@ -36,6 +40,10 @@
   ],
   "author": "Agent Chaos Monkey Team",
   "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.0",
+    "cors": "^2.8.5"
+  },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "@types/node": "^20.0.0",
