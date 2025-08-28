@@ -880,13 +880,17 @@ summary:hover .chevron-icon {
           <option value="openai">OpenAI API</option>
           <option value="http">Custom HTTP Endpoint</option>
         </select>
-        <input id="apiKey" placeholder="API Key (if needed)" type="password" style="padding: 8px; background: #111; color: #00ff41; border: 1px solid #333; border-radius: 4px; font-family: 'Courier New', monospace; flex: 1; min-width: 200px; display: none;">
+        <input id="apiKey" placeholder="⚠️ Test API Key Only - Not Production!" type="password" style="padding: 8px; background: #111; color: #00ff41; border: 1px solid #333; border-radius: 4px; font-family: 'Courier New', monospace; flex: 1; min-width: 200px; display: none;" title="Security Warning: Only use test API keys with low limits. Keys are handled client-side only but visible in browser dev tools.">
         <input id="endpoint" placeholder="Endpoint URL" value="http://localhost:9009" style="padding: 8px; background: #111; color: #00ff41; border: 1px solid #333; border-radius: 4px; font-family: 'Courier New', monospace; flex: 1; min-width: 250px; display: none;">
         <button id="testConnection" style="padding: 8px 16px; background: #00ff41; color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Courier New', monospace;">
           Test Connection
         </button>
       </div>
       <div id="connectionStatus" style="margin-top: 10px; font-size: 13px; display: none;"></div>
+      <div id="securityWarning" style="margin-top: 10px; padding: 10px; background: #1a0a00; border: 1px solid #ff6600; border-radius: 4px; font-size: 12px; color: #ff8844; display: none;">
+        <strong>⚠️ Security Notice:</strong> API keys are client-side only but visible in browser dev tools. Only use test keys with spending limits. For production, implement server-side proxies.
+        <a href="docs/SECURITY.md" target="_blank" style="color: #ffaa66; text-decoration: underline;">Learn more</a>
+      </div>
     </div>
     
     <!-- Dataset Upload Panel -->
@@ -2713,8 +2717,12 @@ class ChaosSimulator {
     if (adapterSelect) {
       adapterSelect.onchange = () => {
         const adapter = adapterSelect.value;
+        const securityWarning = document.getElementById('securityWarning');
+        
         apiKeyInput.style.display = adapter === 'openai' ? 'block' : 'none';
         endpointInput.style.display = adapter === 'http' ? 'block' : 'none';
+        securityWarning.style.display = adapter === 'openai' ? 'block' : 'none';
+        
         if (adapter === 'mock') {
           endpointInput.style.display = 'block';
           endpointInput.value = 'http://localhost:9009';
