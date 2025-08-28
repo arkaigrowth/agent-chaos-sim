@@ -3,6 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+  connect-src 'self' https://api.openai.com https://localhost:9009 http://localhost:9009 http://localhost:8080;
+  img-src 'self' data: blob:;
+  font-src 'self';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+  frame-ancestors 'none';
+">
 <title>AGENT CHAOS LAB</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
 <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
@@ -1844,6 +1856,10 @@ class ChaosSimulator {
       evalSuite: null,
       currentEvalCase: 0,
       evalResults: [],
+      // Security state
+      isDevelopment: false,
+      securityLevel: 'production',
+      testDataset: null,
       packet: { 
         x: 4, 
         y: 5, 
@@ -1952,9 +1968,19 @@ class ChaosSimulator {
     // Add accessibility enhancements
     this.enhanceAccessibility();
     
+    // Initialize security environment
+    if (!this.checkSecurityEnvironment()) {
+      console.error('Security environment check failed');
+      return;
+    }
+    
     // Initialize Real LLM Testing functionality
     this.initializeAdapters();
     this.setupLLMControls();
+    
+    // Setup navigation cleanup
+    window.addEventListener('beforeunload', () => this.clearSensitiveData());
+    window.addEventListener('unload', () => this.clearSensitiveData());
     
     // Parameter section collapse handlers
     document.querySelectorAll('.param-section-title').forEach(title => {
@@ -2687,6 +2713,89 @@ class ChaosSimulator {
     document.head.appendChild(style);
   }
   
+  // ============= SECURITY UTILITIES =============
+  
+  // Environment detection and security enforcement
+  checkSecurityEnvironment() {
+    const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const isHTTPS = location.protocol === 'https:';
+    
+    // Enforce HTTPS in non-localhost environments
+    if (!isLocalhost && !isHTTPS) {
+      console.warn('⚠️ Security: Redirecting to HTTPS');
+      location.replace(`https:${location.href.substring(location.protocol.length)}`);
+      return false;
+    }
+    
+    // Detect development vs production
+    this.state.isDevelopment = isLocalhost;
+    this.state.securityLevel = isLocalhost ? 'development' : 'production';
+    
+    return true;
+  }
+  
+  // Simple client-side key obfuscation (not cryptographically secure, just obscures from casual inspection)
+  obfuscateKey(key) {
+    if (!key) return '';
+    try {
+      // Simple reversible encoding
+      return btoa(key.split('').reverse().join(''));
+    } catch (e) {
+      console.warn('Key obfuscation failed, using plain text');
+      return key;
+    }
+  }
+  
+  deobfuscateKey(obfuscated) {
+    if (!obfuscated) return '';
+    try {
+      return atob(obfuscated).split('').reverse().join('');
+    } catch (e) {
+      console.warn('Key deobfuscation failed');
+      return obfuscated;
+    }
+  }
+  
+  // Validate API key format
+  validateApiKey(key, provider = 'openai') {
+    if (!key) return { valid: false, reason: 'Key is required' };
+    
+    switch (provider) {
+      case 'openai':
+        if (!key.startsWith('sk-')) {
+          return { valid: false, reason: 'OpenAI keys should start with "sk-"' };
+        }
+        if (key.length < 20) {
+          return { valid: false, reason: 'Key appears too short' };
+        }
+        // Check if it looks like a production key (longer, specific format)
+        if (key.length > 50 && !this.state.isDevelopment) {
+          return { valid: false, reason: 'Production keys should not be used in browser! Use test keys only.' };
+        }
+        break;
+    }
+    
+    return { valid: true, reason: 'Key format valid' };
+  }
+  
+  // Clear sensitive data from memory
+  clearSensitiveData() {
+    const apiKeyInput = document.getElementById('apiKey');
+    if (apiKeyInput) {
+      // Overwrite with random data before clearing
+      apiKeyInput.value = Math.random().toString(36).repeat(10);
+      setTimeout(() => {
+        apiKeyInput.value = '';
+      }, 100);
+    }
+    
+    // Clear any obfuscated keys from memory
+    if (this.state.obfuscatedKey) {
+      this.state.obfuscatedKey = Math.random().toString(36).repeat(20);
+      delete this.state.obfuscatedKey;
+    }
+  }
+  
   // ============= REAL LLM TESTING FUNCTIONALITY =============
   
   async initializeAdapters() {
@@ -2758,6 +2867,28 @@ class ChaosSimulator {
     
     statusDiv.style.display = 'block';
     statusDiv.innerHTML = '<span style="color: #ffaa00;">🔄 Testing connection...</span>';
+    
+    // Validate API key if required
+    if (adapter === 'openai') {
+      const apiKey = document.getElementById('apiKey').value;
+      const validation = this.validateApiKey(apiKey, 'openai');
+      
+      if (!validation.valid) {
+        statusDiv.innerHTML = `<span style="color: #ff4444;">❌ ${validation.reason}</span>`;
+        return;
+      }
+      
+      // Show warning for potentially production keys
+      if (apiKey.length > 50 && !this.state.isDevelopment) {
+        if (!confirm('⚠️ This appears to be a production API key. Are you sure you want to use it in the browser? Consider using test keys with spending limits instead.')) {
+          statusDiv.innerHTML = '<span style="color: #ff8844;">⚠️ Connection test cancelled for security</span>';
+          return;
+        }
+      }
+      
+      // Store obfuscated version temporarily
+      this.state.obfuscatedKey = this.obfuscateKey(apiKey);
+    }
     
     try {
       let testUrl;
