@@ -214,33 +214,30 @@
     </section>
 
     <section class="card" id="evalsCard">
-      <h2>Resilience Evals (beta)</h2>
-
+      <h2>Evaluation Suites</h2>
+      <p class="hint">Pre-built test suites for structured agent testing.</p>
       <div class="row">
         <label>
-          Suite:
+          Test Suite:
           <select id="evalSuiteSelect">
-            <option value="reliability_core">Reliability Core</option>
-            <option value="rag_injection">RAG Injection (benign)</option>
-            <option value="rate_limit_backoff">Rate-limit Backoff Discipline</option>
-            <option value="custom">Upload custom YAML/JSON…</option>
+            <option value="reliability_core">Reliability Core (3 test cases)</option>
+            <option value="rag_injection">RAG Injection (benign) (2 test cases)</option>
+            <option value="rate_limit_backoff">Rate Limit Backoff Discipline (1 test case)</option>
+            <option value="custom">Upload Custom YAML/JSON…</option>
           </select>
         </label>
         <label><input type="checkbox" id="evalIncludeBaseline"> Include baseline</label>
       </div>
-
       <div class="row" id="evalUploadRow" style="display:none">
         <input type="file" id="evalFile" accept=".yml,.yaml,.json" />
-        <small class="hint">Schema: suite → cases[] with scenario, seeds[], faults{{…}}, assertions[]</small>
+        <small class="hint">Custom YAML/JSON evaluation format</small>
       </div>
-
       <div class="row">
         <button id="btnRunEval" class="primary">Run Suite</button>
         <button id="btnExportEvalJSON" disabled>Export JSON</button>
         <button id="btnExportEvalMD" disabled>Export MD</button>
         <button id="btnEvalPermalink" disabled>Copy permalink</button>
       </div>
-
       <pre id="evalOutput" class="ascii" style="height:260px; white-space:pre-wrap;"></pre>
     </section>
 

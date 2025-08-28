@@ -802,7 +802,19 @@ body {
   <!-- Evaluation Suites Section -->
   <div id="evaluationSection" class="test-section hidden">
     <h3 class="test-section-title">🔍 Evaluation Suites</h3>
+    
+    <!-- Industry Context Explanation -->
+    <div class="info-box" style="margin-bottom: 15px; padding: 12px; background: #111; border: 1px solid #333; border-radius: 4px;">
+      <p style="color: #00ff41; margin-bottom: 8px;">🏭 <strong>Industry-Standard Benchmarks</strong></p>
+      <p style="font-size: 14px; line-height: 1.5;">Our benchmarks are based on <strong>chaos engineering practices</strong> from Netflix, Amazon, and Google. Each suite tests real-world failure patterns that production AI agents encounter. <a href="../docs/BENCHMARKS_GUIDE.md" target="_blank" style="color: #00ff41;">📚 View Complete Guide</a></p>
+    </div>
+    
     <div class="eval-suites" id="evalSuites"></div>
+    
+    <!-- Dynamic Benchmark Explanation -->
+    <div id="benchmarkExplanation" class="info-box" style="margin: 15px 0; padding: 12px; background: #0a1a0a; border: 1px solid #00ff41; border-radius: 4px; display: none;">
+      <!-- Content will be dynamically updated by JavaScript -->
+    </div>
     
     <!-- Custom Suite Upload -->
     <div class="file-upload">
@@ -810,7 +822,61 @@ body {
       <label for="customSuiteFile" class="file-upload-label">
         📁 Click to upload custom evaluation suite (YAML/JSON)
       </label>
+      <div style="margin-top: 8px; font-size: 13px; color: #999;">
+        <strong>Custom Benchmark Schema:</strong> Define your own test scenarios with fault injection patterns.
+        <br>📖 <a href="../docs/BENCHMARKS_GUIDE.md#creating-custom-benchmarks" target="_blank" style="color: #00ff41;">See YAML Examples & Templates</a>
+      </div>
     </div>
+  </div>
+
+  <!-- Industry SLA Standards Reference -->
+  <div class="sla-standards" style="margin: 20px 0; padding: 15px; background: #111; border: 1px solid #333; border-radius: 4px;">
+    <h3 style="color: #00ff41; margin-bottom: 15px;">📊 Industry SLA Standards</h3>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: #1a1a1a; color: #00ff41;">
+            <th style="padding: 10px; border: 1px solid #333; text-align: left;">Availability</th>
+            <th style="padding: 10px; border: 1px solid #333; text-align: left;">Downtime/Month</th>
+            <th style="padding: 10px; border: 1px solid #333; text-align: left;">Downtime/Year</th>
+            <th style="padding: 10px; border: 1px solid #333; text-align: left;">Use Cases</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #333;">90%</td>
+            <td style="padding: 8px; border: 1px solid #333;">72 hours</td>
+            <td style="padding: 8px; border: 1px solid #333;">36.5 days</td>
+            <td style="padding: 8px; border: 1px solid #333;">Development/testing</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #333;">95%</td>
+            <td style="padding: 8px; border: 1px solid #333;">36 hours</td>
+            <td style="padding: 8px; border: 1px solid #333;">18.25 days</td>
+            <td style="padding: 8px; border: 1px solid #333;">Internal tools</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #333;">99%</td>
+            <td style="padding: 8px; border: 1px solid #333;">7.2 hours</td>
+            <td style="padding: 8px; border: 1px solid #333;">3.65 days</td>
+            <td style="padding: 8px; border: 1px solid #333;">Business applications</td>
+          </tr>
+          <tr style="background: #0a2a0a; color: #00ff41; font-weight: bold;">
+            <td style="padding: 8px; border: 1px solid #333;">99.9%</td>
+            <td style="padding: 8px; border: 1px solid #333;">43.2 minutes</td>
+            <td style="padding: 8px; border: 1px solid #333;">8.7 hours</td>
+            <td style="padding: 8px; border: 1px solid #333;">🎯 Production AI Agents</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #333;">99.99%</td>
+            <td style="padding: 8px; border: 1px solid #333;">4.32 minutes</td>
+            <td style="padding: 8px; border: 1px solid #333;">52.6 minutes</td>
+            <td style="padding: 8px; border: 1px solid #333;">Mission-critical</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top: 10px; font-size: 13px; color: #999;">Our benchmarks target <strong style="color: #00ff41;">99.9% SLA</strong> - the industry standard for production AI services.</p>
   </div>
 
   <!-- Evaluation Results -->
@@ -1039,6 +1105,58 @@ body {
 
 <script>
 // Built-in evaluation suites from evals.js
+// Benchmark explanations for industry context
+const BENCHMARK_EXPLANATIONS = {
+  reliability_core: {
+    title: "🏭 Reliability Core Benchmark",
+    context: "Essential resilience patterns for 99.9% SLA compliance (43.2 min downtime/month)",
+    tests: [
+      "<strong>Network Timeout Recovery:</strong> Tests graceful handling of slow APIs (2-3 sec delays)",
+      "<strong>Rate Limit Handling:</strong> Validates proper HTTP 429 backoff strategies",
+      "<strong>Data Corruption Resilience:</strong> Ensures functionality with 15-25% malformed responses"
+    ],
+    target: "≥70% success rate, ≤8 second MTTR (Mean Time to Recovery)"
+  },
+  rag_injection: {
+    title: "🔍 RAG Security Benchmark",
+    context: "Information integrity testing based on adversarial retrieval patterns",
+    tests: [
+      "<strong>Context Manipulation:</strong> Tests resistance to prompt injection attacks",
+      "<strong>Information Pollution:</strong> Validates accurate retrieval despite noise"
+    ],
+    target: "Correct information extraction despite benign injection attempts"
+  },
+  rate_limit_backoff: {
+    title: "⚡ Rate Limit Discipline",
+    context: "API best practices from major providers (OpenAI, Twitter, Google)",
+    tests: [
+      "<strong>429 Recovery Pattern:</strong> Validates exponential backoff implementation"
+    ],
+    target: "At least 1 retry with recovery within 10 seconds MTTR"
+  }
+};
+
+// Function to update benchmark explanation
+function updateBenchmarkExplanation(key) {
+  const explanationDiv = document.getElementById('benchmarkExplanation');
+  if (!explanationDiv) return;
+  
+  const explanation = BENCHMARK_EXPLANATIONS[key];
+  if (explanation) {
+    explanationDiv.style.display = 'block';
+    explanationDiv.innerHTML = `
+      <h4 style="color: #00ff41; margin-bottom: 10px;">${explanation.title}</h4>
+      <p style="margin-bottom: 10px;"><strong style="color: #ffff00;">Industry Context:</strong> ${explanation.context}</p>
+      <ul style="margin-left: 20px; margin-bottom: 10px;">
+        ${explanation.tests.map(test => `<li style="margin-bottom: 5px;">${test}</li>`).join('')}
+      </ul>
+      <p style="color: #999; font-style: italic;"><em>Target: ${explanation.target}</em></p>
+    `;
+  } else {
+    explanationDiv.style.display = 'none';
+  }
+}
+
 const BUILT_IN_EVALS = {
   reliability_core: {
     suite: "Reliability Core",
@@ -1953,6 +2071,9 @@ class ChaosSimulator {
   
   loadEvalSuite(key) {
     this.state.evalSuite = BUILT_IN_EVALS[key];
+    
+    // Update benchmark explanation
+    updateBenchmarkExplanation(key);
     
     // Update active state
     document.querySelectorAll('.eval-card').forEach((el, i) => {

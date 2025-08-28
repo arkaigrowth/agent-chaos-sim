@@ -241,6 +241,9 @@
       suite = sel.value==='custom' ? null : BUILT_IN[sel.value];
       out.textContent = '';
       btnJSON.disabled = btnMD.disabled = btnPerm.disabled = true;
+      
+      // Update benchmark explanation
+      updateBenchmarkExplanation(sel.value);
     });
 
     file?.addEventListener('change', async e=>{
@@ -284,6 +287,9 @@
         out.textContent = `Loaded suite from URL: ${obj?.suite || '(unnamed)'} with ${(obj?.cases||[]).length} cases.\n`
       }
     }catch(_){}
+    
+    // Initialize benchmark explanation on page load
+    updateBenchmarkExplanation(sel?.value || 'reliability_core');
   }
 
   // Expose programmatic API for Playwright / CI
@@ -338,6 +344,69 @@
       return summary;
     })(suite, includeBaseline, ids, sink);
   };
+
+  // Benchmark explanations for dynamic UI updates
+  const BENCHMARK_EXPLANATIONS = {
+    reliability_core: {
+      title: "🏭 Reliability Core Benchmark",
+      context: "Essential resilience patterns for 99.9% SLA compliance (43.2 min downtime/month)",
+      tests: [
+        "<strong>Network Timeout Recovery:</strong> Tests graceful handling of slow APIs (2-3 sec delays)",
+        "<strong>Rate Limit Handling:</strong> Validates proper HTTP 429 backoff strategies", 
+        "<strong>Data Corruption Resilience:</strong> Ensures functionality with 15-25% malformed responses"
+      ],
+      target: "≥70% success rate, ≤8 second MTTR (Mean Time to Recovery)"
+    },
+    rag_injection: {
+      title: "🔍 RAG Security Benchmark", 
+      context: "Information integrity validation with benign prompt manipulation resistance",
+      tests: [
+        "<strong>Context Integrity:</strong> Maintains accurate information despite context modifications",
+        "<strong>Prompt Injection Defense:</strong> Resists benign attempts to alter behavior",
+        "<strong>Knowledge Accuracy:</strong> Correctly extracts and presents factual information"
+      ],
+      target: "≥85% accuracy in information extraction, consistent behavior"
+    },
+    rate_limit_backoff: {
+      title: "⚡ Rate Limit Discipline Benchmark",
+      context: "API usage best practices under high-volume conditions", 
+      tests: [
+        "<strong>429 Detection:</strong> Properly recognizes rate limit responses",
+        "<strong>Exponential Backoff:</strong> Implements industry-standard retry patterns",
+        "<strong>Recovery Efficiency:</strong> Maintains service availability during throttling"
+      ],
+      target: "≥1 retry attempt, ≤10 second MTTR, no cascade failures"
+    },
+    custom: {
+      title: "📝 Custom Benchmark Upload",
+      context: "Define your own test scenarios with custom fault injection patterns",
+      tests: [
+        "<strong>YAML Schema:</strong> Define test suite, cases, fault patterns, and success criteria",
+        "<strong>Custom Assertions:</strong> Set your own thresholds and validation rules",
+        "<strong>Reproducible Tests:</strong> Use seeds for consistent, repeatable testing"
+      ],
+      target: "Fully customizable based on your specific SLA requirements"
+    }
+  };
+
+  function updateBenchmarkExplanation(suiteKey) {
+    const explanation = BENCHMARK_EXPLANATIONS[suiteKey];
+    const container = document.getElementById('benchmarkExplanation');
+    
+    if (!explanation || !container) return;
+    
+    container.innerHTML = `
+      <div class="benchmark-info">
+        <h4>${explanation.title}</h4>
+        <p><strong>Industry Context:</strong> ${explanation.context}</p>
+        <ul>
+          ${explanation.tests.map(test => `<li>${test}</li>`).join('')}
+        </ul>
+        <p><em>Target: ${explanation.target}</em></p>
+      </div>
+    `;
+  }
+
 
   document.addEventListener('DOMContentLoaded', boot);
 })();
