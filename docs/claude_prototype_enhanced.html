@@ -871,6 +871,39 @@ summary:hover .chevron-icon {
       <p style="font-size: 14px; line-height: 1.5;">Our benchmarks are based on <strong>chaos engineering practices</strong> from Netflix, Amazon, and Google. Each suite tests real-world failure patterns that production AI agents encounter. <a href="benchmarks.html" target="_blank" style="color: #00ff41;">📚 View Complete Guide</a></p>
     </div>
     
+    <!-- LLM Adapter Configuration Panel -->
+    <div class="adapter-config" style="margin-bottom: 20px; padding: 15px; background: #0a0a0a; border: 1px solid #00ff41; border-radius: 4px;">
+      <h4 style="color: #00ff41; margin-bottom: 12px;">🤖 LLM Configuration</h4>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <select id="llmAdapter" style="padding: 8px; background: #111; color: #00ff41; border: 1px solid #00ff41; border-radius: 4px; font-family: 'Courier New', monospace;">
+          <option value="mock">Mock Agent (localhost:9009)</option>
+          <option value="openai">OpenAI API</option>
+          <option value="http">Custom HTTP Endpoint</option>
+        </select>
+        <input id="apiKey" placeholder="API Key (if needed)" type="password" style="padding: 8px; background: #111; color: #00ff41; border: 1px solid #333; border-radius: 4px; font-family: 'Courier New', monospace; flex: 1; min-width: 200px; display: none;">
+        <input id="endpoint" placeholder="Endpoint URL" value="http://localhost:9009" style="padding: 8px; background: #111; color: #00ff41; border: 1px solid #333; border-radius: 4px; font-family: 'Courier New', monospace; flex: 1; min-width: 250px; display: none;">
+        <button id="testConnection" style="padding: 8px 16px; background: #00ff41; color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Courier New', monospace;">
+          Test Connection
+        </button>
+      </div>
+      <div id="connectionStatus" style="margin-top: 10px; font-size: 13px; display: none;"></div>
+    </div>
+    
+    <!-- Dataset Upload Panel -->
+    <div class="dataset-config" style="margin-bottom: 20px; padding: 15px; background: #0a0a0a; border: 1px solid #333; border-radius: 4px;">
+      <h4 style="color: #00ff41; margin-bottom: 12px;">📊 Test Dataset</h4>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <input type="file" id="datasetFile" accept=".jsonl,.csv,.json" style="display: none;">
+        <label for="datasetFile" style="padding: 8px 16px; background: #111; color: #00ff41; border: 1px solid #00ff41; border-radius: 4px; cursor: pointer; font-family: 'Courier New', monospace;">
+          📁 Upload Dataset
+        </label>
+        <span id="datasetInfo" style="color: #777; font-size: 13px;">No dataset loaded</span>
+        <button id="useSampleData" style="padding: 8px 16px; background: #111; color: #00ff41; border: 1px solid #00ff41; border-radius: 4px; cursor: pointer; font-family: 'Courier New', monospace; margin-left: auto;">
+          Use Sample Data
+        </button>
+      </div>
+    </div>
+    
     <div class="eval-suites" id="evalSuites"></div>
     
     <!-- Dynamic Benchmark Explanation -->
@@ -1872,8 +1905,27 @@ class ChaosSimulator {
         <div style="font-size: 10px; color: #777; margin-top: 8px;">
           ${suite.cases.length} test cases | Min score: ${suite.gate.score_min}%
         </div>
+        <div style="display: flex; gap: 10px; margin-top: 12px;">
+          <button class="run-simulation-btn" style="padding: 6px 12px; background: #111; color: #00ff41; border: 1px solid #00ff41; border-radius: 4px; font-size: 12px; cursor: pointer; font-family: 'Courier New', monospace; flex: 1;">
+            ▶️ Simulate
+          </button>
+          <button class="run-real-test-btn" data-suite="${key}" style="padding: 6px 12px; background: #00ff41; color: #000; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; font-family: 'Courier New', monospace; flex: 1;">
+            🚀 Real Test
+          </button>
+        </div>
       `;
-      card.onclick = () => this.loadEvalSuite(key);
+      card.onclick = (e) => {
+        if (!e.target.classList.contains('run-real-test-btn') && !e.target.classList.contains('run-simulation-btn')) {
+          this.loadEvalSuite(key);
+        }
+      };
+      
+      // Add button event handlers after card is created
+      card.querySelector('.run-simulation-btn').onclick = () => this.loadEvalSuite(key);
+      card.querySelector('.run-real-test-btn').onclick = (e) => {
+        e.stopPropagation();
+        this.runRealTest(key);
+      };
       evalSuitesEl.appendChild(card);
     });
     
@@ -1895,6 +1947,10 @@ class ChaosSimulator {
     
     // Add accessibility enhancements
     this.enhanceAccessibility();
+    
+    // Initialize Real LLM Testing functionality
+    this.initializeAdapters();
+    this.setupLLMControls();
     
     // Parameter section collapse handlers
     document.querySelectorAll('.param-section-title').forEach(title => {
@@ -2498,8 +2554,27 @@ class ChaosSimulator {
         <div style="font-size: 10px; color: #777; margin-top: 8px;">
           ${suite.cases.length} test cases | Min score: ${suite.gate.score_min}%
         </div>
+        <div style="display: flex; gap: 10px; margin-top: 12px;">
+          <button class="run-simulation-btn" style="padding: 6px 12px; background: #111; color: #00ff41; border: 1px solid #00ff41; border-radius: 4px; font-size: 12px; cursor: pointer; font-family: 'Courier New', monospace; flex: 1;">
+            ▶️ Simulate
+          </button>
+          <button class="run-real-test-btn" data-suite="${key}" style="padding: 6px 12px; background: #00ff41; color: #000; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; font-family: 'Courier New', monospace; flex: 1;">
+            🚀 Real Test
+          </button>
+        </div>
       `;
-      card.onclick = () => this.loadEvalSuite(key);
+      card.onclick = (e) => {
+        if (!e.target.classList.contains('run-real-test-btn') && !e.target.classList.contains('run-simulation-btn')) {
+          this.loadEvalSuite(key);
+        }
+      };
+      
+      // Add button event handlers after card is created
+      card.querySelector('.run-simulation-btn').onclick = () => this.loadEvalSuite(key);
+      card.querySelector('.run-real-test-btn').onclick = (e) => {
+        e.stopPropagation();
+        this.runRealTest(key);
+      };
       evalSuitesEl.appendChild(card);
     });
   }
@@ -2606,6 +2681,359 @@ class ChaosSimulator {
       }
     `;
     document.head.appendChild(style);
+  }
+  
+  // ============= REAL LLM TESTING FUNCTIONALITY =============
+  
+  async initializeAdapters() {
+    // Load adapter system
+    if (!window.TaskAdapters) {
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.textContent = `
+        import('/adapters/index.js').then(() => {
+          console.log('✅ Adapters loaded');
+        }).catch(err => {
+          console.error('Failed to load adapters:', err);
+        });
+      `;
+      document.head.appendChild(script);
+    }
+  }
+  
+  setupLLMControls() {
+    const adapterSelect = document.getElementById('llmAdapter');
+    const apiKeyInput = document.getElementById('apiKey');
+    const endpointInput = document.getElementById('endpoint');
+    const testConnectionBtn = document.getElementById('testConnection');
+    const datasetFileInput = document.getElementById('datasetFile');
+    const useSampleDataBtn = document.getElementById('useSampleData');
+    
+    // Show/hide fields based on adapter selection
+    if (adapterSelect) {
+      adapterSelect.onchange = () => {
+        const adapter = adapterSelect.value;
+        apiKeyInput.style.display = adapter === 'openai' ? 'block' : 'none';
+        endpointInput.style.display = adapter === 'http' ? 'block' : 'none';
+        if (adapter === 'mock') {
+          endpointInput.style.display = 'block';
+          endpointInput.value = 'http://localhost:9009';
+        }
+      };
+    }
+    
+    // Test connection button
+    if (testConnectionBtn) {
+      testConnectionBtn.onclick = async () => {
+        await this.testLLMConnection();
+      };
+    }
+    
+    // Dataset upload
+    if (datasetFileInput) {
+      datasetFileInput.onchange = async (e) => {
+        await this.handleDatasetUpload(e.target.files[0]);
+      };
+    }
+    
+    // Use sample data button
+    if (useSampleDataBtn) {
+      useSampleDataBtn.onclick = async () => {
+        await this.loadSampleDataset();
+      };
+    }
+  }
+  
+  async testLLMConnection() {
+    const statusDiv = document.getElementById('connectionStatus');
+    const adapter = document.getElementById('llmAdapter').value;
+    
+    statusDiv.style.display = 'block';
+    statusDiv.innerHTML = '<span style="color: #ffaa00;">🔄 Testing connection...</span>';
+    
+    try {
+      let testUrl;
+      if (adapter === 'mock' || adapter === 'http') {
+        const endpoint = document.getElementById('endpoint').value;
+        testUrl = endpoint.replace(/\/$/,'') + (adapter === 'mock' ? '/healthz' : '/health');
+      } else if (adapter === 'openai') {
+        // For OpenAI, we'll do a minimal test request
+        testUrl = 'https://api.openai.com/v1/models';
+      }
+      
+      const response = await fetch(testUrl, {
+        method: 'GET',
+        headers: adapter === 'openai' ? {
+          'Authorization': 'Bearer ' + document.getElementById('apiKey').value
+        } : {}
+      });
+      
+      if (response.ok) {
+        statusDiv.innerHTML = '<span style="color: #00ff41;">✅ Connection successful!</span>';
+        this.state.llmConnected = true;
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      statusDiv.innerHTML = `<span style="color: #ff4444;">❌ Connection failed: ${error.message}</span>`;
+      this.state.llmConnected = false;
+    }
+  }
+  
+  async handleDatasetUpload(file) {
+    if (!file) return;
+    
+    const info = document.getElementById('datasetInfo');
+    info.textContent = `Loading ${file.name}...`;
+    
+    try {
+      const text = await file.text();
+      let data = [];
+      
+      if (file.name.endsWith('.jsonl')) {
+        // Parse JSONL
+        data = text.trim().split('\n').map(line => JSON.parse(line));
+      } else if (file.name.endsWith('.csv')) {
+        // Simple CSV parsing
+        const lines = text.trim().split('\n');
+        const headers = lines[0].split(',');
+        data = lines.slice(1).map(line => {
+          const values = line.split(',');
+          const obj = {};
+          headers.forEach((h, i) => obj[h.trim()] = values[i]?.trim());
+          return obj;
+        });
+      } else if (file.name.endsWith('.json')) {
+        data = JSON.parse(text);
+      }
+      
+      this.state.testDataset = data;
+      info.textContent = `✅ Loaded ${data.length} test cases from ${file.name}`;
+      info.style.color = '#00ff41';
+    } catch (error) {
+      info.textContent = `❌ Error loading file: ${error.message}`;
+      info.style.color = '#ff4444';
+    }
+  }
+  
+  async loadSampleDataset() {
+    const info = document.getElementById('datasetInfo');
+    info.textContent = 'Loading sample dataset...';
+    
+    // Create sample Q&A dataset
+    const sampleData = [
+      { question: "What is the capital of France?", expected: "Paris" },
+      { question: "What is 2 + 2?", expected: "4" },
+      { question: "Who wrote Romeo and Juliet?", expected: "Shakespeare" },
+      { question: "What is the largest planet?", expected: "Jupiter" },
+      { question: "What year did WW2 end?", expected: "1945" }
+    ];
+    
+    this.state.testDataset = sampleData;
+    info.textContent = `✅ Loaded ${sampleData.length} sample test cases`;
+    info.style.color = '#00ff41';
+  }
+  
+  async runRealTest(suiteKey) {
+    const suite = BUILT_IN_EVALS[suiteKey];
+    if (!suite) {
+      console.error('Suite not found:', suiteKey);
+      return;
+    }
+    
+    // Check prerequisites
+    if (!this.state.testDataset || this.state.testDataset.length === 0) {
+      alert('Please load a dataset first!');
+      return;
+    }
+    
+    const adapter = document.getElementById('llmAdapter').value;
+    if (!window.TaskAdapters) {
+      alert('Adapters not loaded yet. Please wait and try again.');
+      await this.initializeAdapters();
+      return;
+    }
+    
+    // Show progress in timeline
+    this.addTimelineEvent('[REAL TEST] Starting ' + suite.suite, 'eval');
+    
+    try {
+      // Get the adapter
+      const adapterModule = await window.TaskAdapters.getAdapter(adapter === 'mock' ? 'http' : adapter);
+      
+      // Prepare adapter options
+      const opts = {
+        baseUrl: adapter === 'mock' || adapter === 'http' ? 
+          document.getElementById('endpoint').value : undefined,
+        apiKey: adapter === 'openai' ? 
+          document.getElementById('apiKey').value : undefined,
+        model: 'gpt-4o-mini'
+      };
+      
+      // Run baseline (no chaos)
+      this.addTimelineEvent('[REAL TEST] Running baseline...', 'recovery');
+      const baselineResults = await this.runTestSuite(adapterModule, suite, this.state.testDataset, {
+        ...opts,
+        chaos: false
+      });
+      
+      // Run with chaos
+      this.addTimelineEvent('[REAL TEST] Running with chaos...', 'fault');
+      const chaosResults = await this.runTestSuite(adapterModule, suite, this.state.testDataset, {
+        ...opts,
+        chaos: true,
+        chaosConfig: suite.cases[0]?.faults || {
+          latencyMs: 2000,
+          http500Rate: 30,
+          rate429: 25
+        }
+      });
+      
+      // Display comparison
+      this.displayRealTestResults(baselineResults, chaosResults, suite);
+      
+      this.addTimelineEvent('[REAL TEST] Complete!', 'recovery');
+      
+    } catch (error) {
+      console.error('Real test failed:', error);
+      this.addTimelineEvent('[REAL TEST] ERROR: ' + error.message, 'fault');
+      alert('Test failed: ' + error.message);
+    }
+  }
+  
+  async runTestSuite(adapter, suite, dataset, opts) {
+    const results = {
+      total: 0,
+      successful: 0,
+      failed: 0,
+      latencies: [],
+      errors: []
+    };
+    
+    // Run up to 5 test cases
+    const testCases = dataset.slice(0, Math.min(5, dataset.length));
+    
+    for (const testCase of testCases) {
+      results.total++;
+      const startTime = performance.now();
+      
+      try {
+        // Prepare prompt based on test case
+        const prompt = testCase.question || testCase.prompt || JSON.stringify(testCase);
+        
+        // If chaos is enabled, use our backend to inject failures
+        let response;
+        if (opts.chaos) {
+          // Route through our chaos backend
+          response = await this.runWithChaos(prompt, opts.chaosConfig);
+        } else {
+          // Direct call to LLM
+          response = await adapter.runTask(testCase, prompt, opts);
+        }
+        
+        const latency = performance.now() - startTime;
+        results.latencies.push(latency);
+        results.successful++;
+        
+      } catch (error) {
+        results.failed++;
+        results.errors.push(error.message);
+      }
+    }
+    
+    // Calculate metrics
+    results.successRate = (results.successful / results.total) * 100;
+    results.avgLatency = results.latencies.length > 0 ? 
+      results.latencies.reduce((a, b) => a + b, 0) / results.latencies.length : 0;
+    
+    return results;
+  }
+  
+  async runWithChaos(prompt, chaosConfig) {
+    const response = await fetch('/api/complete', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        prompt: prompt,
+        chaos: {
+          error_rate: (chaosConfig.http500Rate || 0) / 100,
+          rate_limit: (chaosConfig.rate429 || 0) / 100,
+          latency_ms: chaosConfig.latencyMs || 0
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+    return await response.json();
+  }
+  
+  displayRealTestResults(baseline, chaos, suite) {
+    // Create results display in debug panel
+    const debugInfo = document.getElementById('debugInfo');
+    
+    const resultsHTML = `
+      <div style="padding: 15px; background: #0a0a0a; border: 1px solid #00ff41; border-radius: 4px; margin-top: 10px;">
+        <h3 style="color: #00ff41; margin-bottom: 15px;">🎯 Real Test Results: ${suite.suite}</h3>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div>
+            <h4 style="color: #00ff41; margin-bottom: 10px;">📊 Baseline (No Chaos)</h4>
+            <div style="font-size: 13px; line-height: 1.6;">
+              <div>Success Rate: <span style="color: #00ff41;">${baseline.successRate.toFixed(1)}%</span></div>
+              <div>Avg Latency: <span style="color: #00ff41;">${baseline.avgLatency.toFixed(0)}ms</span></div>
+              <div>Failed: <span style="color: ${baseline.failed > 0 ? '#ff4444' : '#777'};">${baseline.failed}</span></div>
+            </div>
+          </div>
+          
+          <div>
+            <h4 style="color: #ffaa00; margin-bottom: 10px;">⚡ With Chaos</h4>
+            <div style="font-size: 13px; line-height: 1.6;">
+              <div>Success Rate: <span style="color: ${chaos.successRate < 50 ? '#ff4444' : '#ffaa00'};">${chaos.successRate.toFixed(1)}%</span></div>
+              <div>Avg Latency: <span style="color: #ffaa00;">${chaos.avgLatency.toFixed(0)}ms</span></div>
+              <div>Failed: <span style="color: #ff4444;">${chaos.failed}</span></div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #333;">
+          <h4 style="color: #00ff41; margin-bottom: 10px;">📈 Resilience Analysis</h4>
+          <div style="font-size: 13px; line-height: 1.6;">
+            <div>Degradation: <span style="color: #ffaa00;">${(baseline.successRate - chaos.successRate).toFixed(1)}%</span></div>
+            <div>Latency Impact: <span style="color: #ffaa00;">+${(chaos.avgLatency - baseline.avgLatency).toFixed(0)}ms</span></div>
+            <div>Resilience Score: <span style="color: ${chaos.successRate > 70 ? '#00ff41' : '#ff4444'};">${Math.max(0, chaos.successRate).toFixed(0)}%</span></div>
+          </div>
+        </div>
+        
+        ${chaos.errors.length > 0 ? `
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #333;">
+          <h4 style="color: #ff4444; margin-bottom: 10px;">❌ Errors Encountered</h4>
+          <div style="font-size: 11px; color: #ff4444; font-family: monospace;">
+            ${chaos.errors.slice(0, 3).join('<br>')}
+          </div>
+        </div>
+        ` : ''}
+        
+        <div style="margin-top: 15px; padding: 10px; background: #111; border-radius: 4px;">
+          <strong style="color: #00ff41;">💡 Recommendations:</strong>
+          <ul style="margin: 10px 0 0 20px; font-size: 12px; line-height: 1.5;">
+            ${chaos.successRate < 50 ? '<li>Implement circuit breaker pattern for better failure handling</li>' : ''}
+            ${chaos.avgLatency > 5000 ? '<li>Add timeout and retry logic with exponential backoff</li>' : ''}
+            ${chaos.failed > baseline.failed ? '<li>Implement fallback responses or caching strategy</li>' : ''}
+            <li>Consider implementing health checks and graceful degradation</li>
+          </ul>
+        </div>
+      </div>
+    `;
+    
+    // Show debug panel if hidden
+    this.state.debugMode = true;
+    this.toggleDebug();
+    
+    // Insert results
+    debugInfo.innerHTML = resultsHTML + debugInfo.innerHTML;
   }
   
   loadScenario(index) {
