@@ -493,6 +493,84 @@ body {
   border-color: #00ff41;
 }
 
+/* Collapsible Section Animation Styles */
+.chevron-icon {
+  display: inline-block;
+  transition: transform 0.3s ease;
+  color: #00ff41;
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+details[open] .chevron-icon {
+  transform: rotate(90deg);
+}
+
+.pulse-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #00ff41;
+  border-radius: 50%;
+  margin-left: auto;
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.7);
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: scale(1.1);
+    box-shadow: 0 0 0 10px rgba(0, 255, 65, 0);
+  }
+}
+
+summary:hover .pulse-indicator {
+  animation: pulse-glow 0.5s infinite;
+}
+
+summary:hover .chevron-icon {
+  color: #44ff88;
+  text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+}
+
+/* SLA Standards Panel */
+.sla-standards-panel {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin: 20px 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.sla-standards-header {
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  color: #00ff41;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  list-style: none;
+  outline: none;
+}
+
+.sla-standards-header:hover {
+  background: linear-gradient(135deg, #1f1f1f 0%, #2f2f2f 100%);
+  color: #44ff88;
+}
+
+.sla-standards-header::-webkit-details-marker {
+  display: none;
+}
+
 /* Collapsible Control Panel */
 .control-panel {
   background: #1a1a1a;
@@ -500,6 +578,12 @@ body {
   border-radius: 8px;
   margin-bottom: 20px;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.control-panel.highlight {
+  border: 2px solid #00ff41;
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
 }
 
 .control-panel-header {
@@ -829,55 +913,61 @@ body {
     </div>
   </div>
 
-  <!-- Industry SLA Standards Reference -->
-  <div class="sla-standards" style="margin: 20px 0; padding: 15px; background: #111; border: 1px solid #333; border-radius: 4px;">
-    <h3 style="color: #00ff41; margin-bottom: 15px;">📊 Industry SLA Standards</h3>
-    <div style="overflow-x: auto;">
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-          <tr style="background: #1a1a1a; color: #00ff41;">
-            <th style="padding: 10px; border: 1px solid #333; text-align: left;">Availability</th>
-            <th style="padding: 10px; border: 1px solid #333; text-align: left;">Downtime/Month</th>
-            <th style="padding: 10px; border: 1px solid #333; text-align: left;">Downtime/Year</th>
-            <th style="padding: 10px; border: 1px solid #333; text-align: left;">Use Cases</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #333;">90%</td>
-            <td style="padding: 8px; border: 1px solid #333;">72 hours</td>
-            <td style="padding: 8px; border: 1px solid #333;">36.5 days</td>
-            <td style="padding: 8px; border: 1px solid #333;">Development/testing</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #333;">95%</td>
-            <td style="padding: 8px; border: 1px solid #333;">36 hours</td>
-            <td style="padding: 8px; border: 1px solid #333;">18.25 days</td>
-            <td style="padding: 8px; border: 1px solid #333;">Internal tools</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #333;">99%</td>
-            <td style="padding: 8px; border: 1px solid #333;">7.2 hours</td>
-            <td style="padding: 8px; border: 1px solid #333;">3.65 days</td>
-            <td style="padding: 8px; border: 1px solid #333;">Business applications</td>
-          </tr>
-          <tr style="background: #0a2a0a; color: #00ff41; font-weight: bold;">
-            <td style="padding: 8px; border: 1px solid #333;">99.9%</td>
-            <td style="padding: 8px; border: 1px solid #333;">43.2 minutes</td>
-            <td style="padding: 8px; border: 1px solid #333;">8.7 hours</td>
-            <td style="padding: 8px; border: 1px solid #333;">🎯 Production AI Agents</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #333;">99.99%</td>
-            <td style="padding: 8px; border: 1px solid #333;">4.32 minutes</td>
-            <td style="padding: 8px; border: 1px solid #333;">52.6 minutes</td>
-            <td style="padding: 8px; border: 1px solid #333;">Mission-critical</td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- Industry SLA Standards Reference (Collapsible) -->
+  <details class="sla-standards-panel">
+    <summary class="sla-standards-header">
+      <span class="chevron-icon">▶</span>
+      <span>📊 Industry SLA Standards</span>
+      <span class="pulse-indicator"></span>
+    </summary>
+    <div class="sla-standards-content" style="padding: 15px; background: #111;">
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #1a1a1a; color: #00ff41;">
+              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Availability</th>
+              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Downtime/Month</th>
+              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Downtime/Year</th>
+              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Use Cases</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #333;">90%</td>
+              <td style="padding: 8px; border: 1px solid #333;">72 hours</td>
+              <td style="padding: 8px; border: 1px solid #333;">36.5 days</td>
+              <td style="padding: 8px; border: 1px solid #333;">Development/testing</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #333;">95%</td>
+              <td style="padding: 8px; border: 1px solid #333;">36 hours</td>
+              <td style="padding: 8px; border: 1px solid #333;">18.25 days</td>
+              <td style="padding: 8px; border: 1px solid #333;">Internal tools</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #333;">99%</td>
+              <td style="padding: 8px; border: 1px solid #333;">7.2 hours</td>
+              <td style="padding: 8px; border: 1px solid #333;">3.65 days</td>
+              <td style="padding: 8px; border: 1px solid #333;">Business applications</td>
+            </tr>
+            <tr style="background: #0a2a0a; color: #00ff41; font-weight: bold;">
+              <td style="padding: 8px; border: 1px solid #333;">99.9%</td>
+              <td style="padding: 8px; border: 1px solid #333;">43.2 minutes</td>
+              <td style="padding: 8px; border: 1px solid #333;">8.7 hours</td>
+              <td style="padding: 8px; border: 1px solid #333;">🎯 Production AI Agents</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #333;">99.99%</td>
+              <td style="padding: 8px; border: 1px solid #333;">4.32 minutes</td>
+              <td style="padding: 8px; border: 1px solid #333;">52.6 minutes</td>
+              <td style="padding: 8px; border: 1px solid #333;">Mission-critical</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top: 10px; font-size: 13px; color: #999;">Our benchmarks target <strong style="color: #00ff41;">99.9% SLA</strong> - the industry standard for production AI services.</p>
     </div>
-    <p style="margin-top: 10px; font-size: 13px; color: #999;">Our benchmarks target <strong style="color: #00ff41;">99.9% SLA</strong> - the industry standard for production AI services.</p>
-  </div>
+  </details>
 
   <!-- Evaluation Results -->
   <div class="eval-results" id="evalResults">
@@ -895,10 +985,12 @@ body {
   </div>
 
   <!-- Collapsible Control Panel -->
-  <details class="control-panel" open>
+  <details class="control-panel">
     <summary class="control-panel-header">
-      ⚙️ Chaos Parameters & Recovery Settings
+      <span class="chevron-icon">▶</span>
+      <span>⚙️ Chaos Parameters & Recovery Settings</span>
       <span style="font-size: 11px; color: #777; margin-left: 10px;">(Click scenarios above to auto-populate)</span>
+      <span class="pulse-indicator"></span>
     </summary>
     
     <div class="control-panel-content">
@@ -1095,9 +1187,12 @@ body {
         <div id="debugInfo" style="font-size: 11px; color: #777; line-height: 1.4;"></div>
       </div>
       <!-- Right Panel: Live JSON Log Viewer -->
-      <div style="flex: 1; padding: 15px; background: #0a0a0a;">
-        <div style="color: #00ff41; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">📊 LIVE JSON LOG</div>
-        <div id="jsonLogViewer" style="font-size: 10px; color: #999; font-family: 'Courier New', monospace; height: 150px; overflow-y: auto; background: #050505; padding: 8px; border: 1px solid #222; border-radius: 3px; line-height: 1.3;"></div>
+      <div style="flex: 1; padding: 15px; background: #0a0a0a; position: relative;">
+        <div style="color: #00ff41; font-size: 11px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">
+          📊 LIVE JSON LOG
+          <button id="jsonCopyBtn" style="position: absolute; right: 15px; top: 15px; background: rgba(0, 0, 0, 0.8); border: 1px solid #333; color: #00ff41; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all 0.2s;" onclick="copyJsonLog()">📋 Copy</button>
+        </div>
+        <div id="jsonLogViewer" style="font-size: 11px; color: #999; font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace; height: 200px; overflow-y: auto; background: #050505; padding: 12px; border: 2px solid #222; border-radius: 6px; line-height: 1.4; scrollbar-width: thin; scrollbar-color: #333 #050505;"></div>
       </div>
     </div>
   </div>
@@ -1226,6 +1321,35 @@ const BUILT_IN_EVALS = {
     gate: { score_min: 60 }
   }
 };
+
+// Copy JSON Log function
+function copyJsonLog() {
+  const jsonViewer = document.getElementById('jsonLogViewer');
+  const copyBtn = document.getElementById('jsonCopyBtn');
+  
+  // Get text content without HTML tags
+  const textContent = jsonViewer.innerText || jsonViewer.textContent;
+  
+  navigator.clipboard.writeText(textContent).then(() => {
+    // Success feedback
+    copyBtn.innerHTML = '✅ Copied!';
+    copyBtn.style.background = 'rgba(0, 255, 65, 0.2)';
+    copyBtn.style.borderColor = '#00ff41';
+    
+    // Reset after 2 seconds
+    setTimeout(() => {
+      copyBtn.innerHTML = '📋 Copy';
+      copyBtn.style.background = 'rgba(0, 0, 0, 0.8)';
+      copyBtn.style.borderColor = '#333';
+    }, 2000);
+  }).catch(err => {
+    console.error('Failed to copy:', err);
+    copyBtn.innerHTML = '❌ Failed';
+    setTimeout(() => {
+      copyBtn.innerHTML = '📋 Copy';
+    }, 2000);
+  });
+}
 
 // Scenario configurations (preserved from original)
 const scenarios = [
@@ -1791,6 +1915,9 @@ class ChaosSimulator {
     
     // Data export handlers
     this.setupExportHandlers();
+    
+    // Add accessibility enhancements
+    this.enhanceAccessibility();
     
     // Parameter section collapse handlers
     document.querySelectorAll('.param-section-title').forEach(title => {
@@ -2438,9 +2565,92 @@ class ChaosSimulator {
     document.getElementById('debugBtn').style.color = this.state.debugMode ? '#000' : '#00ff41';
   }
   
+  enhanceAccessibility() {
+    // Add ARIA attributes and keyboard navigation to collapsible sections
+    document.querySelectorAll('summary').forEach(summary => {
+      // Add role and aria-expanded attributes
+      summary.setAttribute('role', 'button');
+      summary.setAttribute('tabindex', '0');
+      const isOpen = summary.parentElement.hasAttribute('open');
+      summary.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      
+      // Add keyboard support (Enter and Space keys)
+      summary.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.click();
+        }
+      });
+      
+      // Update aria-expanded when clicked
+      summary.addEventListener('click', function() {
+        setTimeout(() => {
+          const isOpen = this.parentElement.hasAttribute('open');
+          this.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }, 10);
+      });
+    });
+    
+    // Add aria-label to important interactive elements
+    const ariaLabels = {
+      'runBtn': 'Run chaos simulation',
+      'runEvalBtn': 'Run evaluation suite',
+      'pauseBtn': 'Pause simulation',
+      'resetBtn': 'Reset simulation',
+      'randomBtn': 'Randomize chaos parameters',
+      'clearBtn': 'Clear all parameters',
+      'debugBtn': 'Toggle debug mode',
+      'jsonCopyBtn': 'Copy JSON log to clipboard'
+    };
+    
+    Object.entries(ariaLabels).forEach(([id, label]) => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.setAttribute('aria-label', label);
+      }
+    });
+    
+    // Improve focus indicators for keyboard navigation
+    const style = document.createElement('style');
+    style.textContent = `
+      summary:focus {
+        outline: 2px solid #00ff41;
+        outline-offset: 2px;
+      }
+      
+      button:focus, .control-btn:focus {
+        outline: 2px solid #00ff41;
+        outline-offset: 2px;
+      }
+      
+      input:focus, select:focus {
+        outline: 2px solid #00ff41;
+        outline-offset: 1px;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
   loadScenario(index) {
     const scenario = scenarios[index];
     this.state.scenario = scenario;
+    
+    // Auto-expand chaos parameters panel when scenario is selected
+    const chaosPanel = document.querySelector('.control-panel');
+    if (chaosPanel && !chaosPanel.hasAttribute('open')) {
+      chaosPanel.setAttribute('open', 'true');
+      
+      // Add temporary highlight effect
+      chaosPanel.classList.add('highlight');
+      setTimeout(() => {
+        chaosPanel.classList.remove('highlight');
+      }, 2000);
+      
+      // Smooth scroll to parameters section
+      setTimeout(() => {
+        chaosPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
     
     // Log scenario selection
     if (this.dataCollector) {
@@ -2823,12 +3033,19 @@ class ChaosSimulator {
   }
   
   formatJsonForTerminal(obj) {
-    const json = JSON.stringify(obj, null, 1);
+    const json = JSON.stringify(obj, null, 2);
     return json
-      .replace(/"([^"]+)":/g, '<span style="color: #00ff41;">"$1"</span>:')
+      // Enhanced syntax highlighting
+      .replace(/"([^"]+)":/g, '<span style="color: #00ff41; font-weight: bold;">"$1"</span>:')
       .replace(/: "([^"]*)"/g, ': <span style="color: #88ff88;">"$1"</span>')
-      .replace(/: ([0-9.]+)/g, ': <span style="color: #ffaa00;">$1</span>')
-      .replace(/: (null|true|false)/g, ': <span style="color: #ff8888;">$1</span>');
+      .replace(/: ([0-9.]+)/g, ': <span style="color: #ffaa00; font-weight: bold;">$1</span>')
+      .replace(/: (null|true|false)/g, ': <span style="color: #ff8888; font-weight: bold;">$1</span>')
+      // Add indentation guides (subtle)
+      .replace(/^(\s+)/gm, (match) => '<span style="color: #333;">' + match.replace(/ /g, '·') + '</span>')
+      // Highlight brackets and braces
+      .replace(/[\{\[\}\]]/g, '<span style="color: #00ff41; font-weight: bold;">$&</span>')
+      // Highlight commas
+      .replace(/,$/gm, '<span style="color: #666;">,</span>');
   }
   
   render() {
