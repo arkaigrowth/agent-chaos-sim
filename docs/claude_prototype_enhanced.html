@@ -506,36 +506,26 @@ details[open] .chevron-icon {
   transform: rotate(90deg);
 }
 
-.pulse-indicator {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: #00ff41;
-  border-radius: 50%;
-  margin-left: auto;
+/* Chevron pulsing animation */
+.chevron-icon {
   animation: pulse-glow 2s infinite;
 }
 
 @keyframes pulse-glow {
   0%, 100% { 
     opacity: 1; 
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.7);
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
   }
   50% { 
-    opacity: 0.7; 
-    transform: scale(1.1);
-    box-shadow: 0 0 0 10px rgba(0, 255, 65, 0);
+    opacity: 0.8; 
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.9), 0 0 15px rgba(0, 255, 65, 0.6);
   }
 }
 
-summary:hover .pulse-indicator {
-  animation: pulse-glow 0.5s infinite;
-}
-
+/* Enhanced chevron hover effect */
 summary:hover .chevron-icon {
   color: #44ff88;
-  text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+  animation: pulse-glow 0.8s infinite;
 }
 
 /* SLA Standards Panel */
@@ -913,61 +903,6 @@ summary:hover .chevron-icon {
     </div>
   </div>
 
-  <!-- Industry SLA Standards Reference (Collapsible) -->
-  <details class="sla-standards-panel">
-    <summary class="sla-standards-header">
-      <span class="chevron-icon">▶</span>
-      <span>📊 Industry SLA Standards</span>
-      <span class="pulse-indicator"></span>
-    </summary>
-    <div class="sla-standards-content" style="padding: 15px; background: #111;">
-      <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background: #1a1a1a; color: #00ff41;">
-              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Availability</th>
-              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Downtime/Month</th>
-              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Downtime/Year</th>
-              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Use Cases</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style="padding: 8px; border: 1px solid #333;">90%</td>
-              <td style="padding: 8px; border: 1px solid #333;">72 hours</td>
-              <td style="padding: 8px; border: 1px solid #333;">36.5 days</td>
-              <td style="padding: 8px; border: 1px solid #333;">Development/testing</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; border: 1px solid #333;">95%</td>
-              <td style="padding: 8px; border: 1px solid #333;">36 hours</td>
-              <td style="padding: 8px; border: 1px solid #333;">18.25 days</td>
-              <td style="padding: 8px; border: 1px solid #333;">Internal tools</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; border: 1px solid #333;">99%</td>
-              <td style="padding: 8px; border: 1px solid #333;">7.2 hours</td>
-              <td style="padding: 8px; border: 1px solid #333;">3.65 days</td>
-              <td style="padding: 8px; border: 1px solid #333;">Business applications</td>
-            </tr>
-            <tr style="background: #0a2a0a; color: #00ff41; font-weight: bold;">
-              <td style="padding: 8px; border: 1px solid #333;">99.9%</td>
-              <td style="padding: 8px; border: 1px solid #333;">43.2 minutes</td>
-              <td style="padding: 8px; border: 1px solid #333;">8.7 hours</td>
-              <td style="padding: 8px; border: 1px solid #333;">🎯 Production AI Agents</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; border: 1px solid #333;">99.99%</td>
-              <td style="padding: 8px; border: 1px solid #333;">4.32 minutes</td>
-              <td style="padding: 8px; border: 1px solid #333;">52.6 minutes</td>
-              <td style="padding: 8px; border: 1px solid #333;">Mission-critical</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p style="margin-top: 10px; font-size: 13px; color: #999;">Our benchmarks target <strong style="color: #00ff41;">99.9% SLA</strong> - the industry standard for production AI services.</p>
-    </div>
-  </details>
 
   <!-- Evaluation Results -->
   <div class="eval-results" id="evalResults">
@@ -990,7 +925,6 @@ summary:hover .chevron-icon {
       <span class="chevron-icon">▶</span>
       <span>⚙️ Chaos Parameters & Recovery Settings</span>
       <span style="font-size: 11px; color: #777; margin-left: 10px;">(Click scenarios above to auto-populate)</span>
-      <span class="pulse-indicator"></span>
     </summary>
     
     <div class="control-panel-content">
@@ -1174,6 +1108,61 @@ summary:hover .chevron-icon {
   <div class="timeline" id="timeline">
     <span style="color: #00ff41;">TIMELINE:</span>
   </div>
+
+  <!-- Industry SLA Standards Reference (Collapsible) -->
+  <details class="sla-standards-panel">
+    <summary class="sla-standards-header">
+      <span class="chevron-icon">▶</span>
+      <span>📊 Industry SLA Standards</span>
+    </summary>
+    <div class="sla-standards-content" style="padding: 15px; background: #111;">
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #1a1a1a; color: #00ff41;">
+              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Availability</th>
+              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Downtime/Month</th>
+              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Downtime/Year</th>
+              <th style="padding: 10px; border: 1px solid #333; text-align: left;">Use Cases</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #333;">90%</td>
+              <td style="padding: 8px; border: 1px solid #333;">72 hours</td>
+              <td style="padding: 8px; border: 1px solid #333;">36.5 days</td>
+              <td style="padding: 8px; border: 1px solid #333;">Development/testing</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #333;">95%</td>
+              <td style="padding: 8px; border: 1px solid #333;">36 hours</td>
+              <td style="padding: 8px; border: 1px solid #333;">18.25 days</td>
+              <td style="padding: 8px; border: 1px solid #333;">Internal tools</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #333;">99%</td>
+              <td style="padding: 8px; border: 1px solid #333;">7.2 hours</td>
+              <td style="padding: 8px; border: 1px solid #333;">3.65 days</td>
+              <td style="padding: 8px; border: 1px solid #333;">Business applications</td>
+            </tr>
+            <tr style="background: #0a2a0a; color: #00ff41; font-weight: bold;">
+              <td style="padding: 8px; border: 1px solid #333;">99.9%</td>
+              <td style="padding: 8px; border: 1px solid #333;">43.2 minutes</td>
+              <td style="padding: 8px; border: 1px solid #333;">8.7 hours</td>
+              <td style="padding: 8px; border: 1px solid #333;">🎯 Production AI Agents</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #333;">99.99%</td>
+              <td style="padding: 8px; border: 1px solid #333;">4.32 minutes</td>
+              <td style="padding: 8px; border: 1px solid #333;">52.6 minutes</td>
+              <td style="padding: 8px; border: 1px solid #333;">Mission-critical</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top: 10px; font-size: 13px; color: #999;">Our benchmarks target <strong style="color: #00ff41;">99.9% SLA</strong> - the industry standard for production AI services.</p>
+    </div>
+  </details>
 
   <!-- Enhanced Debug Panel with Dual-Pane Layout -->
   <div id="debugPanel" style="display:block; background: #111; border: 1px solid #333; border-radius: 4px; margin-top: 10px; overflow: hidden;">
