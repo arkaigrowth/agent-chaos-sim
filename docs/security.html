@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔒 Security Guidelines - Agent Chaos Monkey</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  color: #e0e0e0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #ff6600 0%, #ff4444 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(255, 102, 0, 0.3);
+}
+
+.header h1 {
+  font-size: 3em;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.header .subtitle {
+  font-size: 1.3em;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.nav-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.nav-card:hover {
+  background: rgba(255, 102, 0, 0.1);
+  border-color: #ff6600;
+  transform: translateY(-2px);
+}
+
+.nav-card .icon {
+  font-size: 2em;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+.sidebar {
+  position: sticky;
+  top: 20px;
+}
+
+.toc {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toc h3 {
+  color: #ff6600;
+  margin-bottom: 15px;
+  font-size: 1.1em;
+}
+
+.toc ul {
+  list-style: none;
+}
+
+.toc li {
+  margin-bottom: 8px;
+}
+
+.toc a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 0.9em;
+  padding: 5px 0;
+  display: block;
+  border-left: 2px solid transparent;
+  padding-left: 10px;
+  transition: all 0.2s ease;
+}
+
+.toc a:hover, .toc a.active {
+  color: #ff6600;
+  border-left-color: #ff6600;
+}
+
+.main-content {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  padding: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.section {
+  margin-bottom: 40px;
+  scroll-margin-top: 80px;
+}
+
+.section h2 {
+  color: #ff6600;
+  font-size: 2.2em;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.section h3 {
+  color: #ffaa66;
+  font-size: 1.6em;
+  margin-bottom: 15px;
+  margin-top: 25px;
+}
+
+.section h4 {
+  color: #ff8844;
+  font-size: 1.3em;
+  margin-bottom: 12px;
+  margin-top: 20px;
+}
+
+.warning-box {
+  background: linear-gradient(135deg, rgba(255, 68, 68, 0.1) 0%, rgba(255, 102, 0, 0.1) 100%);
+  border: 1px solid #ff4444;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border-left: 4px solid #ff4444;
+}
+
+.success-box {
+  background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(0, 200, 50, 0.1) 100%);
+  border: 1px solid #00ff41;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border-left: 4px solid #00ff41;
+}
+
+.info-box {
+  background: linear-gradient(135deg, rgba(102, 153, 255, 0.1) 0%, rgba(51, 102, 204, 0.1) 100%);
+  border: 1px solid #6699ff;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border-left: 4px solid #6699ff;
+}
+
+.code-block {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 15px 0;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.9em;
+  overflow-x: auto;
+  position: relative;
+}
+
+.code-block::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  color: #666;
+  font-size: 0.8em;
+  text-transform: uppercase;
+}
+
+.checklist {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.checklist-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #ff6600;
+}
+
+.deployment-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.deployment-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.deployment-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(255, 102, 0, 0.2);
+}
+
+.deployment-card h4 {
+  color: #ff6600;
+  margin-bottom: 15px;
+  font-size: 1.4em;
+}
+
+.security-level {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8em;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.security-high { background: #00ff41; color: #000; }
+.security-medium { background: #ffaa00; color: #000; }
+.security-low { background: #ff4444; color: #fff; }
+
+ul, ol {
+  margin-left: 20px;
+  margin-bottom: 15px;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+.data-flow {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 30px;
+  margin: 20px 0;
+  text-align: center;
+  font-family: monospace;
+  font-size: 1.1em;
+  line-height: 2;
+}
+
+.highlight {
+  background: rgba(255, 102, 0, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #ff6600;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar {
+    order: -1;
+    position: static;
+  }
+  
+  .nav-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .header h1 {
+    font-size: 2em;
+  }
+  
+  .main-content {
+    padding: 20px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>🔒 Security Guidelines</h1>
+    <div class="subtitle">Agent Chaos Monkey Security Documentation</div>
+  </div>
+
+  <div class="nav-grid">
+    <div class="nav-card" onclick="scrollToSection('current-model')">
+      <span class="icon">🔐</span>
+      <strong>Current Model</strong>
+    </div>
+    <div class="nav-card" onclick="scrollToSection('considerations')">
+      <span class="icon">⚠️</span>
+      <strong>Security Risks</strong>
+    </div>
+    <div class="nav-card" onclick="scrollToSection('deployment')">
+      <span class="icon">🛠️</span>
+      <strong>Deployment</strong>
+    </div>
+    <div class="nav-card" onclick="scrollToSection('best-practices')">
+      <span class="icon">🎯</span>
+      <strong>Best Practices</strong>
+    </div>
+    <div class="nav-card" onclick="scrollToSection('incident-response')">
+      <span class="icon">🚨</span>
+      <strong>Incident Response</strong>
+    </div>
+    <div class="nav-card" onclick="scrollToSection('checklist')">
+      <span class="icon">📋</span>
+      <strong>Checklist</strong>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="sidebar">
+      <div class="toc">
+        <h3>📑 Table of Contents</h3>
+        <ul>
+          <li><a href="#current-model">Current Security Model</a></li>
+          <li><a href="#considerations">Security Considerations</a></li>
+          <li><a href="#deployment">Deployment Options</a></li>
+          <li><a href="#best-practices">Best Practices</a></li>
+          <li><a href="#incident-response">Incident Response</a></li>
+          <li><a href="#advanced">Advanced Measures</a></li>
+          <li><a href="#checklist">Security Checklist</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="section" id="current-model">
+        <h2>🔐 Current Security Model</h2>
+        
+        <div class="info-box">
+          <h4>🔑 API Key Handling</h4>
+          <ul>
+            <li><strong>Client-Side Only</strong>: API keys never leave your browser or reach our servers</li>
+            <li><strong>Direct Connections</strong>: Your browser connects directly to OpenAI/custom APIs</li>
+            <li><strong>No Persistence</strong>: Keys are cleared on page refresh</li>
+            <li><strong>Password Input</strong>: Keys are masked in the UI</li>
+          </ul>
+        </div>
+
+        <h3>📊 Data Flow</h3>
+        <div class="data-flow">
+          Browser → OpenAI API (Direct)<br>
+          Browser → Custom Agent (Direct)<br>
+          Browser → Mock Agent (localhost:9009)
+        </div>
+        
+        <div class="success-box">
+          <strong>✅ Privacy Guarantee:</strong> Our servers never see your API keys or prompts.
+        </div>
+      </div>
+
+      <div class="section" id="considerations">
+        <h2>⚠️ Security Considerations</h2>
+        
+        <div class="warning-box">
+          <h4>🌐 Browser-Based Risks</h4>
+          <ol>
+            <li><strong>Developer Tools</strong>: Keys visible in browser console/network tab</li>
+            <li><strong>Shared Computers</strong>: Keys remain in memory until page refresh</li>
+            <li><strong>XSS Attacks</strong>: Malicious scripts could theoretically access keys</li>
+            <li><strong>Browser Extensions</strong>: Some extensions can read page content</li>
+          </ol>
+        </div>
+
+        <h3>✅ Recommended Safety Practices</h3>
+        
+        <h4>For Testing/Development</h4>
+        <ul>
+          <li>✅ Use dedicated test API keys with low limits</li>
+          <li>✅ Test on local/private networks when possible</li>
+          <li>✅ Clear browser data after testing</li>
+          <li>✅ Use the mock agent when possible (no API key needed)</li>
+        </ul>
+
+        <h4>For Production/Sensitive Use</h4>
+        <ul>
+          <li>🚫 <strong>Don't use production API keys in the browser</strong></li>
+          <li>✅ Implement server-side proxy with your own auth</li>
+          <li>✅ Use API key rotation strategies</li>
+          <li>✅ Monitor API usage for anomalies</li>
+        </ul>
+      </div>
+
+      <div class="section" id="deployment">
+        <h2>🛠️ Secure Deployment Options</h2>
+        
+        <div class="deployment-cards">
+          <div class="deployment-card">
+            <h4>Option 1: Mock Agent Only</h4>
+            <div class="security-level security-high">MOST SECURE</div>
+            <div class="code-block" data-lang="bash"># No external API keys needed
+npm run dev:node
+# Use "Mock Agent (localhost:9009)" in UI</div>
+            <p>Perfect for learning chaos engineering concepts without any external API dependencies.</p>
+          </div>
+
+          <div class="deployment-card">
+            <h4>Option 2: Server-Side Proxy</h4>
+            <div class="security-level security-high">PRODUCTION READY</div>
+            <div class="code-block" data-lang="javascript">// Your secure server
+app.post('/api/llm-proxy', authenticate, async (req, res) => {
+  // Use YOUR API key server-side
+  const response = await openai.completions.create({
+    model: 'gpt-4',
+    messages: req.body.messages
+  });
+  res.json(response);
+});
+
+// In the chaos testing UI:
+// Select "Custom HTTP Endpoint"
+// Use: https://your-secure-server.com/api/llm-proxy</div>
+            <p>Recommended approach for production deployments with proper authentication.</p>
+          </div>
+
+          <div class="deployment-card">
+            <h4>Option 3: Environment Variables</h4>
+            <div class="security-level security-medium">DEVELOPMENT</div>
+            <div class="code-block" data-lang="bash"># Set in your environment
+export OPENAI_API_KEY=sk-...
+
+# Modify the adapter to read from server-side
+# (Requires backend modification)</div>
+            <p>Suitable for development environments with proper access controls.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="best-practices">
+        <h2>🎯 Best Practices</h2>
+        
+        <h3>Development Testing</h3>
+        <ol>
+          <li><strong>Create Test Keys</strong>: Use OpenAI's test keys with low limits</li>
+          <li><strong>Local Testing</strong>: Run on localhost, not public networks</li>
+          <li><strong>Key Rotation</strong>: Rotate test keys regularly</li>
+          <li><strong>Monitor Usage</strong>: Watch for unexpected API calls</li>
+        </ol>
+
+        <h3>Production Deployment</h3>
+        <ol>
+          <li><strong>Server-Side Proxy</strong>: Never expose real API keys to browsers</li>
+          <li><strong>Authentication</strong>: Require user auth before accessing chaos testing</li>
+          <li><strong>Rate Limiting</strong>: Implement your own rate limits</li>
+          <li><strong>Audit Logging</strong>: Log all API usage for monitoring</li>
+        </ol>
+      </div>
+
+      <div class="section" id="incident-response">
+        <h2>🚨 If Your API Key is Compromised</h2>
+        
+        <div class="warning-box">
+          <h4>⚡ Immediate Actions</h4>
+          <ol>
+            <li><strong>Revoke Key</strong>: Delete the compromised key immediately</li>
+            <li><strong>Check Usage</strong>: Review API usage logs for unauthorized calls</li>
+            <li><strong>Create New Key</strong>: Generate a fresh API key</li>
+            <li><strong>Update Limits</strong>: Set strict usage limits on new keys</li>
+          </ol>
+        </div>
+
+        <h3>🔗 OpenAI Specific Resources</h3>
+        <div class="code-block" data-lang="bash"># Check usage at: https://platform.openai.com/usage
+# Revoke keys at: https://platform.openai.com/api-keys
+# Set limits at: https://platform.openai.com/settings/limits</div>
+      </div>
+
+      <div class="section" id="advanced">
+        <h2>🔐 Advanced Security Measures</h2>
+        
+        <h3>Content Security Policy (CSP)</h3>
+        <div class="code-block" data-lang="html">&lt;meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self'; 
+               connect-src 'self' https://api.openai.com https://localhost:9009;"&gt;</div>
+
+        <h3>HTTPS Only</h3>
+        <div class="code-block" data-lang="javascript">// Enforce HTTPS in production
+if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+  location.replace(`https:${location.href.substring(location.protocol.length)}`);
+}</div>
+
+        <h3>Key Obfuscation</h3>
+        <div class="code-block" data-lang="javascript">// Simple client-side obfuscation (not cryptographically secure)
+function obfuscateKey(key) {
+  return btoa(key).split('').reverse().join('');
+}
+
+function deobfuscateKey(obfuscated) {
+  return atob(obfuscated.split('').reverse().join('');
+}</div>
+      </div>
+
+      <div class="section" id="checklist">
+        <h2>📋 Security Checklist</h2>
+        
+        <h3>Before Testing</h3>
+        <div class="checklist">
+          <div class="checklist-item">
+            <input type="checkbox" id="check1">
+            <label for="check1">Using test API keys with limits?</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="check2">
+            <label for="check2">Testing on private network?</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="check3">
+            <label for="check3">Browser privacy mode enabled?</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="check4">
+            <label for="check4">Understanding of data flow?</label>
+          </div>
+        </div>
+
+        <h3>During Testing</h3>
+        <div class="checklist">
+          <div class="checklist-item">
+            <input type="checkbox" id="check5">
+            <label for="check5">Keys masked in UI?</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="check6">
+            <label for="check6">No screenshots with keys visible?</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="check7">
+            <label for="check7">Network requests going directly to APIs?</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="check8">
+            <label for="check8">Mock agent working for non-API tests?</label>
+          </div>
+        </div>
+
+        <h3>After Testing</h3>
+        <div class="checklist">
+          <div class="checklist-item">
+            <input type="checkbox" id="check9">
+            <label for="check9">Page refreshed to clear memory?</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="check10">
+            <label for="check10">Browser data cleared if needed?</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="check11">
+            <label for="check11">API usage reviewed?</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="check12">
+            <label for="check12">Test keys rotated if compromised?</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="info-box">
+          <h4>🎓 Security Education</h4>
+          <p><strong>For Users:</strong> Browser-based tools have inherent security trade-offs. Understanding the convenience vs security spectrum helps you make informed decisions about when to use mock vs real agents.</p>
+          <p><strong>For Developers:</strong> Client-side security has limitations. Implementing server-side proxy patterns, API key management best practices, and monitoring strategies provides defense in depth.</p>
+        </div>
+
+        <div class="warning-box">
+          <strong>⚠️ Remember:</strong> This tool is designed for development and testing. For production AI agent monitoring, implement proper server-side security measures.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function scrollToSection(sectionId) {
+  document.getElementById(sectionId).scrollIntoView({ 
+    behavior: 'smooth',
+    block: 'start'
+  });
+}
+
+// Update active TOC link based on scroll position
+function updateActiveTOC() {
+  const sections = document.querySelectorAll('.section[id]');
+  const tocLinks = document.querySelectorAll('.toc a');
+  
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - 100;
+    if (window.scrollY >= sectionTop) {
+      current = section.getAttribute('id');
+    }
+  });
+
+  tocLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href').substring(1) === current) {
+      link.classList.add('active');
+    }
+  });
+}
+
+window.addEventListener('scroll', updateActiveTOC);
+window.addEventListener('load', updateActiveTOC);
+
+// Persist checklist state
+document.querySelectorAll('.checklist input[type="checkbox"]').forEach(checkbox => {
+  // Load saved state
+  const saved = localStorage.getItem(`security-check-${checkbox.id}`);
+  if (saved === 'true') {
+    checkbox.checked = true;
+  }
+  
+  // Save state on change
+  checkbox.addEventListener('change', () => {
+    localStorage.setItem(`security-check-${checkbox.id}`, checkbox.checked);
+  });
+});
+</script>
+
+</body>
+</html>
