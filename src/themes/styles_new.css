@@ -2,19 +2,19 @@
 
 :root {
   /* Base chaos/hazard palette */
-  --primary: #ffff00;
-  --secondary: #ff6600;
-  --danger: #ff0000;
-  --success: #00ff00;
-  --background: #1a1a1a;
+  --primary: #00ff41;
+  --secondary: #00cc33;
+  --danger: #ff3333;
+  --success: #00ff41;
+  --background: #0a0a0a;
   
   /* Brutalist extensions */
-  --surface: #2d2d2d;
-  --surface-harsh: #404040;
-  --text: #ffffff;
-  --text-contrast: #000000;
-  --border: #666666;
-  --accent: #ff00ff;
+  --surface: #1a1a1a;
+  --surface-harsh: #2a2a2a;
+  --text: #00ff41;
+  --text-contrast: #0a0a0a;
+  --border: #00ff41;
+  --accent: #00ffcc;
   
   /* Raw, industrial elements */
   --border-radius: 0px;
