@@ -14,9 +14,9 @@ const MOCK_AGENT_PORT = process.env.MOCK_AGENT_PORT || 9009;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/docs', express.static(path.join(__dirname, 'docs')));
-app.use('/archive', express.static(path.join(__dirname, 'archive')));
+app.use(express.static(path.join(__dirname, '../../public')));
+app.use('/docs', express.static(path.join(__dirname, '../../docs')));
+app.use('/archive', express.static(path.join(__dirname, '../../archive')));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -137,7 +137,7 @@ let mockAgent = null;
 function startMockAgent() {
   console.log(`Starting mock agent on port ${MOCK_AGENT_PORT}...`);
   mockAgent = spawn('node', [
-    path.join(__dirname, 'tests', 'mock-agent', 'enhanced-server.js')
+    path.join(__dirname, '../../tests', 'mock-agent', 'enhanced-server.js')
   ], {
     env: { ...process.env, MOCK_AGENT_PORT },
     stdio: 'inherit'

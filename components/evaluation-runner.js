@@ -139,7 +139,9 @@ class EvaluationRunner {
     if (!select) return;
 
     // Clear existing options except the custom one
-    select.innerHTML = '';
+    while (select.firstChild) {
+      select.removeChild(select.firstChild);
+    }
     
     // Add built-in suites
     Object.entries(this.builtInSuites).forEach(([key, suite]) => {
@@ -164,10 +166,17 @@ class EvaluationRunner {
       uploadRow.id = 'evalUploadRow';
       uploadRow.className = 'eval-upload-row';
       
-      uploadRow.innerHTML = `
-        <input type="file" id="evalFile" accept=".yml,.yaml,.json" />
-        <small class="hint">Schema: suite → cases[] with scenario, seeds[], faults{}, assertions[]</small>
-      `;
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.id = 'evalFile';
+      fileInput.accept = '.yml,.yaml,.json';
+      
+      const hint = document.createElement('small');
+      hint.className = 'hint';
+      hint.textContent = 'Schema: suite → cases[] with scenario, seeds[], faults{}, assertions[]';
+      
+      uploadRow.appendChild(fileInput);
+      uploadRow.appendChild(hint);
       
       const controls = document.querySelector('.eval-controls');
       if (controls) {

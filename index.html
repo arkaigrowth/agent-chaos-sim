@@ -1,42 +1,383 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Agent Chaos Monkey - Redirecting to Simulation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="refresh" content="0; url=docs/claude_prototype_enhanced.html">
-  <style>
-    body {
-      background: #0a0a0a;
-      color: #00ff41;
-      font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      text-align: center;
-    }
-    .redirect-message {
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-  </style>
-  <script>
-    // Fallback redirect if meta refresh doesn't work
-    setTimeout(function() {
-      window.location.href = 'docs/claude_prototype_enhanced.html';
-    }, 100);
-  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chaos Lab - Agent Resilience Tester</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/themes/styles_new.css" />
 </head>
 <body>
-  <div class="redirect-message">
-    <h1>🎭 Agent Chaos Monkey</h1>
-    <p>Redirecting to Chaos Simulation Playground...</p>
-    <p><a href="docs/claude_prototype_enhanced.html" style="color: #00ff41;">Click here if not redirected automatically</a></p>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">CHAOS LAB</div>
+    <select class="theme-selector" id="themeSelector">
+      <option>THEME ▼</option>
+      <option value="modern">MODERN FLAT</option>
+      <option value="neumorphic">NEUMORPHIC</option>
+      <option value="geometric">BOLD GEOMETRIC</option>
+      <option value="glass">GLASSMORPHISM</option>
+      <option value="brutalist" selected>NEO-BRUTALIST</option>
+    </select>
   </div>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1 class="hero-title">CHAOS LAB</h1>
+    <p class="hero-subtitle">INDUSTRIAL TESTING FOR MAXIMUM AGENT RESILIENCE</p>
+    <button class="btn btn-hero" onclick="window.scrollTo({top: document.querySelector('.story').offsetTop, behavior: 'smooth'})">INITIATE SYSTEMS</button>
+  </div>
+
+  <!-- Story Steps -->
+  <div class="story">
+    <div class="step">
+      <div class="step-title">PICK TARGET</div>
+      <span class="step-subtitle">WEB · MINI-RAG · JSON→TABLE</span>
+    </div>
+    <div class="step">
+      <div class="step-title">RUN BASELINE</div>
+      <span class="step-subtitle">CLEAN CONTROL METRICS</span>
+    </div>
+    <div class="step">
+      <div class="step-title">TOGGLE CHAOS</div>
+      <span class="step-subtitle">500S · 429S · LATENCY · BAD JSON</span>
+    </div>
+    <div class="step">
+      <div class="step-title">ANALYZE DATA</div>
+      <span class="step-subtitle">TRACE + SCORE + ONE-CLICK FORK</span>
+    </div>
+  </div>
+
+  <!-- Main Configuration Grid -->
+  <div class="main-grid">
+    <!-- Target Selection Card -->
+    <div class="card">
+      <h3>TARGET SELECT</h3>
+      <div class="scenario-selection">
+        <div class="form-group">
+          <label class="scenario-option">
+            <input type="radio" name="scenario" value="fetch" checked> 
+            <span class="scenario-icon">🌐</span>
+            <span class="scenario-text">WEB SCRAPING PROTOCOL</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="scenario-option">
+            <input type="radio" name="scenario" value="rag"> 
+            <span class="scenario-icon">📚</span>
+            <span class="scenario-text">DOCUMENT Q&A SYSTEM</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="scenario-option">
+            <input type="radio" name="scenario" value="json"> 
+            <span class="scenario-icon">🔧</span>
+            <span class="scenario-text">API PROCESSING UNIT</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Failure Matrix Card -->
+    <div class="card">
+      <h3>FAILURE MATRIX</h3>
+      <div class="form-group">
+        <label>NETWORK LATENCY (MS)</label>
+        <input type="number" id="latencyMs" value="2000" min="0">
+      </div>
+      <div class="form-group">
+        <label>LATENCY RATE (%)</label>
+        <input type="number" id="latencyRate" value="20" min="0" max="100">
+      </div>
+      <div class="form-group">
+        <label>ERROR RATE (%)</label>
+        <input type="number" id="http500Rate" value="10" min="0" max="100">
+      </div>
+      <div class="form-group">
+        <label>RATE LIMITING (%)</label>
+        <input type="number" id="rate429" value="10" min="0" max="100">
+      </div>
+      <div class="form-group">
+        <label>MALFORMED RESPONSE (%)</label>
+        <input type="number" id="malformedRate" value="15" min="0" max="100">
+      </div>
+    </div>
+
+    <!-- Recovery Unit Card -->
+    <div class="card">
+      <h3>RECOVERY UNIT</h3>
+      <div class="checkbox-group">
+        <input type="checkbox" id="tripwireOn" checked>
+        <label for="tripwireOn">SMART RECOVERY ACTIVE</label>
+      </div>
+      <div class="form-group">
+        <label>MAX RETRIES</label>
+        <input type="number" id="maxRetries" value="3" min="0">
+      </div>
+      <div class="form-group">
+        <label>BACKOFF BASE (MS)</label>
+        <input type="number" id="backoffBase" value="250" min="0">
+      </div>
+      <div class="form-group">
+        <label>BACKOFF FACTOR</label>
+        <input type="number" id="backoffFactor" value="2.0" step="0.1" min="1">
+      </div>
+      <div class="form-group">
+        <label>JITTER (0-1)</label>
+        <input type="number" id="jitter" value="0.2" step="0.05" min="0" max="1">
+      </div>
+    </div>
+  </div>
+
+  <!-- Wizard Component -->
+  <div id="wizard" class="wizard hidden">
+    <div class="wizard-header">
+      <h2>TEST EXECUTION WIZARD</h2>
+      <button class="btn-close" onclick="wizard.hide()">×</button>
+    </div>
+    <div class="wizard-content">
+      <div class="wizard-steps">
+        <div class="wizard-step active" data-step="1">CONFIGURE</div>
+        <div class="wizard-step" data-step="2">BASELINE</div>
+        <div class="wizard-step" data-step="3">CHAOS</div>
+        <div class="wizard-step" data-step="4">RESULTS</div>
+      </div>
+      <div class="wizard-body" id="wizardBody">
+        <!-- Dynamic content will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet Focus -->
+  <div class="bottom-sheet">
+    <!-- Test Controls -->
+    <div class="test-controls">
+      <label>SEED:</label>
+      <input type="text" id="seed" value="1337" placeholder="TEST SEED">
+      <label class="randomize-label">
+        <input type="checkbox" id="surprise"> 🎲 RANDOMIZE
+      </label>
+      <button class="btn-secondary" id="btnReplay">↻ REPLAY</button>
+      <button class="btn-secondary" id="btnPermalink">🔗 SHARE</button>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="btn-group">
+      <button class="btn-primary" id="btnBaseline">▶️ RUN BASELINE</button>
+      <button class="btn-danger" id="btnChaos">⚡ RUN CHAOS</button>
+      <button class="btn-secondary" id="btnWizard">🧙 WIZARD</button>
+      <button class="btn-secondary" id="btnExport">📊 EXPORT REPORT</button>
+    </div>
+
+    <!-- Live Results -->
+    <div class="results-panel" id="resultsPanel">
+      <div class="metric-card">
+        <h4>BASELINE</h4>
+        <div class="metric-value" id="baselineScore">—</div>
+        <div class="metric-label">SCORE</div>
+      </div>
+      <div class="metric-card">
+        <h4>CHAOS</h4>
+        <div class="metric-value" id="chaosScore">—</div>
+        <div class="metric-label">SCORE</div>
+      </div>
+      <div class="metric-card">
+        <h4>DELTA</h4>
+        <div class="metric-value" id="deltaScore">—</div>
+        <div class="metric-label">Δ SCORE</div>
+      </div>
+    </div>
+
+    <!-- View Controls -->
+    <div class="view-toggles">
+      <button class="view-toggle active" data-view="table">📊 TABLE</button>
+      <button class="view-toggle" data-view="json">🔧 JSON</button>
+      <button class="view-toggle" data-view="graph">📈 GRAPH</button>
+      <button class="btn-secondary" id="btnDownload">💾 DOWNLOAD</button>
+      <button class="btn-secondary" id="btnCopy">📋 COPY</button>
+    </div>
+
+    <!-- Results Display Area -->
+    <div id="resultsDisplay" class="results-display">
+      <!-- Trace Table -->
+      <div id="tableView" class="view-content active">
+        <table class="trace-table">
+          <thead>
+            <tr>
+              <th>STEP</th>
+              <th>TOOL</th>
+              <th>FAULT</th>
+              <th>ACTION</th>
+              <th>DURATION</th>
+              <th>RESULT</th>
+            </tr>
+          </thead>
+          <tbody id="traceTableBody">
+            <!-- Dynamic content will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- JSON View -->
+      <div id="jsonView" class="view-content">
+        <pre id="jsonDisplay" class="json-display"></pre>
+      </div>
+
+      <!-- Graph View -->
+      <div id="graphView" class="view-content">
+        <div id="asciiGraph" class="ascii-graph"></div>
+      </div>
+    </div>
+
+    <!-- Enhanced Evaluation Runner -->
+    <div class="eval-section" id="evalSection">
+      <h3>EVALUATION SUITE</h3>
+      <div class="eval-controls">
+        <select id="evalSuiteSelect">
+          <option value="reliability_core">RELIABILITY CORE</option>
+          <option value="rag_injection">RAG INJECTION</option>
+          <option value="rate_limit_backoff">RATE LIMIT BACKOFF</option>
+          <option value="custom">UPLOAD CUSTOM...</option>
+        </select>
+        <label class="eval-option">
+          <input type="checkbox" id="evalBaseline"> Include Baseline
+        </label>
+        <label class="eval-option">
+          <input type="checkbox" id="evalStream"> Real-time Stream
+        </label>
+        <button class="btn-primary" id="btnRunEval">RUN SUITE</button>
+        <button class="btn-secondary" id="btnBatchEval">BATCH RUN</button>
+        <button class="btn-secondary" id="btnExportEval">EXPORT</button>
+        <button class="btn-secondary" id="btnCompareEval">COMPARE</button>
+      </div>
+      <div class="eval-progress" id="evalProgress" style="display: none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="evalProgressFill"></div>
+          <span class="progress-text" id="evalProgressText">0%</span>
+        </div>
+        <div class="eval-status" id="evalStatus">Initializing...</div>
+      </div>
+      <div class="eval-output" id="evalOutput"></div>
+      <div class="eval-history" id="evalHistory" style="display: none;">
+        <h4>Recent Runs</h4>
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Run Status Toast -->
+  <div id="runStatus" class="toast hidden">
+    <div class="toast-inner">
+      <div class="toast-title" id="runTitle">Running…</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+        <span class="progress-text" id="progressText">0%</span>
+      </div>
+      <div class="toast-msg" id="runMsg">Starting scenario…</div>
+    </div>
+  </div>
+
+  <!-- Chaos Theatre -->
+  <div id="chaosTheatre" class="chaos-theatre hidden">
+    <div class="theatre-header">
+      <h4>CHAOS VISUALIZATION</h4>
+      <button class="btn-close" onclick="chaosTheatre.hide()">×</button>
+    </div>
+    <pre id="stage" class="ascii-stage"></pre>
+    <div class="theatre-legend">
+      LEGEND: ● packet · ☁500 · ⛔429 · ⏳ latency · ▢→◇ malformed · ⊘ tool · 💣 ctx · ✓ recovered
+    </div>
+  </div>
+
+  <!-- Scripts - Enhanced Integration -->
+  <script src="/src/core/evals.js"></script>
+  <script src="/src/core/evals_enhanced.js"></script>
+  <script src="/src/integrations/websocket_integration.js"></script>
+  <script src="/src/core/data_schemas.js"></script>
+  
+  <!-- Core Components -->
+  <script src="/components/data-collector.js"></script>
+  <script src="/components/wizard.js"></script>
+  <script src="/components/chaos-config.js"></script>
+  <script src="/components/evaluation-runner.js"></script>
+  <script src="/components/evaluation-runner-enhanced.js"></script>
+  <script src="/components/results-dashboard.js"></script>
+  
+  <!-- Main Application -->
+  <script src="/src/core/app_new.js"></script>
+  
+  <!-- Enhanced Integration Script -->
+  <script>
+    // Enhanced initialization with integration validation
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🚀 Initializing Phase 4 Complete Integration...');
+      
+      // Validate all components are loaded
+      const components = {
+        DataCollector: window.DataCollector,
+        AnalyticsEngine: window.AnalyticsEngine,
+        dataCollector: window.dataCollector,
+        evaluationRunner: window.evaluationRunner,
+        resultsDashboard: window.resultsDashboard,
+        chaosLabApp: window.chaosLabApp,
+        wizard: window.wizard,
+        chaosConfig: window.chaosConfig
+      };
+      
+      const loadedComponents = Object.entries(components)
+        .filter(([name, component]) => component !== undefined);
+      
+      const missingComponents = Object.entries(components)
+        .filter(([name, component]) => component === undefined)
+        .map(([name]) => name);
+      
+      console.log(`✅ Loaded components: ${loadedComponents.map(([name]) => name).join(', ')}`);
+      
+      if (missingComponents.length > 0) {
+        console.warn(`⚠️ Missing components: ${missingComponents.join(', ')}`);
+      }
+      
+      // Setup enhanced integration
+      setTimeout(() => {
+        if (window.dataCollector && window.evaluationRunner) {
+          // Verify enhanced evaluation runner is active
+          if (window.evaluationRunner.dataCollector) {
+            console.log('✅ Enhanced Evaluation Runner active with DataCollector integration');
+          } else {
+            console.warn('⚠️ Standard Evaluation Runner active - enhanced features may be limited');
+          }
+          
+          // Setup integration event handlers
+          window.dataCollector.subscribe((event) => {
+            if (event.type === 'session_completed') {
+              console.log(`📊 Session completed: ${event.data.sessionId}`);
+              if (event.data.insights) {
+                console.log(`💡 Generated ${event.data.insights.length} insights`);
+              }
+            }
+          });
+          
+          console.log('🎯 Phase 4 Complete Integration initialized successfully');
+          console.log('📈 Real-time analytics and data collection pipeline active');
+          console.log('🧪 Enhanced evaluation system with batch processing ready');
+          console.log('📊 Multi-format export and ASCII visualization enabled');
+        }
+      }, 2000);
+      
+      // Performance monitoring
+      if (performance.mark) {
+        performance.mark('chaos-lab-ready');
+        if (performance.measure && performance.getEntriesByName) {
+          setTimeout(() => {
+            performance.measure('chaos-lab-init', 'navigationStart', 'chaos-lab-ready');
+            const measure = performance.getEntriesByName('chaos-lab-init')[0];
+            if (measure) {
+              console.log(`⚡ Initialization completed in ${measure.duration.toFixed(2)}ms`);
+            }
+          }, 100);
+        }
+      }
+    });
+  </script>
 </body>
 </html>

@@ -1,6 +1,49 @@
+// ===== Configuration Constants =====
+const CONFIG = {
+  // Score boundaries
+  MIN_SCORE: 0,
+  MAX_SCORE: 100,
+  
+  // HTTP status codes
+  HTTP_STATUS: {
+    SERVER_ERROR: 500,
+    TOO_MANY_REQUESTS: 429,
+    BAD_GATEWAY: 502
+  },
+  
+  // Score thresholds  
+  SCORE_THRESHOLDS: {
+    EXCELLENT: 90,
+    GOOD: 70,
+    FAIR: 50
+  },
+  
+  // Progress steps
+  PROGRESS_STEPS: {
+    START: 10,
+    NETWORK_FALLBACK: 25,
+    EXTRACT_STRUCTURE: 55,
+    SUMMARIZING: 70,
+    WRAP_UP: 85
+  },
+  
+  // Chaos configuration defaults
+  CHAOS_DEFAULTS: {
+    MAX_FAULTS: 3,
+    MAX_RUNTIME_SECONDS: 120,
+    BACKOFF_BASE_MS: 250,
+    BACKOFF_FACTOR: 2.0,
+    BACKOFF_JITTER: 0.2,
+    MAX_RETRIES: 3
+  },
+  
+  // MTTR normalization
+  MTTR_NORMALIZATION_SECONDS: 30
+};
+
 // ===== Theatre global =====
 let theatre = null;
-let THEATRE_DISABLED = true; // Phase 1: Flag to disable theatre temporarily - ENABLED by default for debugging
+let THEATRE_DISABLED = true; // Flag to disable theatre temporarily
 
 // ===== RNG & helpers =====
 function seeded(seed){let h=0;for(let i=0;i<seed.length;i++)h=(h<<5)-h+seed.charCodeAt(i)|0;let t=h>>>0;return()=>{t+=0x6D2B79F5;let x=Math.imul(t^(t>>>15),1|t);x^=x+Math.imul(x^(x>>>7),61|x);return((x^(x>>>14))>>>0)/4294967296;};}
@@ -19,7 +62,7 @@ function readMinScore(){
   const el = document.getElementById('minScore');
   if (!el) return 0;
   const v = Number(el.value || 0);
-  return Math.max(0, Math.min(100, v));
+  return Math.max(CONFIG.MIN_SCORE, Math.min(CONFIG.MAX_SCORE, v));
 }
 function updateGate(score){
   const min = readMinScore();
@@ -53,30 +96,28 @@ async function chaosFetch(target,seed,t,attempt=0){
   if(should(t.http500Rate,rand)){
     faultInjected="http_500";
     if(theatre) theatre.event('fault', {type:'500'});
-    return new Response(null,{status:500,headers:{'x-chaos-fault':faultInjected}});
+    return new Response(null,{status:CONFIG.HTTP_STATUS.SERVER_ERROR,headers:{'x-chaos-fault':faultInjected}});
   }
   if(should(t.rate429,rand)){
     faultInjected="rate_limit_429";
     if(theatre) theatre.event('fault', {type:'429'});
-    return new Response(null,{status:429,headers:{'x-chaos-fault':faultInjected}});
+    return new Response(null,{status:CONFIG.HTTP_STATUS.TOO_MANY_REQUESTS,headers:{'x-chaos-fault':faultInjected}});
   }
   try{
     const res=await fetch(target,{headers:{'user-agent':'ChaosLab/1.0'}});
     if(faultInjected)res.headers.set('x-chaos-fault',faultInjected);
     return res;
   }catch(e){
-    return new Response(String(e),{status:502});
+    return new Response(String(e),{status:CONFIG.HTTP_STATUS.BAD_GATEWAY});
   }
 }
 async function chaosJSON(target,seed,t,attempt=0){
-  console.log(`[DEBUG] chaosJSON() ENTRY - target: ${target}, seed: ${seed}, malformedRate: ${t.malformedRate}, attempt: ${attempt}`);
   
   const res=await chaosFetch(target,seed,t,attempt);
   let text=await res.text();
   let faultInjected=res.headers.get('x-chaos-fault');
   
   console.log('chaosJSON - malformedRate:', t.malformedRate, 'seed:', seed+":cjson:"+attempt);
-  console.log(`[DEBUG] chaosJSON() - should check result:`, should(t.malformedRate,seeded(seed+":cjson:"+attempt)));
   
   if(should(t.malformedRate,seeded(seed+":cjson:"+attempt))){
     console.log('Injecting malformed JSON fault!');
@@ -89,7 +130,6 @@ async function chaosJSON(target,seed,t,attempt=0){
   const newRes=new Response(text,{status:res.status,headers:{'content-type':'application/json'}});
   if(faultInjected)newRes.headers.set('x-chaos-fault',faultInjected);
   
-  console.log(`[DEBUG] chaosJSON() EXIT - status: ${newRes.status}, faultInjected: ${faultInjected}, textLength: ${text.length}`);
   return newRes;
 }
 function chaosRAGDoc(doc,seed,t){
@@ -170,13 +210,13 @@ function setBadge(score){
   b.textContent = `${validScore}%`;
   
   // Set dramatic styling based on score
-  if (validScore >= 90) {
+  if (validScore >= CONFIG.SCORE_THRESHOLDS.EXCELLENT) {
     b.classList.add('score-excellent');
     b.style.animation = 'pulse-glow 2s infinite';
-  } else if (validScore >= 70) {
+  } else if (validScore >= CONFIG.SCORE_THRESHOLDS.GOOD) {
     b.classList.add('score-good');
     b.style.animation = 'matrix-flicker 3s infinite';
-  } else if (validScore >= 50) {
+  } else if (validScore >= CONFIG.SCORE_THRESHOLDS.FAIR) {
     b.classList.add('score-poor');
     b.style.animation = 'danger-pulse 1.5s infinite';
   } else {
@@ -187,22 +227,22 @@ function setBadge(score){
 
 // ===== Presets =====
 async function runFetch(seed,chaos,t,tw,trace,progress){
-  progress(10,"Fetching page…");
+  progress(CONFIG.PROGRESS_STEPS.START,"Fetching page…");
   const url="https://httpbin.org/html"; const fb="data:text/html,<html><body><h1>Sample HTML</h1><p>This is fallback content for testing.</p></body></html>"; let i=1, t0=trace.start(), tool="web.fetch";
   let res;
   try {
     res = chaos? await chaosFetch(url,seed,t,0) : await fetch(url);
   } catch (e) {
     // Network error - use fallback immediately
-    progress(25,"Network error → fallback");
+    progress(CONFIG.PROGRESS_STEPS.NETWORK_FALLBACK,"Network error → fallback");
     if(theatre) theatre.event('fallback', {to:'cached'});
     if(theatre) theatre.event('recovered', {action:'fallback'});
     trace.end(i++,tool,t0,"recovered",{fault:"network_error",action:"fallback",note:"offline fallback"});
-    progress(55,"Extracting structure…");
+    progress(CONFIG.PROGRESS_STEPS.EXTRACT_STRUCTURE,"Extracting structure…");
     t0=trace.start(); trace.end(i++,"extract_structured",t0,"ok");
-    progress(70,"Summarizing…");
+    progress(CONFIG.PROGRESS_STEPS.SUMMARIZING,"Summarizing…");
     t0=trace.start(); trace.end(i++,"summarize",t0,"ok");
-    progress(85,"Wrapping up…");
+    progress(CONFIG.PROGRESS_STEPS.WRAP_UP,"Wrapping up…");
     return { html: fb.split(',')[1] };
   }
   
@@ -227,11 +267,11 @@ async function runFetch(seed,chaos,t,tw,trace,progress){
       if(theatre) theatre.event('fallback', {to:'cached'});
       if(theatre) theatre.event('recovered', {action:'fallback'});
       trace.end(i++,tool,t0,"recovered",{fault:faultType||String(res.status),action:"fallback",note:"cached html"}); 
-      progress(55,"Extracting structure…");
+      progress(CONFIG.PROGRESS_STEPS.EXTRACT_STRUCTURE,"Extracting structure…");
       t0=trace.start(); trace.end(i++,"extract_structured",t0,"ok");
-      progress(70,"Summarizing…");
+      progress(CONFIG.PROGRESS_STEPS.SUMMARIZING,"Summarizing…");
       t0=trace.start(); trace.end(i++,"summarize",t0,"ok");
-      progress(85,"Wrapping up…");
+      progress(CONFIG.PROGRESS_STEPS.WRAP_UP,"Wrapping up…");
       return { html: fb.split(',')[1] };
     }
   } else if (faultType) {
@@ -241,16 +281,15 @@ async function runFetch(seed,chaos,t,tw,trace,progress){
     trace.end(i++,tool,t0,"ok"); 
   }
   
-  progress(55,"Extracting structure…");
+  progress(CONFIG.PROGRESS_STEPS.EXTRACT_STRUCTURE,"Extracting structure…");
   t0=trace.start(); trace.end(i++,"extract_structured",t0,"ok");
-  progress(70,"Summarizing…");
+  progress(CONFIG.PROGRESS_STEPS.SUMMARIZING,"Summarizing…");
   t0=trace.start(); trace.end(i++,"summarize",t0,"ok");
-  progress(85,"Wrapping up…");
+  progress(CONFIG.PROGRESS_STEPS.WRAP_UP,"Wrapping up…");
   return { html: await res.text() };
 }
 
 async function runJSON(seed,chaos,t,tw,trace,progress){
-  console.log(`[DEBUG] runJSON() ENTRY - seed: ${seed}, chaos: ${chaos}, typeof runJSON: ${typeof runJSON}`);
   
   progress(10,"Fetching JSON…");
   const url="https://jsonplaceholder.typicode.com/users"; let i=1, t0=trace.start(), tool="web.fetch";
@@ -262,11 +301,11 @@ async function runJSON(seed,chaos,t,tw,trace,progress){
     text = await res.text();
   } catch (e) {
     // Network error - use fallback
-    progress(25,"Network error → fallback");
+    progress(CONFIG.PROGRESS_STEPS.NETWORK_FALLBACK,"Network error → fallback");
     trace.end(i++,tool,t0,"recovered",{fault:"network_error",action:"fallback",note:"offline fallback"});
     progress(70,"Formatting table…");
     t0=trace.start(); trace.end(i++,"format_table",t0,"ok");
-    progress(85,"Wrapping up…");
+    progress(CONFIG.PROGRESS_STEPS.WRAP_UP,"Wrapping up…");
     return { data: fallbackData };
   }
   
@@ -301,8 +340,7 @@ async function runJSON(seed,chaos,t,tw,trace,progress){
   }
   progress(70,"Formatting table…");
   t0=trace.start(); trace.end(i++,"format_table",t0,"ok");
-  progress(85,"Wrapping up…");
-  console.log(`[DEBUG] runJSON() EXIT - data length: ${data ? data.length : 'null'}`);
+  progress(CONFIG.PROGRESS_STEPS.WRAP_UP,"Wrapping up…");
   return { data };
 }
 
@@ -351,7 +389,7 @@ Exponential backoff with jitter helps prevent thundering herd problems by random
   progress(60,"Answering questions…");
   const qas=[{q:"What is MTTR?",a:/MTTR.+?recovery/i},{q:"Why backoff with jitter\\??",a:/jitter.+?retries/i}];
   for(const qa of qas){ t0=trace.start(); const ok=qa.a.test(finalDoc); trace.end(i++,"rag.answer",t0,ok?"ok":"failed",{note:qa.q}); }
-  progress(85,"Wrapping up…");
+  progress(CONFIG.PROGRESS_STEPS.WRAP_UP,"Wrapping up…");
   return { text: finalDoc };
 }
 
@@ -796,7 +834,6 @@ function buildPermalink(conf){
 }
 
 async function run(runChaos){
-  console.log(`[DEBUG] run() ENTRY - runChaos: ${runChaos}, typeof run: ${typeof run}, stack:`, new Error().stack.substring(0, 200));
   
   disableControls(true); showToast(); setProgress(3, runChaos? "Running with Chaos…" : "Running Baseline…");
   $("#runTitle").textContent = runChaos? "Running with Chaos" : "Running Baseline";
@@ -805,14 +842,11 @@ async function run(runChaos){
   const t=readToggles(), tw=readTripwire(); const trace=new Trace(); const scen=scenario();
   const progress=(pct,msg)=>setProgress(pct,msg);
   
-  console.log(`[DEBUG] run() - seed: ${seed}, scenario: ${scen}, chaos: ${runChaos}, THEATRE_DISABLED: ${THEATRE_DISABLED}`);
 
   // Start theatre visualization - DISABLED in Phase 1
   if (theatre && runChaos && !THEATRE_DISABLED) {
-    console.log(`[DEBUG] run() - starting theatre`);
     theatre.start(seed, scen);
   } else {
-    console.log(`[DEBUG] run() - theatre disabled or not available`);
   }
 
   try {
@@ -833,10 +867,8 @@ async function run(runChaos){
 
     // Finish theatre visualization - DISABLED in Phase 1
     if (theatre && runChaos && !THEATRE_DISABLED) {
-      console.log(`[DEBUG] run() - finishing theatre`);
       theatre.finish(metrics.score);
     } else {
-      console.log(`[DEBUG] run() - theatre finish disabled or not available`);
     }
 
     if (!runChaos){
@@ -864,7 +896,6 @@ async function run(runChaos){
     }
 
     setProgress(100,"Completed");
-    console.log(`[DEBUG] run() - successfully completed, score: ${metrics.score}`);
   } catch (e){
     setProgress(100,"Run failed"); 
     console.error(`[DEBUG] run() - ERROR:`, e);
@@ -872,7 +903,6 @@ async function run(runChaos){
   } finally {
     setTimeout(()=>hideToast(), 800);
     disableControls(false);
-    console.log(`[DEBUG] run() EXIT`);
   }
 
   const yaml=toChaosYAML(seed,t,tw.loopN); window.__LAST__={rows:trace.rows,metrics:computeScore(trace.rows,{mttrTarget:30}),yaml,scen:scen,seed,tog:t,tw};
@@ -935,11 +965,9 @@ async function boot(){
   
   // Initialize theatre - DISABLED in Phase 1
   if (typeof ChaosTheatre !== 'undefined' && !THEATRE_DISABLED) {
-    console.log(`[DEBUG] boot() - initializing theatre`);
     theatre = new ChaosTheatre();
     window.chaosTheatre = theatre; // For eval support
   } else {
-    console.log(`[DEBUG] boot() - theatre initialization disabled or ChaosTheatre unavailable`);
     THEATRE_DISABLED = true; // Force disable if ChaosTheatre is not available
   }
   
@@ -1747,8 +1775,6 @@ function setupTraceViewSwitching() {
 
 // B) Programmatic runner entry points
 window.runScenario = async function(scenario, seed, chaosOn) {
-  console.log(`[DEBUG] window.runScenario() ENTRY - scenario: ${scenario}, seed: ${seed}, chaosOn: ${chaosOn}`);
-  console.log(`[DEBUG] window.runScenario() - functions available: runFetch=${typeof runFetch}, runJSON=${typeof runJSON}, runRAG=${typeof runRAG}`);
   
   const t = readToggles();
   const tw = readTripwire();
@@ -1757,15 +1783,12 @@ window.runScenario = async function(scenario, seed, chaosOn) {
   
   // Start theatre if chaos is on - DISABLED in Phase 1
   if (theatre && chaosOn && !THEATRE_DISABLED) {
-    console.log(`[DEBUG] window.runScenario() - starting theatre`);
     theatre.start(seed, scenario);
   } else {
-    console.log(`[DEBUG] window.runScenario() - theatre disabled or not available`);
   }
   
   let result;
   try {
-    console.log(`[DEBUG] window.runScenario() - about to call scenario function for ${scenario}`);
     if (scenario === "fetch") {
       result = await runFetch(seed, chaosOn, t, tw, trace, progress);
     } else if (scenario === "json") {
@@ -1773,7 +1796,6 @@ window.runScenario = async function(scenario, seed, chaosOn) {
     } else if (scenario === "rag") {
       result = await runRAG(seed, chaosOn, t, tw, trace, progress);
     }
-    console.log(`[DEBUG] window.runScenario() - scenario function completed`);
     
     const metrics = computeScore(trace.rows, {mttrTarget: 30});
     metrics.seed = seed;
@@ -1781,21 +1803,17 @@ window.runScenario = async function(scenario, seed, chaosOn) {
     
     // Finish theatre if chaos is on - DISABLED in Phase 1
     if (theatre && chaosOn && !THEATRE_DISABLED) {
-      console.log(`[DEBUG] window.runScenario() - finishing theatre`);
       theatre.finish(metrics.score);
     } else {
-      console.log(`[DEBUG] window.runScenario() - theatre finish disabled or not available`);
     }
     
     // Get events from theatre if available
     const events = theatre ? theatre.getEventLog() : [];
     
-    console.log(`[DEBUG] window.runScenario() EXIT - success, score: ${metrics.score}`);
     return { metrics, events, trace: trace.rows };
   } catch (error) {
     console.error(`[DEBUG] window.runScenario() - ERROR:`, error);
     console.error(`[DEBUG] window.runScenario() - ERROR stack:`, error.stack);
-    console.log(`[DEBUG] window.runScenario() EXIT - error`);
     return { metrics: null, events: [], error: error.message };
   }
 };
@@ -1863,11 +1881,10 @@ function recordEvent(type, data) {
   }
 }
 
-// Hook into existing controls to record events - FIXED for Phase 1 to prevent infinite recursion
+// Hook into existing controls to record events - prevent infinite recursion
 const originalRun = run;
-let runInProgress = false; // Phase 1: Prevent infinite recursion
+let runInProgress = false; // Prevent infinite recursion
 run = async function(runChaos) {
-  console.log(`[DEBUG] wrapped run() ENTRY - runInProgress: ${runInProgress}, runChaos: ${runChaos}`);
   
   if (runInProgress) {
     console.error(`[DEBUG] wrapped run() - RECURSION DETECTED! Calling originalRun directly`);
@@ -1878,14 +1895,12 @@ run = async function(runChaos) {
   try {
     recordEvent('run', { chaos: runChaos });
     const result = await originalRun(runChaos);
-    console.log(`[DEBUG] wrapped run() - completed successfully`);
     return result;
   } catch (error) {
     console.error(`[DEBUG] wrapped run() - ERROR:`, error);
     throw error;
   } finally {
     runInProgress = false;
-    console.log(`[DEBUG] wrapped run() EXIT`);
   }
 };
 

@@ -1,4 +1,22 @@
 // Wizard Component - Step-by-step workflow management
+
+// Helper function to safely set HTML content
+function safeSetHTML(element, htmlString) {
+  // Clear existing content
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
+  
+  // Use DOMParser for complex HTML templates
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlString, 'text/html');
+  
+  // Move nodes from parsed document to target element
+  while (doc.body.firstChild) {
+    element.appendChild(doc.body.firstChild);
+  }
+}
+
 class ChaosWizard {
   constructor() {
     this.currentStep = 1;
@@ -74,7 +92,7 @@ class ChaosWizard {
   }
 
   renderConfigStep() {
-    this.bodyElement.innerHTML = `
+    safeSetHTML(this.bodyElement, `
       <h3>CONFIGURATION SETUP</h3>
       <p>Configure your chaos testing parameters:</p>
       
@@ -111,11 +129,11 @@ class ChaosWizard {
         <button class="btn-secondary" onclick="wizard.hide()">CANCEL</button>
         <button class="btn-primary" onclick="wizard.nextStep()">NEXT →</button>
       </div>
-    `;
+    `);
   }
 
   renderBaselineStep() {
-    this.bodyElement.innerHTML = `
+    safeSetHTML(this.bodyElement, `
       <h3>BASELINE EXECUTION</h3>
       <p>Running baseline test to establish normal performance...</p>
       
@@ -142,11 +160,11 @@ class ChaosWizard {
         <button class="btn-primary" id="wizardBaselineBtn" onclick="wizard.runBaseline()">▶️ RUN BASELINE</button>
         <button class="btn-primary hidden" id="wizardBaselineNext" onclick="wizard.nextStep()">NEXT →</button>
       </div>
-    `;
+    `);
   }
 
   renderChaosStep() {
-    this.bodyElement.innerHTML = `
+    safeSetHTML(this.bodyElement, `
       <h3>CHAOS EXECUTION</h3>
       <p>Running chaos test with failure injection...</p>
       
@@ -173,7 +191,7 @@ class ChaosWizard {
         <button class="btn-danger" id="wizardChaosBtn" onclick="wizard.runChaos()">⚡ RUN CHAOS</button>
         <button class="btn-primary hidden" id="wizardChaosNext" onclick="wizard.nextStep()">NEXT →</button>
       </div>
-    `;
+    `);
   }
 
   renderResultsStep() {
@@ -182,7 +200,7 @@ class ChaosWizard {
     const delta = chaosScore - baselineScore;
     const deltaClass = delta >= 0 ? 'status-success' : 'status-error';
     
-    this.bodyElement.innerHTML = `
+    safeSetHTML(this.bodyElement, `
       <h3>RESULTS ANALYSIS</h3>
       <p>Test execution complete. Analysis and recommendations:</p>
       
@@ -218,7 +236,7 @@ class ChaosWizard {
         <button class="btn-primary" onclick="wizard.exportResults()">📊 EXPORT REPORT</button>
         <button class="btn-secondary" onclick="wizard.hide()">CLOSE</button>
       </div>
-    `;
+    `);
   }
 
   generateRecommendations(baseline, chaos) {
@@ -301,7 +319,10 @@ class ChaosWizard {
       
       const logLine = document.createElement('div');
       logLine.className = 'log-line';
-      logLine.innerHTML = `<span class="status-success">✅ BASELINE COMPLETE - SCORE: ${score}</span>`;
+      const statusSpan = document.createElement('span');
+      statusSpan.className = 'status-success';
+      statusSpan.textContent = `✅ BASELINE COMPLETE - SCORE: ${score}`;
+      logLine.appendChild(statusSpan);
       log.appendChild(logLine);
       
       btn.classList.add('hidden');
@@ -311,7 +332,10 @@ class ChaosWizard {
       console.error('Wizard baseline error:', error);
       const logLine = document.createElement('div');
       logLine.className = 'log-line';
-      logLine.innerHTML = `<span class="status-error">❌ BASELINE FAILED: ${error.message}</span>`;
+      const statusSpan = document.createElement('span');
+      statusSpan.className = 'status-error';
+      statusSpan.textContent = `❌ BASELINE FAILED: ${error.message}`;
+      logLine.appendChild(statusSpan);
       log.appendChild(logLine);
       
       btn.disabled = false;
@@ -369,7 +393,10 @@ class ChaosWizard {
       
       const logLine = document.createElement('div');
       logLine.className = 'log-line';
-      logLine.innerHTML = `<span class="status-success">✅ CHAOS COMPLETE - SCORE: ${score}</span>`;
+      const statusSpan = document.createElement('span');
+      statusSpan.className = 'status-success';
+      statusSpan.textContent = `✅ CHAOS COMPLETE - SCORE: ${score}`;
+      logLine.appendChild(statusSpan);
       log.appendChild(logLine);
       
       btn.classList.add('hidden');
@@ -379,7 +406,10 @@ class ChaosWizard {
       console.error('Wizard chaos error:', error);
       const logLine = document.createElement('div');
       logLine.className = 'log-line';
-      logLine.innerHTML = `<span class="status-error">❌ CHAOS FAILED: ${error.message}</span>`;
+      const statusSpan = document.createElement('span');
+      statusSpan.className = 'status-error';
+      statusSpan.textContent = `❌ CHAOS FAILED: ${error.message}`;
+      logLine.appendChild(statusSpan);
       log.appendChild(logLine);
       
       btn.disabled = false;

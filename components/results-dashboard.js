@@ -109,7 +109,10 @@ class ResultsDashboard {
     const tbody = document.getElementById('traceTableBody');
     if (!tbody) return;
 
-    tbody.innerHTML = '';
+    // Clear existing content safely
+    while (tbody.firstChild) {
+      tbody.removeChild(tbody.firstChild);
+    }
 
     // Combine traces from both baseline and chaos runs
     const traces = [];
@@ -135,7 +138,13 @@ class ResultsDashboard {
     }
 
     if (traces.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="no-data">NO TEST DATA AVAILABLE</td></tr>';
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.setAttribute('colspan', '6');
+      td.className = 'no-data';
+      td.textContent = 'NO TEST DATA AVAILABLE';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
       return;
     }
 
@@ -148,14 +157,36 @@ class ResultsDashboard {
       const duration = row.duration_ms ? `${row.duration_ms}MS` : '—';
       const status = this.formatStatus(row.status, row.fault);
 
-      tr.innerHTML = `
-        <td>${row.step} <span class="run-type">[${row.runType}]</span></td>
-        <td>${row.tool?.toUpperCase() || 'UNKNOWN'}</td>
-        <td class="fault-cell">${fault.toUpperCase()}</td>
-        <td>${action.toUpperCase()}</td>
-        <td>${duration}</td>
-        <td>${status}</td>
-      `;
+      // Create cells safely
+      const stepCell = document.createElement('td');
+      const stepSpan = document.createElement('span');
+      stepSpan.className = 'run-type';
+      stepSpan.textContent = `[${row.runType}]`;
+      stepCell.textContent = `${row.step} `;
+      stepCell.appendChild(stepSpan);
+
+      const toolCell = document.createElement('td');
+      toolCell.textContent = row.tool?.toUpperCase() || 'UNKNOWN';
+
+      const faultCell = document.createElement('td');
+      faultCell.className = 'fault-cell';
+      faultCell.textContent = fault.toUpperCase();
+
+      const actionCell = document.createElement('td');
+      actionCell.textContent = action.toUpperCase();
+
+      const durationCell = document.createElement('td');
+      durationCell.textContent = duration;
+
+      const statusCell = document.createElement('td');
+      statusCell.textContent = status;
+
+      tr.appendChild(stepCell);
+      tr.appendChild(toolCell);
+      tr.appendChild(faultCell);
+      tr.appendChild(actionCell);
+      tr.appendChild(durationCell);
+      tr.appendChild(statusCell);
 
       tbody.appendChild(tr);
     });
